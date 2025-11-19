@@ -131,7 +131,7 @@ export default function Chat() {
 
       console.log('Sending payload to n8n:', payload);
 
-      const response = await fetch('https://ftlteam4160.app.n8n.cloud/webhook/medexplain-query', {
+      const response = await fetch('https://ftlteam4160.app.n8n.cloud/webhook-test/medexplain-query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
