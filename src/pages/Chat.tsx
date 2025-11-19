@@ -129,7 +129,7 @@ export default function Chat() {
         submitted_at: new Date().toISOString()
       };
 
-      const response = await fetch('YOUR_N8N_WEBHOOK_URL_HERE', {
+      const response = await fetch('https://ftlteam4160.app.n8n.cloud/webhook/medexplain-query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
