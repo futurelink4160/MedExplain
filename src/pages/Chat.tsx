@@ -129,6 +129,8 @@ export default function Chat() {
         submitted_at: new Date().toISOString()
       };
 
+      console.log('Sending payload to n8n:', payload);
+
       const response = await fetch('https://ftlteam4160.app.n8n.cloud/webhook/medexplain-query', {
         method: 'POST',
         headers: {
@@ -137,9 +139,17 @@ export default function Chat() {
         body: JSON.stringify(payload),
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (!response.ok) {
-        throw new Error('Failed to submit form');
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Failed to submit form: ${response.status} - ${errorText}`);
       }
+
+      const responseData = await response.json();
+      console.log('Success response:', responseData);
 
       setSuccess(true);
       setAge('');
