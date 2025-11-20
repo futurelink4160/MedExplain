@@ -8,6 +8,7 @@ import Chat from './pages/Chat';
 import Evidence from './pages/Evidence';
 import Cases from './pages/Cases';
 import Admin from './pages/Admin';
+import Results from './pages/Results';
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
@@ -60,6 +61,14 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <Admin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results"
+            element={
+              <ProtectedRoute>
+                <Results />
               </ProtectedRoute>
             }
           />

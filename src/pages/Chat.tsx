@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
 import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus } from 'lucide-react';
 
 export default function Chat() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [age, setAge] = useState('');
   const [role, setRole] = useState('');
   const [medication, setMedication] = useState('');
@@ -151,20 +153,7 @@ export default function Chat() {
       const responseData = await response.json();
       console.log('Success response:', responseData);
 
-      setSuccess(true);
-      setAge('');
-      setRole('');
-      setMedication('');
-      setQuestion('');
-      setSymptoms('');
-      setDuration('');
-      setOtherMeds('');
-      setFiles(null);
-
-      const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-      if (fileInput) fileInput.value = '';
-
-      setTimeout(() => setSuccess(false), 5000);
+      navigate('/results', { state: { responseData } });
 
     } catch (err: any) {
       setError(err.message || 'An error occurred while submitting the form');
