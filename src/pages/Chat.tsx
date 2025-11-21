@@ -1,12 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
+import ResultsDisplay from '../components/ResultsDisplay';
 import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus } from 'lucide-react';
+
+interface PgxResults {
+  drug_labels: string[];
+  genes: string[];
+  variants: string[];
+  phenotypes: string[];
+}
+
+interface ResponseData {
+  response_type: string;
+  emergency_detected: boolean;
+  urgency_level: string;
+  rag_results: string;
+  pgx_results: PgxResults;
+  final_answer_markdown: string;
+}
 
 export default function Chat() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [age, setAge] = useState('');
   const [role, setRole] = useState('');
   const [medication, setMedication] = useState('');
@@ -20,7 +35,9 @@ export default function Chat() {
   const [success, setSuccess] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [activeField, setActiveField] = useState<string | null>(null);
+  const [responseData, setResponseData] = useState<ResponseData | null>(null);
   const recognitionRef = useRef<any>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -94,6 +111,25 @@ export default function Chat() {
     }
   }
 
+  function handleNewQuery() {
+    setResponseData(null);
+    setAge('');
+    setRole('');
+    setMedication('');
+    setQuestion('');
+    setSymptoms('');
+    setDuration('');
+    setOtherMeds('');
+    setFiles(null);
+    setError('');
+    setSuccess(false);
+
+    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -150,10 +186,15 @@ export default function Chat() {
         throw new Error(`Failed to submit form: ${response.status} - ${errorText}`);
       }
 
-      const responseData = await response.json();
-      console.log('Success response:', responseData);
+      const data = await response.json();
+      console.log('Success response:', data);
 
-      navigate('/results', { state: { responseData } });
+      setResponseData(data);
+      setSuccess(true);
+
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
 
     } catch (err: any) {
       setError(err.message || 'An error occurred while submitting the form');
@@ -510,6 +551,12 @@ export default function Chat() {
             </div>
           </div>
         </div>
+
+        {responseData && (
+          <div ref={resultsRef} className="mt-8">
+            <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+          </div>
+        )}
       </div>
     </Layout>
   );
