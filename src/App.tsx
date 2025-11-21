@@ -9,6 +9,7 @@ import Evidence from './pages/Evidence';
 import Cases from './pages/Cases';
 import Admin from './pages/Admin';
 import Results from './pages/Results';
+import ResultsDemo from './pages/ResultsDemo';
 
 function HomeRedirect() {
   const { user, loading } = useAuth();
@@ -71,6 +72,10 @@ function App() {
                 <Results />
               </ProtectedRoute>
             }
+          />
+          <Route
+            path="/results-demo"
+            element={<ResultsDemo />}
           />
         </Routes>
       </AuthProvider>
