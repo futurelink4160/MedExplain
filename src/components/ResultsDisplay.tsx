@@ -55,11 +55,22 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
     setShowEmailModal(false);
   };
 
-  const extractSection = (markdown: string, title: string): string => {
+  const extractSection = (markdown: string | undefined, title: string): string => {
+    if (!markdown) return '';
     const regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|$)`, 'i');
     const match = markdown.match(regex);
     return match ? match[1].trim() : '';
   };
+
+  if (!data || !data.final_answer_markdown) {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 p-8">
+        <div className="text-center">
+          <p className="text-gray-600">No results data available.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (data.emergency_detected) {
     return (

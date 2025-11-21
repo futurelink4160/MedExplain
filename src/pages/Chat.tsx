@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
 import ResultsDisplay from '../components/ResultsDisplay';
-import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus } from 'lucide-react';
+import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus, TestTube } from 'lucide-react';
+import { mockResponseData } from '../test-data';
 
 interface PgxResults {
   drug_labels: string[];
@@ -128,6 +129,15 @@ export default function Chat() {
     if (fileInput) fileInput.value = '';
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleTestWithMockData() {
+    setResponseData(mockResponseData as ResponseData);
+    setSuccess(true);
+
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -533,6 +543,15 @@ export default function Chat() {
                       <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                     </>
                   )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleTestWithMockData}
+                  className="w-full mt-3 bg-gradient-to-r from-green-600 to-teal-600 text-white py-2 px-4 rounded-xl font-medium text-sm shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-300 transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+                >
+                  <TestTube className="w-4 h-4" />
+                  <span>Test with Mock Data</span>
                 </button>
               </form>
 
