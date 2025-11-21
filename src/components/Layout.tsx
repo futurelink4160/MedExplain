@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, BookmarkCheck, Shield } from 'lucide-react';
+import { LogOut, User, BookmarkCheck, Shield, Home } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -32,6 +32,13 @@ export default function Layout({ children }: LayoutProps) {
             </Link>
 
             <nav className="hidden md:flex items-center space-x-6">
+              <Link
+                to="/"
+                className="text-gray-700 hover:text-purple-600 font-medium transition flex items-center space-x-1"
+              >
+                <Home className="w-4 h-4" />
+                <span>Home</span>
+              </Link>
               <Link
                 to="/chat"
                 className="text-gray-700 hover:text-purple-600 font-medium transition"
