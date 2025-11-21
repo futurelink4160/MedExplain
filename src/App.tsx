@@ -11,7 +11,7 @@ import Admin from './pages/Admin';
 import Results from './pages/Results';
 import ResultsDemo from './pages/ResultsDemo';
 
-function HomeRedirect() {
+function DashboardRedirect() {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -22,7 +22,7 @@ function HomeRedirect() {
     );
   }
 
-  return user ? <Navigate to="/chat" replace /> : <Home />;
+  return user ? <Navigate to="/chat" replace /> : <Navigate to="/home" replace />;
 }
 
 function App() {
@@ -30,7 +30,8 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<HomeRedirect />} />
+          <Route path="/" element={<DashboardRedirect />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route

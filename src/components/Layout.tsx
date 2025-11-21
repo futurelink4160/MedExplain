@@ -13,7 +13,12 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/home') {
+      return location.pathname === '/home' || location.pathname === '/';
+    }
+    return location.pathname === path;
+  };
 
   async function handleSignOut() {
     await signOut();
@@ -25,7 +30,7 @@ export default function Layout({ children }: LayoutProps) {
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/home" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-lg flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-lg">M</span>
               </div>
@@ -37,9 +42,9 @@ export default function Layout({ children }: LayoutProps) {
 {user && (
               <nav className="hidden md:flex items-center space-x-6">
                 <Link
-                  to="/"
+                  to="/home"
                   className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
-                    isActive('/')
+                    isActive('/home')
                       ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
                       : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
                   }`}
