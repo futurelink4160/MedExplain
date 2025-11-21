@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, BookmarkCheck, Shield, Home } from 'lucide-react';
+import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, FolderOpen } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,7 +10,10 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
+
+  const isActive = (path: string) => location.pathname === path;
 
   async function handleSignOut() {
     await signOut();
@@ -22,7 +25,7 @@ export default function Layout({ children }: LayoutProps) {
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/chat" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-lg flex items-center justify-center shadow-sm">
                 <span className="text-white font-bold text-lg">M</span>
               </div>
@@ -34,33 +37,56 @@ export default function Layout({ children }: LayoutProps) {
             <nav className="hidden md:flex items-center space-x-6">
               <Link
                 to="/"
-                className="text-gray-700 hover:text-purple-600 font-medium transition flex items-center space-x-1"
+                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  isActive('/')
+                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                }`}
               >
                 <Home className="w-4 h-4" />
                 <span>Home</span>
               </Link>
               <Link
                 to="/chat"
-                className="text-gray-700 hover:text-purple-600 font-medium transition"
+                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  isActive('/chat')
+                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                }`}
               >
-                Chat
+                <MessageSquare className="w-4 h-4" />
+                <span>Chat</span>
               </Link>
               <Link
                 to="/evidence"
-                className="text-gray-700 hover:text-purple-600 font-medium transition"
+                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  isActive('/evidence')
+                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                }`}
               >
-                Evidence
+                <FileText className="w-4 h-4" />
+                <span>Evidence</span>
               </Link>
               <Link
                 to="/cases"
-                className="text-gray-700 hover:text-purple-600 font-medium transition"
+                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  isActive('/cases')
+                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                }`}
               >
-                My Cases
+                <FolderOpen className="w-4 h-4" />
+                <span>My Cases</span>
               </Link>
               {isAdmin && (
                 <Link
                   to="/admin"
-                  className="text-gray-700 hover:text-purple-600 font-medium transition flex items-center space-x-1"
+                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                    isActive('/admin')
+                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                      : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                  }`}
                 >
                   <Shield className="w-4 h-4" />
                   <span>Admin</span>
