@@ -34,65 +34,67 @@ export default function Layout({ children }: LayoutProps) {
               </h1>
             </Link>
 
-            <nav className="hidden md:flex items-center space-x-6">
-              <Link
-                to="/"
-                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
-                  isActive('/')
-                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
-                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
-                }`}
-              >
-                <Home className="w-4 h-4" />
-                <span>Home</span>
-              </Link>
-              <Link
-                to="/chat"
-                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
-                  isActive('/chat')
-                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
-                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
-                }`}
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Chat</span>
-              </Link>
-              <Link
-                to="/evidence"
-                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
-                  isActive('/evidence')
-                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
-                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
-                }`}
-              >
-                <FileText className="w-4 h-4" />
-                <span>Evidence</span>
-              </Link>
-              <Link
-                to="/cases"
-                className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
-                  isActive('/cases')
-                    ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
-                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
-                }`}
-              >
-                <FolderOpen className="w-4 h-4" />
-                <span>My Cases</span>
-              </Link>
-              {isAdmin && (
+{user && (
+              <nav className="hidden md:flex items-center space-x-6">
                 <Link
-                  to="/admin"
+                  to="/"
                   className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
-                    isActive('/admin')
+                    isActive('/')
                       ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
                       : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
                   }`}
                 >
-                  <Shield className="w-4 h-4" />
-                  <span>Admin</span>
+                  <Home className="w-4 h-4" />
+                  <span>Home</span>
                 </Link>
-              )}
-            </nav>
+                <Link
+                  to="/chat"
+                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                    isActive('/chat')
+                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                      : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Chat</span>
+                </Link>
+                <Link
+                  to="/evidence"
+                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                    isActive('/evidence')
+                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                      : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Evidence</span>
+                </Link>
+                <Link
+                  to="/cases"
+                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                    isActive('/cases')
+                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                      : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <FolderOpen className="w-4 h-4" />
+                  <span>My Cases</span>
+                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                      isActive('/admin')
+                        ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
+                        : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span>Admin</span>
+                  </Link>
+                )}
+              </nav>
+            )}
 
             {user && (
               <div className="relative">
