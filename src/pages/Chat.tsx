@@ -196,9 +196,24 @@ export default function Chat() {
         throw new Error(`Failed to submit form: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json();
-      console.log('Success response:', data);
+      const responseText = await response.text();
+      console.log('Raw response text:', responseText);
 
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log('Parsed response data:', data);
+      } catch (parseError) {
+        console.error('Failed to parse JSON:', parseError);
+        throw new Error('Invalid JSON response from server');
+      }
+
+      if (!data || typeof data !== 'object') {
+        console.error('Invalid response structure:', data);
+        throw new Error('Invalid response structure from server');
+      }
+
+      console.log('Setting response data:', data);
       setResponseData(data);
       setSuccess(true);
 
@@ -207,6 +222,7 @@ export default function Chat() {
       }, 100);
 
     } catch (err: any) {
+      console.error('Submission error:', err);
       setError(err.message || 'An error occurred while submitting the form');
     } finally {
       setLoading(false);
