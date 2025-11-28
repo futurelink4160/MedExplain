@@ -208,10 +208,21 @@ export default function Chat() {
       const responseText = await response.text();
       console.log('Raw response text:', responseText);
       console.log('Response text length:', responseText.length);
+      console.log('First 100 chars:', responseText.substring(0, 100));
+      console.log('Last 100 chars:', responseText.substring(responseText.length - 100));
 
       let data;
       try {
-        data = JSON.parse(responseText);
+        let cleanedText = responseText.trim();
+
+        if (cleanedText.startsWith('"') && cleanedText.endsWith('"')) {
+          console.log('Response appears to be double-encoded, removing outer quotes');
+          cleanedText = cleanedText.slice(1, -1);
+          cleanedText = cleanedText.replace(/\\n/g, '\n').replace(/\\"/g, '"');
+        }
+
+        console.log('Cleaned text first 100 chars:', cleanedText.substring(0, 100));
+        data = JSON.parse(cleanedText);
         console.log('Parsed response data:', JSON.stringify(data, null, 2));
       } catch (parseError) {
         console.error('Failed to parse JSON:', parseError);
@@ -615,6 +626,13 @@ export default function Chat() {
 
         {responseData && (
           <div ref={resultsRef} className="mt-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <h3 className="font-bold text-blue-900">Debug: Response Data Received</h3>
+              <p className="text-sm text-blue-800">Response Type: {responseData.response_type}</p>
+              <p className="text-sm text-blue-800">Emergency: {String(responseData.emergency_detected)}</p>
+              <p className="text-sm text-blue-800">Has Markdown: {responseData.final_answer_markdown ? 'Yes' : 'No'}</p>
+              <p className="text-sm text-blue-800">Markdown Length: {responseData.final_answer_markdown?.length || 0}</p>
+            </div>
             <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
           </div>
         )}
