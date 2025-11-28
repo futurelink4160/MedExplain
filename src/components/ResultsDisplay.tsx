@@ -39,6 +39,10 @@ interface ResultsDisplayProps {
 }
 
 export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps) {
+  console.log('ResultsDisplay received data:', data);
+  console.log('ResultsDisplay data.final_answer_markdown:', data?.final_answer_markdown?.substring(0, 200));
+  console.log('ResultsDisplay data.pgx_results:', data?.pgx_results);
+
   const [showPgx, setShowPgx] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState('');

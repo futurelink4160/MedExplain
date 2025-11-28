@@ -198,19 +198,36 @@ export default function Chat() {
 
       const responseText = await response.text();
       console.log('Raw response text:', responseText);
+      console.log('Response text length:', responseText.length);
 
       let data;
       try {
         data = JSON.parse(responseText);
-        console.log('Parsed response data:', data);
+        console.log('Parsed response data:', JSON.stringify(data, null, 2));
       } catch (parseError) {
         console.error('Failed to parse JSON:', parseError);
+        console.error('Response text that failed to parse:', responseText.substring(0, 500));
         throw new Error('Invalid JSON response from server');
       }
 
       if (!data || typeof data !== 'object') {
         console.error('Invalid response structure:', data);
         throw new Error('Invalid response structure from server');
+      }
+
+      console.log('Response data structure check:');
+      console.log('- Has final_answer_markdown:', !!data.final_answer_markdown);
+      console.log('- Has pgx_results:', !!data.pgx_results);
+      console.log('- Has emergency_detected:', !!data.emergency_detected);
+      console.log('- Has response_type:', !!data.response_type);
+      console.log('- Has urgency_level:', !!data.urgency_level);
+
+      if (!data.final_answer_markdown) {
+        console.warn('WARNING: Missing final_answer_markdown in response');
+      }
+
+      if (!data.pgx_results) {
+        console.warn('WARNING: Missing pgx_results in response');
       }
 
       console.log('Setting response data:', data);
