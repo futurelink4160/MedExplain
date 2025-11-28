@@ -17,8 +17,17 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
+interface DrugLabel {
+  drug_id?: string;
+  known_side_effects?: string[];
+  box_warnings?: string[];
+  pharmacogenomic_considerations?: string[];
+  safety_notes?: string[];
+  when_to_call_doctor?: string[];
+}
+
 interface PgxResults {
-  drug_labels: string[];
+  drug_labels: (string | DrugLabel)[];
   genes: string[];
   variants: string[];
   phenotypes: string[];
@@ -298,12 +307,77 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
             <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
               {data.pgx_results.drug_labels.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Notes</h3>
-                  <ul className="list-disc list-inside space-y-2 text-gray-700">
-                    {data.pgx_results.drug_labels.map((label, idx) => (
-                      <li key={idx}>{label}</li>
-                    ))}
-                  </ul>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
+                  <div className="space-y-4">
+                    {data.pgx_results.drug_labels.map((label, idx) => {
+                      if (typeof label === 'string') {
+                        return (
+                          <div key={idx} className="text-gray-700">
+                            <p>{label}</p>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={idx} className="space-y-3">
+                          {label.known_side_effects && label.known_side_effects.length > 0 && (
+                            <div>
+                              <h4 className="font-bold text-gray-800 mb-2">Known Side Effects:</h4>
+                              <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                {label.known_side_effects.map((effect, i) => (
+                                  <li key={i}>{effect}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.box_warnings && label.box_warnings.length > 0 && (
+                            <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                              <h4 className="font-bold text-red-900 mb-2">⚠️ Important Warnings:</h4>
+                              <ul className="list-disc list-inside space-y-1 text-red-800">
+                                {label.box_warnings.map((warning, i) => (
+                                  <li key={i}>{warning}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.pharmacogenomic_considerations && label.pharmacogenomic_considerations.length > 0 && (
+                            <div>
+                              <h4 className="font-bold text-gray-800 mb-2">Genetic Considerations:</h4>
+                              <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                {label.pharmacogenomic_considerations.map((consideration, i) => (
+                                  <li key={i}>{consideration}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.safety_notes && label.safety_notes.length > 0 && (
+                            <div>
+                              <h4 className="font-bold text-gray-800 mb-2">Safety Notes:</h4>
+                              <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                {label.safety_notes.map((note, i) => (
+                                  <li key={i}>{note}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.when_to_call_doctor && label.when_to_call_doctor.length > 0 && (
+                            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+                              <h4 className="font-bold text-yellow-900 mb-2">When to Call Your Doctor:</h4>
+                              <ul className="list-disc list-inside space-y-1 text-yellow-800">
+                                {label.when_to_call_doctor.map((when, i) => (
+                                  <li key={i}>{when}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 

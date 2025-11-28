@@ -5,8 +5,17 @@ import ResultsDisplay from '../components/ResultsDisplay';
 import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus, TestTube } from 'lucide-react';
 import { mockResponseData } from '../test-data';
 
+interface DrugLabel {
+  drug_id?: string;
+  known_side_effects?: string[];
+  box_warnings?: string[];
+  pharmacogenomic_considerations?: string[];
+  safety_notes?: string[];
+  when_to_call_doctor?: string[];
+}
+
 interface PgxResults {
-  drug_labels: string[];
+  drug_labels: (string | DrugLabel)[];
   genes: string[];
   variants: string[];
   phenotypes: string[];
