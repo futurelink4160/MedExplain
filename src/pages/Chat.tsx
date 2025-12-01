@@ -33,14 +33,12 @@ interface ResponseData {
 export default function Chat() {
   const { user } = useAuth();
   const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
   const [role, setRole] = useState('');
   const [medication, setMedication] = useState('');
   const [question, setQuestion] = useState('');
   const [symptoms, setSymptoms] = useState('');
   const [duration, setDuration] = useState('');
   const [otherMeds, setOtherMeds] = useState('');
-  const [medicalHistory, setMedicalHistory] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -81,9 +79,6 @@ export default function Chat() {
               break;
             case 'otherMeds':
               setOtherMeds(prev => prev ? prev + ' ' + transcript : transcript);
-              break;
-            case 'medicalHistory':
-              setMedicalHistory(prev => prev ? prev + ' ' + transcript : transcript);
               break;
           }
         }
@@ -129,14 +124,12 @@ export default function Chat() {
   function handleNewQuery() {
     setResponseData(null);
     setAge('');
-    setGender('');
     setRole('');
     setMedication('');
     setQuestion('');
     setSymptoms('');
     setDuration('');
     setOtherMeds('');
-    setMedicalHistory('');
     setFiles(null);
     setError('');
     setSuccess(false);
@@ -182,14 +175,12 @@ export default function Chat() {
 
       const payload = {
         Age: parseInt(age),
-        Gender: gender || 'Not specified',
         'Profession/Role': role,
         'Medication Name': medication || 'Not specified',
         'Your Question/Inquiry': question,
         'Current Symptoms': symptoms || 'None mentioned',
         'Duration of Symptoms': duration || 'Not specified',
         'Other Medications/Supplements': otherMeds || 'None mentioned',
-        'Additional Relevant History': medicalHistory || 'None mentioned',
         Attachments: fileData.length > 0 ? fileData : 'No files uploaded',
         user_id: user?.id,
         submitted_at: new Date().toISOString()
@@ -217,21 +208,10 @@ export default function Chat() {
       const responseText = await response.text();
       console.log('Raw response text:', responseText);
       console.log('Response text length:', responseText.length);
-      console.log('First 100 chars:', responseText.substring(0, 100));
-      console.log('Last 100 chars:', responseText.substring(responseText.length - 100));
 
       let data;
       try {
-        let cleanedText = responseText.trim();
-
-        if (cleanedText.startsWith('"') && cleanedText.endsWith('"')) {
-          console.log('Response appears to be double-encoded, removing outer quotes');
-          cleanedText = cleanedText.slice(1, -1);
-          cleanedText = cleanedText.replace(/\\n/g, '\n').replace(/\\"/g, '"');
-        }
-
-        console.log('Cleaned text first 100 chars:', cleanedText.substring(0, 100));
-        data = JSON.parse(cleanedText);
+        data = JSON.parse(responseText);
         console.log('Parsed response data:', JSON.stringify(data, null, 2));
       } catch (parseError) {
         console.error('Failed to parse JSON:', parseError);
@@ -374,31 +354,8 @@ export default function Chat() {
                   </div>
 
                   <div className="group">
-                    <label htmlFor="gender" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
-                        <User className="w-3.5 h-3.5 text-white" />
-                      </div>
-                      Gender
-                    </label>
-                    <select
-                      id="gender"
-                      value={gender}
-                      onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all text-sm font-medium"
-                    >
-                      <option value="">Select gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Non-binary">Non-binary</option>
-                      <option value="Prefer not to say">Prefer not to say</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-5">
-                  <div className="group">
                     <label htmlFor="role" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <FileText className="w-3.5 h-3.5 text-white" />
                       </div>
                       Who Are You? <span className="text-red-500 ml-1">*</span>
@@ -408,7 +365,7 @@ export default function Chat() {
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-200 focus:border-pink-500 outline-none transition-all text-sm font-medium"
+                      className="w-full px-4 py-2.5 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all text-sm font-medium"
                     >
                       <option value="">Select your role</option>
                       <option value="Patient">Patient</option>
@@ -576,36 +533,6 @@ export default function Chat() {
                 </div>
 
                 <div className="group">
-                  <label htmlFor="medical-history" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
-                      <FileText className="w-3.5 h-3.5 text-white" />
-                    </div>
-                    Additional Relevant History
-                  </label>
-                  <div className="relative">
-                    <textarea
-                      id="medical-history"
-                      value={medicalHistory}
-                      onChange={(e) => setMedicalHistory(e.target.value)}
-                      rows={3}
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-200 rounded-lg focus:ring-2 focus:ring-teal-200 focus:border-teal-500 outline-none transition-all resize-none text-sm"
-                      placeholder="Medical conditions, allergies, surgeries, family history, or other relevant information..."
-                    />
-                    <button
-                      type="button"
-                      onClick={() => isListening && activeField === 'medicalHistory' ? stopListening() : startListening('medicalHistory')}
-                      className={`absolute right-2 top-2 p-1.5 rounded-lg transition-all ${
-                        isListening && activeField === 'medicalHistory'
-                          ? 'bg-red-500 text-white animate-pulse'
-                          : 'bg-teal-100 text-teal-600 hover:bg-teal-200'
-                      }`}
-                    >
-                      {isListening && activeField === 'medicalHistory' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="group">
                   <label className="flex items-center text-xs font-bold text-gray-800 mb-2">
                     <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                       <Upload className="w-3.5 h-3.5 text-white" />
@@ -688,13 +615,6 @@ export default function Chat() {
 
         {responseData && (
           <div ref={resultsRef} className="mt-8">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <h3 className="font-bold text-blue-900">Debug: Response Data Received</h3>
-              <p className="text-sm text-blue-800">Response Type: {responseData.response_type}</p>
-              <p className="text-sm text-blue-800">Emergency: {String(responseData.emergency_detected)}</p>
-              <p className="text-sm text-blue-800">Has Markdown: {responseData.final_answer_markdown ? 'Yes' : 'No'}</p>
-              <p className="text-sm text-blue-800">Markdown Length: {responseData.final_answer_markdown?.length || 0}</p>
-            </div>
             <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
           </div>
         )}
