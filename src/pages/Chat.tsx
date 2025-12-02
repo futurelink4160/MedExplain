@@ -274,16 +274,27 @@ export default function Chat() {
         }
       }
 
-      // Handle case where n8n wraps the response in an "output" field as a JSON string
+      // Handle case where n8n wraps the response in an "output" field
       if (data.output && typeof data.output === 'string') {
-        console.log('Response is wrapped in "output" field as JSON string, unwrapping...');
+        console.log('Response has "output" field, attempting to unwrap...');
         try {
+          // Try parsing as JSON first
           const unwrapped = JSON.parse(data.output);
-          console.log('Successfully unwrapped output field');
+          console.log('Successfully parsed output field as JSON');
           data = unwrapped;
-        } catch (unwrapError) {
-          console.error('Failed to parse output field:', unwrapError);
-          throw new Error('Response wrapped in output field but could not parse it');
+        } catch (parseError) {
+          console.log('Output field is not JSON, checking if it is markdown or plain text...');
+          // If it's not JSON, check if it looks like markdown/text content
+          if (data.output.trim().startsWith('###') || data.output.trim().startsWith('#')) {
+            console.log('Output field contains markdown, treating as final_answer_markdown');
+            // It's markdown content - use it as final_answer_markdown
+            data.final_answer_markdown = data.output;
+            delete data.output;
+          } else {
+            // Try one more time - maybe it's double-encoded JSON string
+            console.error('Failed to parse output field:', parseError);
+            throw new Error('Response wrapped in output field but could not parse it');
+          }
         }
       }
 
