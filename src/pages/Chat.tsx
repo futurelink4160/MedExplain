@@ -310,6 +310,14 @@ export default function Chat() {
       console.log('- Has urgency_level:', !!data.urgency_level);
       console.log('- Has rag_results:', !!data.rag_results);
 
+      // Log the actual content preview
+      if (data.final_answer_markdown) {
+        console.log('final_answer_markdown preview:', data.final_answer_markdown.substring(0, 500));
+      }
+      if (data.markdown_answer) {
+        console.log('markdown_answer preview:', typeof data.markdown_answer === 'string' ? data.markdown_answer.substring(0, 500) : data.markdown_answer);
+      }
+
       // Handle alternative field name: markdown_answer -> final_answer_markdown
       if (data.markdown_answer && !data.final_answer_markdown) {
         console.log('Converting markdown_answer to final_answer_markdown');
