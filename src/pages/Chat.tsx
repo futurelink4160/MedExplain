@@ -378,8 +378,31 @@ export default function Chat() {
                   </div>
 
                   <div className="group">
-                    <label htmlFor="role" className="flex items-center text-xs font-bold text-gray-800 mb-2">
+                    <label htmlFor="gender" className="flex items-center text-xs font-bold text-gray-800 mb-2">
                       <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                        <User className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      Gender
+                    </label>
+                    <select
+                      id="gender"
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all text-sm font-medium"
+                    >
+                      <option value="">Select gender</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Non-binary">Non-binary</option>
+                      <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-5">
+                  <div className="group">
+                    <label htmlFor="role" className="flex items-center text-xs font-bold text-gray-800 mb-2">
+                      <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <FileText className="w-3.5 h-3.5 text-white" />
                       </div>
                       Who Are You? <span className="text-red-500 ml-1">*</span>
@@ -389,7 +412,7 @@ export default function Chat() {
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all text-sm font-medium"
+                      className="w-full px-4 py-2.5 bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-200 focus:border-pink-500 outline-none transition-all text-sm font-medium"
                     >
                       <option value="">Select your role</option>
                       <option value="Patient">Patient</option>
@@ -401,35 +424,35 @@ export default function Chat() {
                       <option value="Other">Other</option>
                     </select>
                   </div>
-                </div>
 
-                <div className="group">
-                  <label htmlFor="medication" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
-                      <Pill className="w-3.5 h-3.5 text-white" />
+                  <div className="group">
+                    <label htmlFor="medication" className="flex items-center text-xs font-bold text-gray-800 mb-2">
+                      <div className="w-6 h-6 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                        <Pill className="w-3.5 h-3.5 text-white" />
+                      </div>
+                      Medication You Want Information About
+                    </label>
+                    <div className="relative">
+                      <input
+                        id="medication"
+                        type="text"
+                        value={medication}
+                        onChange={(e) => setMedication(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-200 focus:border-amber-500 outline-none transition-all text-sm"
+                        placeholder="Example: Sertraline, Metformin, Amoxicillin"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => isListening && activeField === 'medication' ? stopListening() : startListening('medication')}
+                        className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
+                          isListening && activeField === 'medication'
+                            ? 'bg-red-500 text-white animate-pulse'
+                            : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                        }`}
+                      >
+                        {isListening && activeField === 'medication' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                      </button>
                     </div>
-                    Medication You Want Information About
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="medication"
-                      type="text"
-                      value={medication}
-                      onChange={(e) => setMedication(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-200 focus:border-pink-500 outline-none transition-all text-sm"
-                      placeholder="Example: Sertraline, Metformin, Amoxicillin"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => isListening && activeField === 'medication' ? stopListening() : startListening('medication')}
-                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
-                        isListening && activeField === 'medication'
-                          ? 'bg-red-500 text-white animate-pulse'
-                          : 'bg-pink-100 text-pink-600 hover:bg-pink-200'
-                      }`}
-                    >
-                      {isListening && activeField === 'medication' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-                    </button>
                   </div>
                 </div>
 
@@ -552,6 +575,36 @@ export default function Chat() {
                       }`}
                     >
                       {isListening && activeField === 'otherMeds' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="group">
+                  <label htmlFor="medical-history" className="flex items-center text-xs font-bold text-gray-800 mb-2">
+                    <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <FileText className="w-3.5 h-3.5 text-white" />
+                    </div>
+                    Additional Relevant History
+                  </label>
+                  <div className="relative">
+                    <textarea
+                      id="medical-history"
+                      value={medicalHistory}
+                      onChange={(e) => setMedicalHistory(e.target.value)}
+                      rows={3}
+                      className="w-full px-4 py-2.5 bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-200 rounded-lg focus:ring-2 focus:ring-teal-200 focus:border-teal-500 outline-none transition-all resize-none text-sm"
+                      placeholder="Medical conditions, allergies, surgeries, family history, or other relevant information..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() => isListening && activeField === 'medicalHistory' ? stopListening() : startListening('medicalHistory')}
+                      className={`absolute right-2 top-2 p-1.5 rounded-lg transition-all ${
+                        isListening && activeField === 'medicalHistory'
+                          ? 'bg-red-500 text-white animate-pulse'
+                          : 'bg-teal-100 text-teal-600 hover:bg-teal-200'
+                      }`}
+                    >
+                      {isListening && activeField === 'medicalHistory' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                     </button>
                   </div>
                 </div>
