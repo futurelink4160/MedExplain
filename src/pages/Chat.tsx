@@ -175,12 +175,14 @@ export default function Chat() {
 
       const payload = {
         Age: parseInt(age),
+        Gender: gender || 'Not specified',
         'Profession/Role': role,
         'Medication Name': medication || 'Not specified',
         'Your Question/Inquiry': question,
         'Current Symptoms': symptoms || 'None mentioned',
         'Duration of Symptoms': duration || 'Not specified',
         'Other Medications/Supplements': otherMeds || 'None mentioned',
+        'Additional Relevant History': medicalHistory || 'None mentioned',
         Attachments: fileData.length > 0 ? fileData : 'No files uploaded',
         user_id: user?.id,
         submitted_at: new Date().toISOString()
@@ -188,7 +190,10 @@ export default function Chat() {
 
       console.log('Sending payload to n8n:', payload);
 
-      const response = await fetch('https://ftlteam4160.app.n8n.cloud/webhook-test/medexplain-query', {
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://ftlteam4160.app.n8n.cloud/webhook-test/medexplain-query';
+      console.log('Webhook URL:', webhookUrl);
+
+      const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -208,10 +213,22 @@ export default function Chat() {
       const responseText = await response.text();
       console.log('Raw response text:', responseText);
       console.log('Response text length:', responseText.length);
+      console.log('First 100 chars:', responseText.substring(0, 100));
+      console.log('Last 100 chars:', responseText.substring(responseText.length - 100));
 
       let data;
       try {
-        data = JSON.parse(responseText);
+        let cleanedText = responseText.trim();
+
+        // Handle double-encoded JSON (if n8n returns JSON as a string)
+        if (cleanedText.startsWith('"') && cleanedText.endsWith('"')) {
+          console.log('Response appears to be double-encoded, removing outer quotes');
+          cleanedText = cleanedText.slice(1, -1);
+          cleanedText = cleanedText.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        }
+
+        console.log('Cleaned text first 100 chars:', cleanedText.substring(0, 100));
+        data = JSON.parse(cleanedText);
         console.log('Parsed response data:', JSON.stringify(data, null, 2));
       } catch (parseError) {
         console.error('Failed to parse JSON:', parseError);
