@@ -1,0 +1,374 @@
+import { useState } from 'react';
+import {
+  Activity,
+  BookOpen,
+  Shield,
+  FileText,
+  ChevronDown,
+  ChevronUp,
+  Download,
+  Mail,
+  RefreshCw,
+  Dna
+} from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+
+interface DrugLabel {
+  drug_id?: string;
+  known_side_effects?: string[];
+  box_warnings?: string[];
+  pharmacogenomic_considerations?: string[];
+  safety_notes?: string[];
+  when_to_call_doctor?: string[];
+}
+
+interface PgxResults {
+  drug_labels: (string | DrugLabel)[];
+  genes: string[];
+  variants: string[];
+  phenotypes: string[];
+  testing_guidelines?: {
+    fda_level?: string;
+    cpic_dosing_info?: boolean;
+    has_dosing_guideline?: boolean;
+  };
+}
+
+interface ResponseData {
+  response_type: string;
+  emergency_detected: boolean;
+  urgency_level: string;
+  rag_results?: string;
+  pgx_results: PgxResults;
+  final_answer_markdown: string;
+}
+
+interface ClinicalResultsDisplayProps {
+  data: ResponseData;
+  onNewQuery?: () => void;
+}
+
+export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalResultsDisplayProps) {
+  const [showPgx, setShowPgx] = useState(true);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailTo, setEmailTo] = useState('');
+
+  const handleDownloadPDF = () => {
+    window.print();
+  };
+
+  const handleSendEmail = () => {
+    const mailtoLink = `mailto:${emailTo}?subject=${encodeURIComponent('Clinical Pharmacogenomics Summary')}&body=${encodeURIComponent(data.final_answer_markdown || '')}`;
+    window.location.href = mailtoLink;
+    setShowEmailModal(false);
+  };
+
+  const extractSection = (markdown: string | undefined, title: string): string => {
+    if (!markdown) return '';
+    const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
+    const regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|---|$)`, 'i');
+    const match = cleanedMarkdown.match(regex);
+    return match ? match[1].trim() : '';
+  };
+
+  if (!data || !data.final_answer_markdown) {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 p-8">
+        <div className="text-center">
+          <p className="text-gray-600">No results data available.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const markdown = data.final_answer_markdown.replace(/\\n/g, '\n');
+
+  // Extract sections
+  const pgxContext = extractSection(markdown, 'Pharmacogenomic Context') ||
+                     extractSection(markdown, 'Pharmacogenomic Overview') ||
+                     extractSection(markdown, 'Pharmacogenomic Considerations');
+  const clinicalInterpretation = extractSection(markdown, 'Clinical Interpretation') ||
+                                  extractSection(markdown, 'Clinical Context and Relevance') ||
+                                  extractSection(markdown, 'Clinical Considerations');
+  const recommendations = extractSection(markdown, 'Recommendations for Clinical Action') ||
+                         extractSection(markdown, 'Recommendations for Clinical Management') ||
+                         extractSection(markdown, 'Clinical Recommendations') ||
+                         extractSection(markdown, 'Recommendations for Provider Consideration');
+  const summary = extractSection(markdown, 'Summary');
+  const references = extractSection(markdown, 'References');
+
+  // Extract patient overview from the beginning
+  const patientOverviewMatch = markdown.match(/\*\*Patient (?:Overview|Profile|Details):\*\*([\s\S]*?)(?=---|###)/i);
+  const patientOverview = patientOverviewMatch ? patientOverviewMatch[1].trim() : '';
+
+  return (
+    <div className="space-y-6 mb-8">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-12 -mb-12"></div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-white mb-2">Clinical Pharmacogenomics Summary</h1>
+            <p className="text-slate-200 text-lg">Warfarin-Associated Symptom Analysis</p>
+            <div className="mt-3 flex items-center space-x-4 text-sm">
+              <span className="bg-white/20 px-3 py-1 rounded-full text-white">
+                {data.response_type || 'CLINICAL_PGX_SUMMARY'}
+              </span>
+              <span className={`px-3 py-1 rounded-full ${
+                data.urgency_level === 'LOW' ? 'bg-green-500/20 text-green-200' :
+                data.urgency_level === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-200' :
+                'bg-red-500/20 text-red-200'
+              }`}>
+                Urgency: {data.urgency_level || 'LOW'}
+              </span>
+            </div>
+          </div>
+          <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-4 justify-end">
+        <button
+          onClick={handleDownloadPDF}
+          className="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          <span>Download PDF</span>
+        </button>
+        <button
+          onClick={() => setShowEmailModal(true)}
+          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Mail className="w-4 h-4" />
+          <span>Email Summary</span>
+        </button>
+        {onNewQuery && (
+          <button
+            onClick={onNewQuery}
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>New Query</span>
+          </button>
+        )}
+      </div>
+
+      {/* Patient Overview */}
+      {patientOverview && (
+        <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <FileText className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Patient Overview</h2>
+              <div className="prose prose-slate max-w-none text-gray-700">
+                <ReactMarkdown>{patientOverview}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pharmacogenomic Context */}
+      {pgxContext && (
+        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl shadow-lg p-6 border-l-4 border-emerald-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Dna className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-emerald-900 mb-4">Pharmacogenomic Context</h2>
+              <div className="prose prose-emerald max-w-none text-gray-700">
+                <ReactMarkdown>{pgxContext}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clinical Interpretation */}
+      {clinicalInterpretation && (
+        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-lg p-6 border-l-4 border-amber-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-amber-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-amber-900 mb-4">Clinical Interpretation</h2>
+              <div className="prose prose-amber max-w-none text-gray-700">
+                <ReactMarkdown>{clinicalInterpretation}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recommendations */}
+      {recommendations && (
+        <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-cyan-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-cyan-900 mb-4">Clinical Recommendations</h2>
+              <div className="prose prose-cyan max-w-none text-gray-700">
+                <ReactMarkdown>{recommendations}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Summary */}
+      {summary && (
+        <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-lg p-6 border-l-4 border-slate-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <FileText className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Summary</h2>
+              <div className="prose prose-slate max-w-none text-gray-700">
+                <ReactMarkdown>{summary}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pharmacogenomic Results Details */}
+      {data.pgx_results && (
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
+          <button
+            onClick={() => setShowPgx(!showPgx)}
+            className="w-full px-6 py-4 flex items-center justify-between bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 transition-colors"
+          >
+            <div className="flex items-center space-x-3">
+              <Dna className="w-6 h-6 text-emerald-600" />
+              <h3 className="text-xl font-bold text-slate-900">Pharmacogenomic Data Details</h3>
+            </div>
+            {showPgx ? <ChevronUp className="w-5 h-5 text-slate-600" /> : <ChevronDown className="w-5 h-5 text-slate-600" />}
+          </button>
+
+          {showPgx && (
+            <div className="p-6 space-y-6">
+              {/* Testing Guidelines */}
+              {data.pgx_results.testing_guidelines && (
+                <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
+                  <h4 className="font-bold text-emerald-900 mb-3 flex items-center">
+                    <Shield className="w-5 h-5 mr-2" />
+                    Testing Guidelines
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    {data.pgx_results.testing_guidelines.fda_level && (
+                      <p><strong>FDA Level:</strong> {data.pgx_results.testing_guidelines.fda_level}</p>
+                    )}
+                    {data.pgx_results.testing_guidelines.cpic_dosing_info !== undefined && (
+                      <p><strong>CPIC Dosing Info:</strong> {data.pgx_results.testing_guidelines.cpic_dosing_info ? 'Available' : 'Not Available'}</p>
+                    )}
+                    {data.pgx_results.testing_guidelines.has_dosing_guideline !== undefined && (
+                      <p><strong>Dosing Guideline:</strong> {data.pgx_results.testing_guidelines.has_dosing_guideline ? 'Available' : 'Not Available'}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Genes */}
+              {data.pgx_results.genes && data.pgx_results.genes.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-slate-900 mb-3">Relevant Genes</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {data.pgx_results.genes.map((gene, idx) => (
+                      <span key={idx} className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                        {gene}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Variants */}
+              {data.pgx_results.variants && data.pgx_results.variants.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-slate-900 mb-3">Genetic Variants</h4>
+                  <div className="space-y-2">
+                    {data.pgx_results.variants.map((variant, idx) => (
+                      <div key={idx} className="px-4 py-2 bg-slate-50 rounded border border-slate-200 text-sm">
+                        {variant}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Phenotypes */}
+              {data.pgx_results.phenotypes && data.pgx_results.phenotypes.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-slate-900 mb-3">Phenotypes</h4>
+                  <div className="space-y-2">
+                    {data.pgx_results.phenotypes.map((phenotype, idx) => (
+                      <div key={idx} className="px-4 py-2 bg-blue-50 rounded border border-blue-200 text-sm">
+                        {phenotype}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* References */}
+      {references && (
+        <div className="bg-slate-50 rounded-xl shadow p-6 border border-slate-200">
+          <h3 className="text-lg font-bold text-slate-900 mb-3">References</h3>
+          <div className="prose prose-slate prose-sm max-w-none text-gray-700">
+            <ReactMarkdown>{references}</ReactMarkdown>
+          </div>
+        </div>
+      )}
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-2xl font-bold text-slate-900 mb-4">Email Summary</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Recipient Email
+                </label>
+                <input
+                  type="email"
+                  value={emailTo}
+                  onChange={(e) => setEmailTo(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="doctor@example.com"
+                />
+              </div>
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleSendEmail}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Send Email
+                </button>
+                <button
+                  onClick={() => setShowEmailModal(false)}
+                  className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
 import ResultsDisplay from '../components/ResultsDisplay';
+import ClinicalResultsDisplay from '../components/ClinicalResultsDisplay';
 import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus, TestTube } from 'lucide-react';
 import { mockResponseData } from '../test-data';
 
@@ -905,7 +906,14 @@ export default function Chat() {
 
         {responseData && (
           <div ref={resultsRef} className="mt-8">
-            <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+            {/* Detect format: Clinical vs Patient-Friendly */}
+            {responseData.response_type === 'CLINICAL_PGX_SUMMARY' ||
+             responseData.final_answer_markdown?.includes('Pharmacogenomic Context') ||
+             responseData.final_answer_markdown?.includes('Clinical Interpretation') ? (
+              <ClinicalResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+            ) : (
+              <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+            )}
           </div>
         )}
       </div>
