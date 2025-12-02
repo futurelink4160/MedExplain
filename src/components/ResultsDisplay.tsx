@@ -55,8 +55,12 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
   console.log('ResultsDisplay received data:', data);
   console.log('ResultsDisplay data.final_answer_markdown:', data?.final_answer_markdown?.substring(0, 200));
   console.log('ResultsDisplay data.pgx_results:', data?.pgx_results);
+  console.log('ResultsDisplay pgx_results.genes:', data?.pgx_results?.genes);
+  console.log('ResultsDisplay pgx_results.variants:', data?.pgx_results?.variants);
+  console.log('ResultsDisplay pgx_results.phenotypes:', data?.pgx_results?.phenotypes);
+  console.log('ResultsDisplay pgx_results.drug_labels:', data?.pgx_results?.drug_labels);
 
-  const [showPgx, setShowPgx] = useState(false);
+  const [showPgx, setShowPgx] = useState(true); // Changed to true to show by default
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState('');
   const [emailSubject, setEmailSubject] = useState('My MedExplain Educational Summary');

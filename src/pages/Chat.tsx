@@ -333,6 +333,54 @@ export default function Chat() {
         delete data.markdown_answer;
       }
 
+      // Fix literal \n in text fields (replace \\n with actual newlines)
+      const fixNewlines = (text: string | undefined): string => {
+        if (!text) return '';
+        // Replace literal \n with actual newlines
+        return text.replace(/\\n/g, '\n');
+      };
+
+      if (data.clinical_summary && typeof data.clinical_summary === 'string') {
+        data.clinical_summary = fixNewlines(data.clinical_summary);
+      }
+      if (data.pgx_interpretation && typeof data.pgx_interpretation === 'string') {
+        data.pgx_interpretation = fixNewlines(data.pgx_interpretation);
+      }
+      if (data.disclaimer && typeof data.disclaimer === 'string') {
+        data.disclaimer = fixNewlines(data.disclaimer);
+      }
+      if (data.final_answer_markdown && typeof data.final_answer_markdown === 'string') {
+        data.final_answer_markdown = fixNewlines(data.final_answer_markdown);
+      }
+
+      // Check if clinical_summary is a nested object and convert it to markdown
+      if (data.clinical_summary && typeof data.clinical_summary === 'object') {
+        console.log('clinical_summary is an object, converting to markdown...');
+        let summaryText = '';
+
+        const formatObject = (obj: any, indent = ''): string => {
+          let result = '';
+          for (const [key, value] of Object.entries(obj)) {
+            const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+              result += `${indent}**${formattedKey}:**\n${formatObject(value, indent + '  ')}\n`;
+            } else if (Array.isArray(value)) {
+              result += `${indent}**${formattedKey}:**\n`;
+              value.forEach(item => {
+                result += `${indent}- ${item}\n`;
+              });
+            } else {
+              result += `${indent}**${formattedKey}:** ${value}\n`;
+            }
+          }
+          return result;
+        };
+
+        summaryText = formatObject(data.clinical_summary);
+        data.clinical_summary = summaryText;
+      }
+
       // Convert clinical format to UI format if needed
       if (data.clinical_summary && !data.final_answer_markdown) {
         console.log('Converting clinical format to UI format...');
@@ -368,6 +416,26 @@ export default function Chat() {
           variants: [],
           phenotypes: []
         };
+      } else {
+        // Ensure pgx_results arrays are actually arrays
+        console.log('Validating pgx_results structure...');
+        if (!Array.isArray(data.pgx_results.drug_labels)) {
+          console.log('Converting drug_labels to array');
+          data.pgx_results.drug_labels = data.pgx_results.drug_labels ? [data.pgx_results.drug_labels] : [];
+        }
+        if (!Array.isArray(data.pgx_results.genes)) {
+          console.log('Converting genes to array');
+          data.pgx_results.genes = data.pgx_results.genes ? [data.pgx_results.genes] : [];
+        }
+        if (!Array.isArray(data.pgx_results.variants)) {
+          console.log('Converting variants to array');
+          data.pgx_results.variants = data.pgx_results.variants ? [data.pgx_results.variants] : [];
+        }
+        if (!Array.isArray(data.pgx_results.phenotypes)) {
+          console.log('Converting phenotypes to array');
+          data.pgx_results.phenotypes = data.pgx_results.phenotypes ? [data.pgx_results.phenotypes] : [];
+        }
+        console.log('After validation, pgx_results:', data.pgx_results);
       }
 
       // Add default values for missing required fields
