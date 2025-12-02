@@ -317,8 +317,24 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
 
   const markdown = data.final_answer_markdown;
 
+  // DEBUG: Show raw markdown
+  console.log('=== RENDERING RESULTS ===');
+  console.log('Markdown length:', markdown?.length);
+  console.log('First 500 chars:', markdown?.substring(0, 500));
+
   return (
     <div className="space-y-6 mb-8">
+      {/* DEBUG VIEW - Remove this after fixing */}
+      <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4 mb-4">
+        <h3 className="font-bold text-yellow-900 mb-2">🐛 DEBUG INFO:</h3>
+        <div className="text-xs text-gray-700 space-y-1">
+          <p><strong>Markdown length:</strong> {markdown?.length || 0} characters</p>
+          <p><strong>Has content:</strong> {markdown ? 'Yes' : 'No'}</p>
+          <p><strong>First 200 chars:</strong></p>
+          <pre className="bg-white p-2 rounded text-xs overflow-auto max-h-40">{markdown?.substring(0, 200)}</pre>
+        </div>
+      </div>
+
       <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
