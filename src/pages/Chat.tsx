@@ -25,9 +25,13 @@ interface ResponseData {
   response_type: string;
   emergency_detected: boolean;
   urgency_level: string;
-  rag_results: string;
-  pgx_results: PgxResults;
-  final_answer_markdown: string;
+  rag_results?: string;
+  pgx_results?: PgxResults;
+  final_answer_markdown?: string;
+  clinical_summary?: string;
+  pgx_interpretation?: string;
+  clinical_recommendations?: string[];
+  disclaimer?: string;
 }
 
 export default function Chat() {
@@ -273,17 +277,57 @@ export default function Chat() {
       console.log('=== RESPONSE STRUCTURE CHECK ===');
       console.log('- Has final_answer_markdown:', !!data.final_answer_markdown);
       console.log('- Has pgx_results:', !!data.pgx_results);
+      console.log('- Has clinical_summary:', !!data.clinical_summary);
+      console.log('- Has pgx_interpretation:', !!data.pgx_interpretation);
+      console.log('- Has clinical_recommendations:', !!data.clinical_recommendations);
       console.log('- Has emergency_detected:', !!data.emergency_detected);
       console.log('- Has response_type:', !!data.response_type);
       console.log('- Has urgency_level:', !!data.urgency_level);
       console.log('- Has rag_results:', !!data.rag_results);
 
-      // Check if required fields are missing
+      // Convert clinical format to UI format if needed
+      if (data.clinical_summary && !data.final_answer_markdown) {
+        console.log('Converting clinical format to UI format...');
+
+        let markdown = `### Clinical Summary\n\n${data.clinical_summary}\n\n`;
+
+        if (data.pgx_interpretation) {
+          markdown += `### Pharmacogenomic Interpretation\n\n${data.pgx_interpretation}\n\n`;
+        }
+
+        if (data.clinical_recommendations && Array.isArray(data.clinical_recommendations)) {
+          markdown += `### Clinical Recommendations\n\n`;
+          data.clinical_recommendations.forEach((rec, index) => {
+            markdown += `${index + 1}. ${rec}\n`;
+          });
+          markdown += `\n`;
+        }
+
+        if (data.disclaimer) {
+          markdown += `### Disclaimer\n\n${data.disclaimer}\n\n`;
+        }
+
+        data.final_answer_markdown = markdown;
+        console.log('Converted to markdown format');
+      }
+
+      // Create empty pgx_results if not present
+      if (!data.pgx_results) {
+        console.log('Creating empty pgx_results structure');
+        data.pgx_results = {
+          drug_labels: [],
+          genes: [],
+          variants: [],
+          phenotypes: []
+        };
+      }
+
+      // Validate minimum required fields
       const missingFields = [];
-      if (!data.final_answer_markdown) missingFields.push('final_answer_markdown');
-      if (!data.pgx_results) missingFields.push('pgx_results');
+      if (!data.final_answer_markdown) missingFields.push('final_answer_markdown or clinical_summary');
       if (!data.response_type) missingFields.push('response_type');
       if (!data.urgency_level) missingFields.push('urgency_level');
+      if (data.emergency_detected === undefined) missingFields.push('emergency_detected');
 
       if (missingFields.length > 0) {
         console.error('===== MISSING REQUIRED FIELDS =====');
@@ -293,7 +337,7 @@ export default function Chat() {
         throw new Error(`n8n response missing required fields: ${missingFields.join(', ')}. Check your n8n "Respond to Webhook" node.`);
       }
 
-      console.log('✓ All required fields present');
+      console.log('✓ Response validated and converted successfully');
       console.log('Setting response data and scrolling to results...');
       setResponseData(data);
       setSuccess(true);
