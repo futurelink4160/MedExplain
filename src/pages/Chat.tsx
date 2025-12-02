@@ -33,12 +33,14 @@ interface ResponseData {
 export default function Chat() {
   const { user } = useAuth();
   const [age, setAge] = useState('');
+  const [gender, setGender] = useState('');
   const [role, setRole] = useState('');
   const [medication, setMedication] = useState('');
   const [question, setQuestion] = useState('');
   const [symptoms, setSymptoms] = useState('');
   const [duration, setDuration] = useState('');
   const [otherMeds, setOtherMeds] = useState('');
+  const [medicalHistory, setMedicalHistory] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -79,6 +81,9 @@ export default function Chat() {
               break;
             case 'otherMeds':
               setOtherMeds(prev => prev ? prev + ' ' + transcript : transcript);
+              break;
+            case 'medicalHistory':
+              setMedicalHistory(prev => prev ? prev + ' ' + transcript : transcript);
               break;
           }
         }
@@ -124,12 +129,14 @@ export default function Chat() {
   function handleNewQuery() {
     setResponseData(null);
     setAge('');
+    setGender('');
     setRole('');
     setMedication('');
     setQuestion('');
     setSymptoms('');
     setDuration('');
     setOtherMeds('');
+    setMedicalHistory('');
     setFiles(null);
     setError('');
     setSuccess(false);
