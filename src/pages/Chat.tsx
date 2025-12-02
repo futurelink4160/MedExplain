@@ -346,6 +346,20 @@ export default function Chat() {
         };
       }
 
+      // Add default values for missing required fields
+      if (data.final_answer_markdown && !data.response_type) {
+        console.log('Adding default response_type');
+        data.response_type = 'CLINICAL_PATIENT_SUMMARY';
+      }
+      if (data.final_answer_markdown && !data.urgency_level) {
+        console.log('Adding default urgency_level');
+        data.urgency_level = 'MEDIUM';
+      }
+      if (data.final_answer_markdown && data.emergency_detected === undefined) {
+        console.log('Adding default emergency_detected');
+        data.emergency_detected = false;
+      }
+
       // Validate minimum required fields
       const missingFields = [];
       if (!data.final_answer_markdown) missingFields.push('final_answer_markdown or clinical_summary');
