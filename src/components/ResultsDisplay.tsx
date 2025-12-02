@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   Clock,
   Info,
-  RefreshCw
+  RefreshCw,
+  User
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -317,6 +318,25 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
 
   const markdown = data.final_answer_markdown;
 
+  // Extract patient data from markdown
+  const extractPatientData = () => {
+    const ageMatch = markdown.match(/(?:Age|age)[:/\s]*(\d+)[- ]?year[- ]?old\s+(\w+)/i);
+    const medicationMatch = markdown.match(/(?:Medication|medication)[:/\s]*([^\n,]+?)(?:\n|,|\*\*)/i);
+    const symptomsMatch = markdown.match(/(?:Symptoms|symptom|presents? with)[:/\s]*([^\n]+?)(?:\n|\*\*)/i);
+    const durationMatch = markdown.match(/(\d+\s+days?)/i);
+    const otherMedsMatch = markdown.match(/(?:Other medications|other medications|concomitant medications)[:/\s]*([^\n]+?)(?:\n|\*\*)/i);
+
+    return {
+      age: ageMatch ? `${ageMatch[1]}-year-old ${ageMatch[2]}` : null,
+      medication: medicationMatch ? medicationMatch[1].trim() : null,
+      symptoms: symptomsMatch ? symptomsMatch[1].trim() : null,
+      duration: durationMatch ? durationMatch[1] : null,
+      otherMeds: otherMedsMatch ? otherMedsMatch[1].trim() : 'None reported'
+    };
+  };
+
+  const patientData = extractPatientData();
+
   return (
     <div className="space-y-6 mb-8">
       <div className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
@@ -328,6 +348,48 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
             <p className="text-blue-100 text-lg">Educational information to support your understanding</p>
           </div>
           <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
+        </div>
+      </div>
+
+      {/* Patient Information */}
+      <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-600">
+        <div className="flex items-start space-x-4">
+          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <User className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {patientData.age && (
+                <div className="bg-white p-4 rounded-lg border border-slate-200">
+                  <p className="text-sm text-slate-600 font-medium mb-1">Patient</p>
+                  <p className="text-lg text-slate-900">{patientData.age}</p>
+                </div>
+              )}
+              {patientData.medication && (
+                <div className="bg-white p-4 rounded-lg border border-slate-200">
+                  <p className="text-sm text-slate-600 font-medium mb-1">Medication</p>
+                  <p className="text-lg text-slate-900">{patientData.medication}</p>
+                </div>
+              )}
+              {patientData.symptoms && (
+                <div className="bg-white p-4 rounded-lg border border-slate-200">
+                  <p className="text-sm text-slate-600 font-medium mb-1">Your Symptoms</p>
+                  <p className="text-lg text-slate-900">{patientData.symptoms}</p>
+                </div>
+              )}
+              {patientData.duration && (
+                <div className="bg-white p-4 rounded-lg border border-slate-200">
+                  <p className="text-sm text-slate-600 font-medium mb-1">Duration</p>
+                  <p className="text-lg text-slate-900">{patientData.duration}</p>
+                </div>
+              )}
+              <div className="bg-white p-4 rounded-lg border border-slate-200">
+                <p className="text-sm text-slate-600 font-medium mb-1">Other Medications</p>
+                <p className="text-lg text-slate-900">{patientData.otherMeds}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
