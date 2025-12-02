@@ -274,6 +274,19 @@ export default function Chat() {
         }
       }
 
+      // Handle case where n8n wraps the response in an "output" field as a JSON string
+      if (data.output && typeof data.output === 'string') {
+        console.log('Response is wrapped in "output" field as JSON string, unwrapping...');
+        try {
+          const unwrapped = JSON.parse(data.output);
+          console.log('Successfully unwrapped output field');
+          data = unwrapped;
+        } catch (unwrapError) {
+          console.error('Failed to parse output field:', unwrapError);
+          throw new Error('Response wrapped in output field but could not parse it');
+        }
+      }
+
       console.log('=== RESPONSE STRUCTURE CHECK ===');
       console.log('- Has final_answer_markdown:', !!data.final_answer_markdown);
       console.log('- Has pgx_results:', !!data.pgx_results);
