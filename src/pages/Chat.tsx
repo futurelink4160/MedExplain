@@ -218,10 +218,17 @@ export default function Chat() {
       }
 
       const responseText = await response.text();
+      console.log('=== N8N RESPONSE DEBUG ===');
       console.log('Raw response text:', responseText);
       console.log('Response text length:', responseText.length);
-      console.log('First 100 chars:', responseText.substring(0, 100));
-      console.log('Last 100 chars:', responseText.substring(responseText.length - 100));
+      console.log('First 200 chars:', responseText.substring(0, 200));
+      console.log('Last 200 chars:', responseText.substring(Math.max(0, responseText.length - 200)));
+      console.log('Response content type:', response.headers.get('content-type'));
+
+      if (!responseText || responseText.length === 0) {
+        console.error('ERROR: Empty response from n8n webhook');
+        throw new Error('Empty response from n8n webhook. Check your n8n "Respond to Webhook" node configuration.');
+      }
 
       let data;
       try {
@@ -234,13 +241,17 @@ export default function Chat() {
           cleanedText = cleanedText.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
         }
 
-        console.log('Cleaned text first 100 chars:', cleanedText.substring(0, 100));
+        console.log('Cleaned text first 200 chars:', cleanedText.substring(0, 200));
         data = JSON.parse(cleanedText);
-        console.log('Parsed response data:', JSON.stringify(data, null, 2));
+        console.log('Successfully parsed JSON');
+        console.log('Parsed data type:', typeof data);
+        console.log('Parsed data keys:', Object.keys(data));
+        console.log('Full parsed response data:', JSON.stringify(data, null, 2));
       } catch (parseError) {
-        console.error('Failed to parse JSON:', parseError);
-        console.error('Response text that failed to parse:', responseText.substring(0, 500));
-        throw new Error('Invalid JSON response from server');
+        console.error('===== JSON PARSE ERROR =====');
+        console.error('Parse error:', parseError);
+        console.error('Failed text (first 1000 chars):', responseText.substring(0, 1000));
+        throw new Error(`Invalid JSON response from n8n: ${parseError.message}`);
       }
 
       if (!data || typeof data !== 'object') {
@@ -248,22 +259,42 @@ export default function Chat() {
         throw new Error('Invalid response structure from server');
       }
 
-      console.log('Response data structure check:');
+      // Handle case where n8n returns an array with one item
+      if (Array.isArray(data)) {
+        console.log('Response is an array, extracting first item');
+        if (data.length > 0) {
+          data = data[0];
+          console.log('Extracted data:', data);
+        } else {
+          throw new Error('n8n returned empty array');
+        }
+      }
+
+      console.log('=== RESPONSE STRUCTURE CHECK ===');
       console.log('- Has final_answer_markdown:', !!data.final_answer_markdown);
       console.log('- Has pgx_results:', !!data.pgx_results);
       console.log('- Has emergency_detected:', !!data.emergency_detected);
       console.log('- Has response_type:', !!data.response_type);
       console.log('- Has urgency_level:', !!data.urgency_level);
+      console.log('- Has rag_results:', !!data.rag_results);
 
-      if (!data.final_answer_markdown) {
-        console.warn('WARNING: Missing final_answer_markdown in response');
+      // Check if required fields are missing
+      const missingFields = [];
+      if (!data.final_answer_markdown) missingFields.push('final_answer_markdown');
+      if (!data.pgx_results) missingFields.push('pgx_results');
+      if (!data.response_type) missingFields.push('response_type');
+      if (!data.urgency_level) missingFields.push('urgency_level');
+
+      if (missingFields.length > 0) {
+        console.error('===== MISSING REQUIRED FIELDS =====');
+        console.error('Missing fields:', missingFields);
+        console.error('Available fields:', Object.keys(data));
+        console.error('Full response:', JSON.stringify(data, null, 2));
+        throw new Error(`n8n response missing required fields: ${missingFields.join(', ')}. Check your n8n "Respond to Webhook" node.`);
       }
 
-      if (!data.pgx_results) {
-        console.warn('WARNING: Missing pgx_results in response');
-      }
-
-      console.log('Setting response data:', data);
+      console.log('✓ All required fields present');
+      console.log('Setting response data and scrolling to results...');
       setResponseData(data);
       setSuccess(true);
 
