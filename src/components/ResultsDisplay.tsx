@@ -78,9 +78,21 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
 
   const extractSection = (markdown: string | undefined, title: string): string => {
     if (!markdown) return '';
+
+    // First, ensure literal \n are converted to actual newlines
+    const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
+
     const regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|$)`, 'i');
-    const match = markdown.match(regex);
-    return match ? match[1].trim() : '';
+    const match = cleanedMarkdown.match(regex);
+    const extracted = match ? match[1].trim() : '';
+
+    if (extracted) {
+      console.log(`Extracted section "${title}":`, extracted.substring(0, 100) + '...');
+    } else {
+      console.log(`Section "${title}" not found in markdown`);
+    }
+
+    return extracted;
   };
 
   if (!data || !data.final_answer_markdown) {
@@ -366,6 +378,22 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
           </div>
         </div>
       </div>
+
+      {extractSection(markdown, 'Relevant Genetic Information') && (
+        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Activity className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-indigo-900 mb-4">Relevant Genetic Information</h2>
+              <div className="prose prose-indigo max-w-none text-gray-700">
+                <ReactMarkdown>{extractSection(markdown, 'Relevant Genetic Information')}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
         <div className="flex items-start space-x-4">
