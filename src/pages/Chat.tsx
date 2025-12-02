@@ -300,6 +300,7 @@ export default function Chat() {
 
       console.log('=== RESPONSE STRUCTURE CHECK ===');
       console.log('- Has final_answer_markdown:', !!data.final_answer_markdown);
+      console.log('- Has markdown_answer:', !!data.markdown_answer);
       console.log('- Has pgx_results:', !!data.pgx_results);
       console.log('- Has clinical_summary:', !!data.clinical_summary);
       console.log('- Has pgx_interpretation:', !!data.pgx_interpretation);
@@ -308,6 +309,29 @@ export default function Chat() {
       console.log('- Has response_type:', !!data.response_type);
       console.log('- Has urgency_level:', !!data.urgency_level);
       console.log('- Has rag_results:', !!data.rag_results);
+
+      // Handle alternative field name: markdown_answer -> final_answer_markdown
+      if (data.markdown_answer && !data.final_answer_markdown) {
+        console.log('Converting markdown_answer to final_answer_markdown');
+
+        // Check if markdown_answer is actually a JSON string
+        if (typeof data.markdown_answer === 'string' && data.markdown_answer.trim().startsWith('{')) {
+          try {
+            console.log('markdown_answer appears to be JSON, attempting to parse...');
+            const parsedMarkdown = JSON.parse(data.markdown_answer);
+            console.log('Successfully parsed markdown_answer as JSON:', parsedMarkdown);
+
+            // Merge the parsed content into data
+            Object.assign(data, parsedMarkdown);
+          } catch (e) {
+            console.log('Could not parse markdown_answer as JSON, using as-is');
+            data.final_answer_markdown = data.markdown_answer;
+          }
+        } else {
+          data.final_answer_markdown = data.markdown_answer;
+        }
+        delete data.markdown_answer;
+      }
 
       // Convert clinical format to UI format if needed
       if (data.clinical_summary && !data.final_answer_markdown) {
