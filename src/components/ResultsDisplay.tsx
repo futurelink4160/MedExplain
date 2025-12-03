@@ -77,12 +77,23 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
     setShowEmailModal(false);
   };
 
+  if (!data || !data.final_answer_markdown) {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 p-8">
+        <div className="text-center">
+          <p className="text-gray-600">No results data available.</p>
+          <p className="text-sm text-gray-500 mt-2">Debug: {JSON.stringify(data)}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const markdown = data.final_answer_markdown;
+
   const extractSection = (markdown: string | undefined, title: string): string => {
     if (!markdown) return '';
 
-    // First, ensure literal \n are converted to actual newlines
     const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
-
     const regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|$)`, 'i');
     const match = cleanedMarkdown.match(regex);
     const extracted = match ? match[1].trim() : '';
@@ -96,14 +107,12 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
     return extracted;
   };
 
-  // Parse all sections from markdown dynamically
   const parseAllSections = (markdown: string | undefined): Array<{ title: string; content: string }> => {
     if (!markdown) return [];
 
     const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
     const sections: Array<{ title: string; content: string }> = [];
 
-    // Match all ### headers and their content
     const regex = /###\s*([^\n]+)\n([\s\S]*?)(?=###|$)/g;
     let match;
 
@@ -122,21 +131,9 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
   const allSections = parseAllSections(markdown);
   const hasSections = allSections.length > 0;
 
-  // Check if any patient-friendly sections exist
   const hasPatientSections = extractSection(markdown, 'Understanding Your Concern') ||
     extractSection(markdown, 'About This Medication') ||
     extractSection(markdown, 'Why These Symptoms May Happen');
-
-  if (!data || !data.final_answer_markdown) {
-    return (
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 p-8">
-        <div className="text-center">
-          <p className="text-gray-600">No results data available.</p>
-          <p className="text-sm text-gray-500 mt-2">Debug: {JSON.stringify(data)}</p>
-        </div>
-      </div>
-    );
-  }
 
   // Check if this is clinical format response
   const isClinicalFormat = data.clinical_summary || data.pgx_interpretation || data.clinical_recommendations;
@@ -346,8 +343,6 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
       </div>
     );
   }
-
-  const markdown = data.final_answer_markdown;
 
   // Extract patient data from markdown
   const extractPatientData = () => {
