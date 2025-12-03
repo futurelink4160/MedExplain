@@ -96,6 +96,32 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
     return extracted;
   };
 
+  // Parse all sections from markdown dynamically
+  const parseAllSections = (markdown: string | undefined): Array<{ title: string; content: string }> => {
+    if (!markdown) return [];
+
+    const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
+    const sections: Array<{ title: string; content: string }> = [];
+
+    // Match all ### headers and their content
+    const regex = /###\s*([^\n]+)\n([\s\S]*?)(?=###|$)/g;
+    let match;
+
+    while ((match = regex.exec(cleanedMarkdown)) !== null) {
+      const title = match[1].trim();
+      const content = match[2].trim();
+      if (content) {
+        sections.push({ title, content });
+      }
+    }
+
+    console.log('Parsed sections:', sections.map(s => s.title));
+    return sections;
+  };
+
+  const allSections = parseAllSections(markdown);
+  const hasSections = allSections.length > 0;
+
   // Check if any patient-friendly sections exist
   const hasPatientSections = extractSection(markdown, 'Understanding Your Concern') ||
     extractSection(markdown, 'About This Medication') ||
@@ -342,49 +368,236 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
 
   const patientData = extractPatientData();
 
-  // If no patient-friendly sections found, show raw markdown
-  if (!hasPatientSections) {
+  // Get color scheme based on section title
+  const getSectionStyle = (title: string) => {
+    const lowerTitle = title.toLowerCase();
+
+    if (lowerTitle.includes('gene') || lowerTitle.includes('genetic') || lowerTitle.includes('pharmacogenomic') || lowerTitle.includes('pgx')) {
+      return { bg: 'from-teal-50 to-cyan-50', border: 'border-teal-500', iconBg: 'bg-teal-500', icon: Activity };
+    }
+    if (lowerTitle.includes('summary') || lowerTitle.includes('overview')) {
+      return { bg: 'from-blue-50 to-slate-50', border: 'border-blue-500', iconBg: 'bg-blue-500', icon: BookOpen };
+    }
+    if (lowerTitle.includes('interpretation') || lowerTitle.includes('analysis')) {
+      return { bg: 'from-cyan-50 to-sky-50', border: 'border-cyan-500', iconBg: 'bg-cyan-500', icon: Activity };
+    }
+    if (lowerTitle.includes('recommendation') || lowerTitle.includes('action')) {
+      return { bg: 'from-green-50 to-emerald-50', border: 'border-green-600', iconBg: 'bg-green-600', icon: CheckCircle2 };
+    }
+    if (lowerTitle.includes('warning') || lowerTitle.includes('alert') || lowerTitle.includes('emergency')) {
+      return { bg: 'from-red-50 to-rose-50', border: 'border-red-600', iconBg: 'bg-red-600', icon: AlertTriangle };
+    }
+    if (lowerTitle.includes('medication') || lowerTitle.includes('drug')) {
+      return { bg: 'from-yellow-50 to-amber-50', border: 'border-yellow-500', iconBg: 'bg-yellow-500', icon: Pill };
+    }
+    if (lowerTitle.includes('safety') || lowerTitle.includes('precaution')) {
+      return { bg: 'from-orange-50 to-red-50', border: 'border-orange-500', iconBg: 'bg-orange-500', icon: Shield };
+    }
+    if (lowerTitle.includes('disclaimer') || lowerTitle.includes('note')) {
+      return { bg: 'from-gray-50 to-slate-50', border: 'border-gray-500', iconBg: 'bg-gray-600', icon: Info };
+    }
+    if (lowerTitle.includes('contact') || lowerTitle.includes('doctor') || lowerTitle.includes('call')) {
+      return { bg: 'from-blue-50 to-cyan-50', border: 'border-blue-600', iconBg: 'bg-blue-600', icon: Phone };
+    }
+
+    // Default style
+    return { bg: 'from-slate-50 to-gray-50', border: 'border-slate-500', iconBg: 'bg-slate-500', icon: BookOpen };
+  };
+
+  // If sections found, show them beautifully
+  if (hasSections && !hasPatientSections) {
     return (
       <div className="space-y-6 mb-8">
-        <div className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
           <div className="relative z-10 flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2">Your Medical Information</h1>
-              <p className="text-blue-100 text-lg">Educational information from your query</p>
+              <h1 className="text-4xl font-bold text-white mb-2">Your Pharmacogenomic Report</h1>
+              <p className="text-blue-100 text-lg">Personalized medication and genetic information</p>
             </div>
             <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
-          <div className="prose prose-blue max-w-none text-gray-700">
-            <ReactMarkdown>{markdown.replace(/\\n/g, '\n')}</ReactMarkdown>
+        {allSections.map((section, idx) => {
+          const style = getSectionStyle(section.title);
+          const IconComponent = style.icon;
+
+          return (
+            <div key={idx} className={`bg-gradient-to-br ${style.bg} rounded-xl shadow-lg p-6 border-l-4 ${style.border}`}>
+              <div className="flex items-start space-x-4">
+                <div className={`w-12 h-12 ${style.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                  <IconComponent className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{section.title}</h2>
+                  <div className="prose prose-blue max-w-none text-gray-700">
+                    <ReactMarkdown>{section.content}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+
+        {data.pgx_results && (
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+            <button
+              onClick={() => setShowPgx(!showPgx)}
+              className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center">
+                  <Info className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Additional Genomic Details (Genes, Variants & Drug Labels)
+                </h2>
+              </div>
+              {showPgx ? (
+                <ChevronUp className="w-6 h-6 text-gray-600" />
+              ) : (
+                <ChevronDown className="w-6 h-6 text-gray-600" />
+              )}
+            </button>
+
+            {showPgx && (
+              <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
+                {data.pgx_results.drug_labels.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
+                    <div className="space-y-4">
+                      {data.pgx_results.drug_labels.map((label, idx) => {
+                        if (typeof label === 'string') {
+                          return (
+                            <div key={idx} className="text-gray-700">
+                              <p>{label}</p>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div key={idx} className="space-y-3">
+                            {label.known_side_effects && label.known_side_effects.length > 0 && (
+                              <div>
+                                <h4 className="font-bold text-gray-800 mb-2">Known Side Effects:</h4>
+                                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                  {label.known_side_effects.map((effect, i) => (
+                                    <li key={i}>{effect}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {label.box_warnings && label.box_warnings.length > 0 && (
+                              <div className="bg-red-50 border-l-4 border-red-500 p-3 rounded">
+                                <h4 className="font-bold text-red-900 mb-2">Important Warnings:</h4>
+                                <ul className="list-disc list-inside space-y-1 text-red-800">
+                                  {label.box_warnings.map((warning, i) => (
+                                    <li key={i}>{warning}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {label.pharmacogenomic_considerations && label.pharmacogenomic_considerations.length > 0 && (
+                              <div>
+                                <h4 className="font-bold text-gray-800 mb-2">Genetic Considerations:</h4>
+                                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                  {label.pharmacogenomic_considerations.map((consideration, i) => (
+                                    <li key={i}>{consideration}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {label.safety_notes && label.safety_notes.length > 0 && (
+                              <div>
+                                <h4 className="font-bold text-gray-800 mb-2">Safety Notes:</h4>
+                                <ul className="list-disc list-inside space-y-1 text-gray-700">
+                                  {label.safety_notes.map((note, i) => (
+                                    <li key={i}>{note}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {label.when_to_call_doctor && label.when_to_call_doctor.length > 0 && (
+                              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+                                <h4 className="font-bold text-yellow-900 mb-2">When to Call Your Doctor:</h4>
+                                <ul className="list-disc list-inside space-y-1 text-yellow-800">
+                                  {label.when_to_call_doctor.map((when, i) => (
+                                    <li key={i}>{when}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {data.pgx_results.genes.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
+                    <ul className="list-disc list-inside space-y-2 text-gray-700">
+                      {data.pgx_results.genes.map((gene, idx) => (
+                        <li key={idx}>{gene}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {data.pgx_results.variants.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Relevant Variants</h3>
+                    <ul className="list-disc list-inside space-y-2 text-gray-700">
+                      {data.pgx_results.variants.map((variant, idx) => (
+                        <li key={idx}>{variant}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {data.pgx_results.phenotypes.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Information</h3>
+                    <ul className="list-disc list-inside space-y-2 text-gray-700">
+                      {data.pgx_results.phenotypes.map((phenotype, idx) => (
+                        <li key={idx}>{phenotype}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={handleDownloadPDF}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
           >
             <Download className="w-5 h-5" />
-            <span>Download as PDF</span>
+            <span>Download Report as PDF</span>
           </button>
 
           <button
             onClick={() => setShowEmailModal(true)}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-green-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
           >
             <Mail className="w-5 h-5" />
-            <span>Email This</span>
+            <span>Email This Report</span>
           </button>
 
           {onNewQuery && (
             <button
               onClick={onNewQuery}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             >
               <RefreshCw className="w-5 h-5" />
               <span>Start New Query</span>
@@ -395,7 +608,7 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
         {showEmailModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Email Summary</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Email Report</h2>
 
               <div className="space-y-4">
                 <div>
@@ -439,7 +652,7 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
                 </button>
                 <button
                   onClick={handleSendEmail}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg font-bold hover:shadow-lg transition"
                 >
                   Send Email
                 </button>
