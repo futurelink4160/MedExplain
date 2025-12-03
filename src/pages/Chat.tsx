@@ -906,14 +906,7 @@ export default function Chat() {
 
         {responseData && (
           <div ref={resultsRef} className="mt-8">
-            {/* Detect format: Clinical vs Patient-Friendly */}
-            {responseData.response_type === 'CLINICAL_PGX_SUMMARY' ||
-             responseData.final_answer_markdown?.includes('Pharmacogenomic Context') ||
-             responseData.final_answer_markdown?.includes('Clinical Interpretation') ? (
-              <ClinicalResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
-            ) : (
-              <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
-            )}
+            <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
           </div>
         )}
       </div>
