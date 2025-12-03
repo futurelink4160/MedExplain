@@ -96,6 +96,11 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
     return extracted;
   };
 
+  // Check if any patient-friendly sections exist
+  const hasPatientSections = extractSection(markdown, 'Understanding Your Concern') ||
+    extractSection(markdown, 'About This Medication') ||
+    extractSection(markdown, 'Why These Symptoms May Happen');
+
   if (!data || !data.final_answer_markdown) {
     return (
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8 p-8">
@@ -336,6 +341,115 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
   };
 
   const patientData = extractPatientData();
+
+  // If no patient-friendly sections found, show raw markdown
+  if (!hasPatientSections) {
+    return (
+      <div className="space-y-6 mb-8">
+        <div className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Your Medical Information</h1>
+              <p className="text-blue-100 text-lg">Educational information from your query</p>
+            </div>
+            <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+          <div className="prose prose-blue max-w-none text-gray-700">
+            <ReactMarkdown>{markdown.replace(/\\n/g, '\n')}</ReactMarkdown>
+          </div>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <button
+            onClick={handleDownloadPDF}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          >
+            <Download className="w-5 h-5" />
+            <span>Download as PDF</span>
+          </button>
+
+          <button
+            onClick={() => setShowEmailModal(true)}
+            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          >
+            <Mail className="w-5 h-5" />
+            <span>Email This</span>
+          </button>
+
+          {onNewQuery && (
+            <button
+              onClick={onNewQuery}
+              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <RefreshCw className="w-5 h-5" />
+              <span>Start New Query</span>
+            </button>
+          )}
+        </div>
+
+        {showEmailModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Email Summary</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">To:</label>
+                  <input
+                    type="email"
+                    value={emailTo}
+                    onChange={(e) => setEmailTo(e.target.value)}
+                    placeholder="recipient@example.com"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Subject:</label>
+                  <input
+                    type="text"
+                    value={emailSubject}
+                    onChange={(e) => setEmailSubject(e.target.value)}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Message:</label>
+                  <textarea
+                    value={emailBody}
+                    onChange={(e) => setEmailBody(e.target.value)}
+                    rows={10}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowEmailModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendEmail}
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition"
+                >
+                  Send Email
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 mb-8">
