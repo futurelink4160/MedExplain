@@ -200,10 +200,18 @@ export default function Chat() {
         submitted_at: new Date().toISOString()
       };
 
-      console.log('Sending payload to n8n:', payload);
-
       const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://ftlteam4160.app.n8n.cloud/webhook-test/medexplain-query';
+
+      console.log('=== WEBHOOK REQUEST DEBUG ===');
       console.log('Webhook URL:', webhookUrl);
+      console.log('Payload keys:', Object.keys(payload));
+      console.log('Payload Age:', payload.Age);
+      console.log('Payload Gender:', payload.Gender);
+      console.log('Payload Role:', payload['Profession/Role']);
+      console.log('Payload Question:', payload['Your Question/Inquiry']);
+      console.log('Payload Attachments type:', typeof payload.Attachments);
+      console.log('Payload Attachments value:', payload.Attachments);
+      console.log('Full payload:', JSON.stringify(payload, null, 2));
 
       const response = await fetch(webhookUrl, {
         method: 'POST',
@@ -213,12 +221,17 @@ export default function Chat() {
         body: JSON.stringify(payload),
       });
 
+      console.log('=== WEBHOOK RESPONSE DEBUG ===');
       console.log('Response status:', response.status);
       console.log('Response ok:', response.ok);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('=== WEBHOOK ERROR ===');
+        console.error('Error status:', response.status);
         console.error('Error response:', errorText);
+        console.error('Was trying to send to:', webhookUrl);
         throw new Error(`Failed to submit form: ${response.status} - ${errorText}`);
       }
 
