@@ -375,58 +375,72 @@ export default function Chat() {
         data.final_answer_markdown = fixNewlines(data.final_answer_markdown);
       }
 
-      // Check if clinical_summary is a nested object and convert it to markdown
-      if (data.clinical_summary && typeof data.clinical_summary === 'object') {
-        console.log('clinical_summary is an object, converting to markdown...');
-        let summaryText = '';
+      // Check if we have structured clinical_summary and convert to markdown
+      if (data.clinical_summary && typeof data.clinical_summary === 'object' && !data.final_answer_markdown) {
+        console.log('clinical_summary is an object, converting to markdown format...');
+        let markdown = '';
 
-        const formatObject = (obj: any, indent = ''): string => {
-          let result = '';
-          for (const [key, value] of Object.entries(obj)) {
-            const formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        const cs = data.clinical_summary;
 
-            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-              result += `${indent}**${formattedKey}:**\n${formatObject(value, indent + '  ')}\n`;
-            } else if (Array.isArray(value)) {
-              result += `${indent}**${formattedKey}:**\n`;
-              value.forEach(item => {
-                result += `${indent}- ${item}\n`;
-              });
-            } else {
-              result += `${indent}**${formattedKey}:** ${value}\n`;
-            }
+        // Patient Overview
+        if (cs.patient_profile) {
+          markdown += `**Patient Profile:**\n`;
+          const profile = cs.patient_profile;
+          if (profile.age) markdown += `- **Age:** ${profile.age}\n`;
+          if (profile.sex) markdown += `- **Gender:** ${profile.sex}\n`;
+          if (profile.current_medications && Array.isArray(profile.current_medications)) {
+            markdown += `- **Current Medications:** ${profile.current_medications.join(', ')}\n`;
           }
-          return result;
-        };
-
-        summaryText = formatObject(data.clinical_summary);
-        data.clinical_summary = summaryText;
-      }
-
-      // Convert clinical format to UI format if needed
-      if (data.clinical_summary && !data.final_answer_markdown) {
-        console.log('Converting clinical format to UI format...');
-
-        let markdown = `### Clinical Summary\n\n${data.clinical_summary}\n\n`;
-
-        if (data.pgx_interpretation) {
-          markdown += `### Pharmacogenomic Interpretation\n\n${data.pgx_interpretation}\n\n`;
+          if (profile.symptoms && Array.isArray(profile.symptoms)) {
+            markdown += `- **Current Symptoms:** ${profile.symptoms.join(', ')}\n`;
+          }
+          if (profile.symptom_duration_days) {
+            markdown += `- **Duration of Symptoms:** ${profile.symptom_duration_days} days\n`;
+          }
+          if (profile.urgency_level) markdown += `- **Urgency Level:** ${profile.urgency_level}\n`;
+          if (profile.genetic_marker) markdown += `- **Genetic Marker:** ${profile.genetic_marker}\n`;
+          markdown += `\n---\n\n`;
         }
 
-        if (data.clinical_recommendations && Array.isArray(data.clinical_recommendations)) {
-          markdown += `### Clinical Recommendations\n\n`;
-          data.clinical_recommendations.forEach((rec, index) => {
-            markdown += `${index + 1}. ${rec}\n`;
+        // Pharmacogenomic Context
+        markdown += `### Pharmacogenomic Context\n\n`;
+        if (data.rag_results) {
+          markdown += `${data.rag_results}\n\n`;
+        }
+        if (cs.pharmacogenomic_interpretation) {
+          const pgx = cs.pharmacogenomic_interpretation;
+          if (pgx.summary) markdown += `${pgx.summary}\n\n`;
+          if (pgx.relevance) markdown += `${pgx.relevance}\n\n`;
+          if (pgx.clinical_implications && Array.isArray(pgx.clinical_implications)) {
+            pgx.clinical_implications.forEach((impl: string) => {
+              markdown += `- ${impl}\n`;
+            });
+            markdown += `\n`;
+          }
+          if (pgx.guideline_reference) {
+            markdown += `**Guideline Reference:** ${pgx.guideline_reference}\n\n`;
+          }
+        }
+
+        // Clinical Interpretation
+        if (cs.clinical_context && Array.isArray(cs.clinical_context)) {
+          markdown += `### Clinical Interpretation\n\n`;
+          cs.clinical_context.forEach((context: string) => {
+            markdown += `${context}\n\n`;
           });
-          markdown += `\n`;
         }
 
-        if (data.disclaimer) {
-          markdown += `### Disclaimer\n\n${data.disclaimer}\n\n`;
+        // Clinical Recommendations
+        if (cs.management_considerations && Array.isArray(cs.management_considerations)) {
+          markdown += `### Recommendations for Clinical Action\n\n`;
+          cs.management_considerations.forEach((rec: string, idx: number) => {
+            markdown += `${idx + 1}. ${rec}\n\n`;
+          });
         }
 
         data.final_answer_markdown = markdown;
-        console.log('Converted to markdown format');
+        console.log('Successfully converted clinical_summary to markdown');
+        console.log('Generated markdown preview:', markdown.substring(0, 500));
       }
 
       // Create empty pgx_results if not present
