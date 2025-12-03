@@ -22,6 +22,27 @@ interface PgxResults {
   phenotypes: string[];
 }
 
+interface ClinicalSummary {
+  patient_profile?: {
+    age?: number;
+    sex?: string;
+    current_medications?: string[];
+    symptoms?: string[];
+    symptom_duration_days?: number;
+    urgency_level?: string;
+    emergency_red_flags?: boolean;
+    genetic_marker?: string;
+  };
+  clinical_context?: string[];
+  pharmacogenomic_interpretation?: {
+    summary?: string;
+    relevance?: string;
+    clinical_implications?: string[];
+    guideline_reference?: string;
+  };
+  management_considerations?: string[];
+}
+
 interface ResponseData {
   response_type: string;
   emergency_detected: boolean;
@@ -29,7 +50,7 @@ interface ResponseData {
   rag_results?: string;
   pgx_results?: PgxResults;
   final_answer_markdown?: string;
-  clinical_summary?: string;
+  clinical_summary?: string | ClinicalSummary;
   pgx_interpretation?: string;
   clinical_recommendations?: string[];
   disclaimer?: string;
@@ -933,7 +954,11 @@ export default function Chat() {
 
         {responseData && (
           <div ref={resultsRef} className="mt-8">
-            <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+            {responseData.response_type === 'CLINICAL_PGX_SUMMARY' || responseData.response_type === 'CLINICAL_PATIENT_SUMMARY' ? (
+              <ClinicalResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+            ) : (
+              <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+            )}
           </div>
         )}
       </div>
