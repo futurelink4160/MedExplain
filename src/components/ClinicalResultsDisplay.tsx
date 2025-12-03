@@ -9,7 +9,10 @@ import {
   Download,
   Mail,
   RefreshCw,
-  Dna
+  Dna,
+  AlertTriangle,
+  CheckCircle,
+  Printer
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -94,6 +97,13 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
                          extractSection(markdown, 'Recommendations for Clinical Management') ||
                          extractSection(markdown, 'Clinical Recommendations') ||
                          extractSection(markdown, 'Recommendations for Provider Consideration');
+  const nextSteps = extractSection(markdown, 'Next Steps') ||
+                   extractSection(markdown, 'Follow-up Actions') ||
+                   extractSection(markdown, 'Action Steps');
+  const warningSignsSection = extractSection(markdown, 'Warning Signs') ||
+                              extractSection(markdown, 'Red Flags') ||
+                              extractSection(markdown, 'Emergency Signs') ||
+                              extractSection(markdown, 'When to Seek Immediate Care');
   const summary = extractSection(markdown, 'Summary');
   const references = extractSection(markdown, 'References');
 
@@ -126,33 +136,6 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
           </div>
           <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
         </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-4 justify-end">
-        <button
-          onClick={handleDownloadPDF}
-          className="flex items-center space-x-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
-        >
-          <Download className="w-4 h-4" />
-          <span>Download PDF</span>
-        </button>
-        <button
-          onClick={() => setShowEmailModal(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Mail className="w-4 h-4" />
-          <span>Email Summary</span>
-        </button>
-        {onNewQuery && (
-          <button
-            onClick={onNewQuery}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>New Query</span>
-          </button>
-        )}
       </div>
 
       {/* Patient Overview */}
@@ -217,6 +200,40 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
               <h2 className="text-2xl font-bold text-cyan-900 mb-4">Clinical Recommendations</h2>
               <div className="prose prose-cyan max-w-none text-gray-700">
                 <ReactMarkdown>{recommendations}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Next Steps */}
+      {nextSteps && (
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-green-900 mb-4">Next Steps</h2>
+              <div className="prose prose-green max-w-none text-gray-700">
+                <ReactMarkdown>{nextSteps}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Warning Signs */}
+      {warningSignsSection && (
+        <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-lg p-6 border-l-4 border-red-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-red-900 mb-4">Warning Signs</h2>
+              <div className="prose prose-red max-w-none text-gray-700">
+                <ReactMarkdown>{warningSignsSection}</ReactMarkdown>
               </div>
             </div>
           </div>
@@ -332,6 +349,33 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
           </div>
         </div>
       )}
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-4 justify-center pt-6">
+        <button
+          onClick={handleDownloadPDF}
+          className="flex items-center space-x-2 px-6 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium shadow-lg hover:shadow-xl"
+        >
+          <Download className="w-5 h-5" />
+          <span>Download</span>
+        </button>
+        <button
+          onClick={() => window.print()}
+          className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl"
+        >
+          <Printer className="w-5 h-5" />
+          <span>Print</span>
+        </button>
+        {onNewQuery && (
+          <button
+            onClick={onNewQuery}
+            className="flex items-center space-x-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-lg hover:shadow-xl"
+          >
+            <RefreshCw className="w-5 h-5" />
+            <span>Start New Query</span>
+          </button>
+        )}
+      </div>
 
       {/* Email Modal */}
       {showEmailModal && (
