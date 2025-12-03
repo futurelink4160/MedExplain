@@ -49,9 +49,10 @@ interface ResponseData {
 interface ClinicalResultsDisplayProps {
   data: ResponseData;
   onNewQuery?: () => void;
+  role?: string;
 }
 
-export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalResultsDisplayProps) {
+export default function ClinicalResultsDisplay({ data, onNewQuery, role }: ClinicalResultsDisplayProps) {
   const [showPgx, setShowPgx] = useState(true);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState('');
@@ -86,6 +87,9 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
 
   const markdown = data.final_answer_markdown.replace(/\\n/g, '\n');
 
+  // Check if user is a clinician
+  const isClinician = role === 'Doctor' || role === 'Clinician';
+
   // Extract sections
   const pgxContext = extractSection(markdown, 'Pharmacogenomic Context') ||
                      extractSection(markdown, 'Pharmacogenomic Overview') ||
@@ -97,6 +101,8 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
                          extractSection(markdown, 'Recommendations for Clinical Management') ||
                          extractSection(markdown, 'Clinical Recommendations') ||
                          extractSection(markdown, 'Recommendations for Provider Consideration');
+
+  // Patient/Caregiver specific sections
   const nextSteps = extractSection(markdown, 'Next Steps') ||
                    extractSection(markdown, 'Follow-up Actions') ||
                    extractSection(markdown, 'Action Steps');
@@ -104,6 +110,21 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
                               extractSection(markdown, 'Red Flags') ||
                               extractSection(markdown, 'Emergency Signs') ||
                               extractSection(markdown, 'When to Seek Immediate Care');
+
+  // Clinician specific sections
+  const dosingConsiderations = extractSection(markdown, 'Dosing Considerations') ||
+                              extractSection(markdown, 'Dosing Recommendations') ||
+                              extractSection(markdown, 'Dosage Adjustments');
+  const riskAssessment = extractSection(markdown, 'Risk Assessment') ||
+                        extractSection(markdown, 'Risk Stratification') ||
+                        extractSection(markdown, 'Clinical Risk Factors');
+  const monitoringRequirements = extractSection(markdown, 'Monitoring Requirements') ||
+                                extractSection(markdown, 'Follow-up Monitoring') ||
+                                extractSection(markdown, 'Laboratory Monitoring');
+  const drugInteractions = extractSection(markdown, 'Drug Interactions') ||
+                          extractSection(markdown, 'Potential Interactions') ||
+                          extractSection(markdown, 'Interaction Considerations');
+
   const summary = extractSection(markdown, 'Summary');
   const references = extractSection(markdown, 'References');
 
@@ -206,8 +227,73 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
         </div>
       )}
 
-      {/* Next Steps */}
-      {nextSteps && (
+      {/* Clinician-specific sections */}
+      {isClinician && dosingConsiderations && (
+        <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl shadow-lg p-6 border-l-4 border-violet-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-violet-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Activity className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-violet-900 mb-4">Dosing Considerations</h2>
+              <div className="prose prose-violet max-w-none text-gray-700">
+                <ReactMarkdown>{dosingConsiderations}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isClinician && riskAssessment && (
+        <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl shadow-lg p-6 border-l-4 border-orange-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-orange-900 mb-4">Risk Assessment</h2>
+              <div className="prose prose-orange max-w-none text-gray-700">
+                <ReactMarkdown>{riskAssessment}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isClinician && drugInteractions && (
+        <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl shadow-lg p-6 border-l-4 border-rose-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-rose-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Shield className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-rose-900 mb-4">Drug Interactions</h2>
+              <div className="prose prose-rose max-w-none text-gray-700">
+                <ReactMarkdown>{drugInteractions}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isClinician && monitoringRequirements && (
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-teal-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-teal-900 mb-4">Monitoring Requirements</h2>
+              <div className="prose prose-teal max-w-none text-gray-700">
+                <ReactMarkdown>{monitoringRequirements}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Patient/Caregiver-specific sections */}
+      {!isClinician && nextSteps && (
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -224,7 +310,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery }: ClinicalRes
       )}
 
       {/* Warning Signs */}
-      {warningSignsSection && (
+      {!isClinician && warningSignsSection && (
         <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-lg p-6 border-l-4 border-red-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">

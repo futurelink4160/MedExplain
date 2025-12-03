@@ -3,8 +3,7 @@ import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
 import ResultsDisplay from '../components/ResultsDisplay';
 import ClinicalResultsDisplay from '../components/ClinicalResultsDisplay';
-import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus, TestTube } from 'lucide-react';
-import { mockResponseData } from '../test-data';
+import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus } from 'lucide-react';
 
 interface DrugLabel {
   drug_id?: string;
@@ -171,15 +170,6 @@ export default function Chat() {
     if (fileInput) fileInput.value = '';
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function handleTestWithMockData() {
-    setResponseData(mockResponseData as ResponseData);
-    setSuccess(true);
-
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -680,10 +670,7 @@ export default function Chat() {
                       <option value="Patient">Patient</option>
                       <option value="Caregiver">Caregiver</option>
                       <option value="Doctor">Doctor</option>
-                      <option value="Nurse">Nurse</option>
-                      <option value="Pharmacist">Pharmacist</option>
                       <option value="Clinician">Clinician</option>
-                      <option value="Other">Other</option>
                     </select>
                   </div>
 
@@ -925,15 +912,6 @@ export default function Chat() {
                     </>
                   )}
                 </button>
-
-                <button
-                  type="button"
-                  onClick={handleTestWithMockData}
-                  className="w-full mt-3 bg-gradient-to-r from-green-600 to-teal-600 text-white py-2 px-4 rounded-xl font-medium text-sm shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-300 transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
-                >
-                  <TestTube className="w-4 h-4" />
-                  <span>Test with Mock Data</span>
-                </button>
               </form>
 
               <div className="mt-6 p-4 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl">
@@ -955,7 +933,7 @@ export default function Chat() {
         {responseData && (
           <div ref={resultsRef} className="mt-8">
             {responseData.response_type === 'CLINICAL_PGX_SUMMARY' || responseData.response_type === 'CLINICAL_PATIENT_SUMMARY' ? (
-              <ClinicalResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+              <ClinicalResultsDisplay data={responseData} onNewQuery={handleNewQuery} role={role} />
             ) : (
               <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
             )}
