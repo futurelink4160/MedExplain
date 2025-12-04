@@ -27,6 +27,16 @@ export const mockResponseData = {
     ]
   },
   final_answer_markdown: `
+**Patient Information:**
+
+- **Age:** 35-year-old female
+- **Current Medication:** Sertraline (Zoloft) 50mg daily
+- **Symptoms:** Dizziness and nausea
+- **Duration:** 5 days
+- **Other Medications:** None reported
+
+---
+
 ### Understanding Your Concern
 
 You've mentioned experiencing dizziness and nausea while taking Sertraline (Zoloft), an antidepressant medication. These are known side effects that some people experience, especially when first starting the medication or after a dose change. It's important to understand what might be causing these symptoms and when you should seek medical attention.

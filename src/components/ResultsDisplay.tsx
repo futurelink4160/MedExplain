@@ -345,7 +345,17 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
   }
 
   // Extract patient data from markdown
+  // Extract patient overview from the beginning
+  const patientOverviewMatch = markdown.match(/\*\*Patient (?:Overview|Profile|Details|Information):\*\*([\s\S]*?)(?=---|###)/i);
+  const patientOverview = patientOverviewMatch ? patientOverviewMatch[1].trim() : '';
+
   const extractPatientData = () => {
+    // If there's a structured patient overview section, use ReactMarkdown to display it
+    if (patientOverview) {
+      return { hasStructuredOverview: true, overview: patientOverview };
+    }
+
+    // Otherwise, try to extract individual fields
     // Try structured format first
     let ageMatch = markdown.match(/\*\*Age:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i) ||
                    markdown.match(/\*\*Patient:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i);
@@ -386,6 +396,7 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
     let otherMedsMatch = markdown.match(/\*\*(?:Other|Concomitant) Medications?:\*\*\s*([^\n*]+)/i);
 
     return {
+      hasStructuredOverview: false,
       age: ageMatch ? `${ageMatch[1]}-year-old ${ageMatch[2]}` : null,
       medication: medicationMatch ? medicationMatch[1].trim().replace(/\s*\(.*?\)\s*$/, '') : null,
       symptoms: symptomsMatch ? symptomsMatch[1].trim() : null,
@@ -707,7 +718,7 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
       </div>
 
       {/* Patient Information */}
-      {(patientData.age || patientData.medication || patientData.symptoms || patientData.duration) && (
+      {(patientData.hasStructuredOverview || patientData.age || patientData.medication || patientData.symptoms || patientData.duration) && (
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -716,33 +727,37 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-blue-900 mb-4">Your Information</h2>
               <div className="prose prose-blue max-w-none text-gray-700">
-                <ul className="space-y-2">
-                  {patientData.age && (
-                    <li>
-                      <strong>Patient:</strong> {patientData.age}
-                    </li>
-                  )}
-                  {patientData.medication && (
-                    <li>
-                      <strong>Medication:</strong> {patientData.medication}
-                    </li>
-                  )}
-                  {patientData.symptoms && (
-                    <li>
-                      <strong>Your Symptoms:</strong> {patientData.symptoms}
-                    </li>
-                  )}
-                  {patientData.duration && (
-                    <li>
-                      <strong>Duration:</strong> {patientData.duration}
-                    </li>
-                  )}
-                  {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
-                    <li>
-                      <strong>Other Medications:</strong> {patientData.otherMeds}
-                    </li>
-                  )}
-                </ul>
+                {patientData.hasStructuredOverview ? (
+                  <ReactMarkdown>{patientData.overview}</ReactMarkdown>
+                ) : (
+                  <ul className="space-y-2">
+                    {patientData.age && (
+                      <li>
+                        <strong>Patient:</strong> {patientData.age}
+                      </li>
+                    )}
+                    {patientData.medication && (
+                      <li>
+                        <strong>Medication:</strong> {patientData.medication}
+                      </li>
+                    )}
+                    {patientData.symptoms && (
+                      <li>
+                        <strong>Your Symptoms:</strong> {patientData.symptoms}
+                      </li>
+                    )}
+                    {patientData.duration && (
+                      <li>
+                        <strong>Duration:</strong> {patientData.duration}
+                      </li>
+                    )}
+                    {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
+                      <li>
+                        <strong>Other Medications:</strong> {patientData.otherMeds}
+                      </li>
+                    )}
+                  </ul>
+                )}
               </div>
             </div>
           </div>
