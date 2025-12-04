@@ -291,6 +291,20 @@ export default function Evidence() {
                               {highlightText(doc.content, searchTerm)}
                             </p>
                           )}
+                          {doc.metadata.source && isUrl(doc.metadata.source) && (
+                            <div className="mt-3 pt-3 border-t border-purple-100">
+                              <p className="text-xs text-gray-600 mb-1 font-semibold">Source Article:</p>
+                              <a
+                                href={doc.metadata.source}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-purple-600 hover:underline text-sm font-medium flex items-center group/link transition-colors"
+                              >
+                                <span className="break-all">{doc.metadata.source}</span>
+                                <ExternalLink className="w-4 h-4 ml-2 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
+                              </a>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
