@@ -444,7 +444,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Pharmacogenomic Results Details - Always visible for all roles */}
-      {data.pgx_results && (data.pgx_results.genes?.length > 0 || data.pgx_results.variants?.length > 0 || data.pgx_results.phenotypes?.length > 0) && (
+      {data.pgx_results && (data.pgx_results.drug_labels?.length > 0 || data.pgx_results.genes?.length > 0 || data.pgx_results.variants?.length > 0 || data.pgx_results.phenotypes?.length > 0) && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
           <div className="w-full px-6 py-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200">
             <div className="flex items-center space-x-3">
@@ -454,6 +454,103 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
           </div>
 
           <div className="p-6 space-y-6">
+              {/* Drug Labels */}
+              {data.pgx_results.drug_labels && data.pgx_results.drug_labels.length > 0 && (
+                <div>
+                  <h4 className="font-bold text-slate-900 mb-3 text-lg">Drug Label Information</h4>
+                  <div className="space-y-4">
+                    {data.pgx_results.drug_labels.map((label, idx) => {
+                      if (typeof label === 'string') {
+                        return (
+                          <div key={idx} className="px-4 py-3 bg-slate-50 rounded border border-slate-200">
+                            <p className="text-gray-700">{label}</p>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={idx} className="space-y-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                          {label.drug_id && (
+                            <div className="mb-3">
+                              <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                                {label.drug_id}
+                              </span>
+                            </div>
+                          )}
+
+                          {label.known_side_effects && label.known_side_effects.length > 0 && (
+                            <div>
+                              <h5 className="font-bold text-gray-800 mb-2 flex items-center">
+                                <AlertTriangle className="w-4 h-4 mr-2 text-amber-600" />
+                                Known Side Effects:
+                              </h5>
+                              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
+                                {label.known_side_effects.map((effect, i) => (
+                                  <li key={i}>{effect}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.box_warnings && label.box_warnings.length > 0 && (
+                            <div className="bg-red-50 border-l-4 border-red-600 p-3 rounded">
+                              <h5 className="font-bold text-red-900 mb-2 flex items-center">
+                                <AlertTriangle className="w-4 h-4 mr-2" />
+                                Box Warnings:
+                              </h5>
+                              <ul className="list-disc list-inside space-y-1 text-red-800">
+                                {label.box_warnings.map((warning, i) => (
+                                  <li key={i}>{warning}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.pharmacogenomic_considerations && label.pharmacogenomic_considerations.length > 0 && (
+                            <div>
+                              <h5 className="font-bold text-gray-800 mb-2 flex items-center">
+                                <Dna className="w-4 h-4 mr-2 text-emerald-600" />
+                                Pharmacogenomic Considerations:
+                              </h5>
+                              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
+                                {label.pharmacogenomic_considerations.map((consideration, i) => (
+                                  <li key={i}>{consideration}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.safety_notes && label.safety_notes.length > 0 && (
+                            <div>
+                              <h5 className="font-bold text-gray-800 mb-2 flex items-center">
+                                <Shield className="w-4 h-4 mr-2 text-blue-600" />
+                                Safety Notes:
+                              </h5>
+                              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
+                                {label.safety_notes.map((note, i) => (
+                                  <li key={i}>{note}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {label.when_to_call_doctor && label.when_to_call_doctor.length > 0 && (
+                            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
+                              <h5 className="font-bold text-yellow-900 mb-2">When to Contact Healthcare Provider:</h5>
+                              <ul className="list-disc list-inside space-y-1 text-yellow-800">
+                                {label.when_to_call_doctor.map((when, i) => (
+                                  <li key={i}>{when}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Testing Guidelines */}
               {data.pgx_results.testing_guidelines && (
                 <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
