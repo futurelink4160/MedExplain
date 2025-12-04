@@ -707,80 +707,42 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
       </div>
 
       {/* Patient Information */}
-      {patientData.age && (
+      {(patientData.age || patientData.medication || patientData.symptoms || patientData.duration) && (
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <User className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-blue-900 mb-4">Patient</h2>
+              <h2 className="text-2xl font-bold text-blue-900 mb-4">Your Information</h2>
               <div className="prose prose-blue max-w-none text-gray-700">
-                <p className="text-xl">{patientData.age}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {patientData.medication && (
-        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Pill className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-yellow-900 mb-4">Medication</h2>
-              <div className="prose prose-yellow max-w-none text-gray-700">
-                <p className="text-xl">{patientData.medication}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {patientData.symptoms && (
-        <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-lg p-6 border-l-4 border-red-500">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <AlertTriangle className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-red-900 mb-4">Your Symptoms</h2>
-              <div className="prose prose-red max-w-none text-gray-700">
-                <p className="text-xl">{patientData.symptoms}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {patientData.duration && (
-        <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-lg p-6 border-l-4 border-slate-500">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-slate-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Clock className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Duration</h2>
-              <div className="prose prose-slate max-w-none text-gray-700">
-                <p className="text-xl">{patientData.duration}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
-        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-teal-500">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Pill className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-teal-900 mb-4">Other Medications</h2>
-              <div className="prose prose-teal max-w-none text-gray-700">
-                <p className="text-xl">{patientData.otherMeds}</p>
+                <ul className="space-y-2">
+                  {patientData.age && (
+                    <li>
+                      <strong>Patient:</strong> {patientData.age}
+                    </li>
+                  )}
+                  {patientData.medication && (
+                    <li>
+                      <strong>Medication:</strong> {patientData.medication}
+                    </li>
+                  )}
+                  {patientData.symptoms && (
+                    <li>
+                      <strong>Your Symptoms:</strong> {patientData.symptoms}
+                    </li>
+                  )}
+                  {patientData.duration && (
+                    <li>
+                      <strong>Duration:</strong> {patientData.duration}
+                    </li>
+                  )}
+                  {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
+                    <li>
+                      <strong>Other Medications:</strong> {patientData.otherMeds}
+                    </li>
+                  )}
+                </ul>
               </div>
             </div>
           </div>
