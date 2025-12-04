@@ -12,7 +12,8 @@ import {
   Dna,
   AlertTriangle,
   CheckCircle,
-  Printer
+  Printer,
+  User
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
@@ -56,6 +57,8 @@ interface PatientQueryData {
   duration?: string;
   otherMeds?: string;
   medicalHistory?: string;
+  hasStructuredOverview?: boolean;
+  overview?: string;
 }
 
 interface ClinicalResultsDisplayProps {
@@ -193,53 +196,64 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       </div>
 
       {/* Patient Information */}
-      {patientData && (patientData.age || patientData.medication || patientData.question || patientData.symptoms || patientData.duration) && (
+      {patientData && (patientData.hasStructuredOverview || patientData.age || patientData.medication || patientData.question || patientData.symptoms || patientData.duration) && (
         <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-cyan-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0">
-              <FileText className="w-6 h-6 text-white" />
+              <User className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">Patient Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {patientData.age && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200">
-                    <strong className="text-slate-700">Age:</strong> <span className="text-gray-700">{patientData.age}</span>
-                  </div>
-                )}
-                {patientData.gender && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200">
-                    <strong className="text-slate-700">Gender:</strong> <span className="text-gray-700">{patientData.gender}</span>
-                  </div>
-                )}
-                {patientData.medication && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200">
-                    <strong className="text-slate-700">Medication:</strong> <span className="text-gray-700">{patientData.medication}</span>
-                  </div>
-                )}
-                {patientData.question && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
-                    <strong className="text-slate-700">Question/Concern:</strong> <span className="text-gray-700">{patientData.question}</span>
-                  </div>
-                )}
-                {patientData.symptoms && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
-                    <strong className="text-slate-700">Current Symptoms:</strong> <span className="text-gray-700">{patientData.symptoms}</span>
-                  </div>
-                )}
-                {patientData.duration && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200">
-                    <strong className="text-slate-700">Duration:</strong> <span className="text-gray-700">{patientData.duration}</span>
-                  </div>
-                )}
-                {patientData.otherMeds && patientData.otherMeds !== 'None mentioned' && patientData.otherMeds !== 'None reported' && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
-                    <strong className="text-slate-700">Other Medications:</strong> <span className="text-gray-700">{patientData.otherMeds}</span>
-                  </div>
-                )}
-                {patientData.medicalHistory && patientData.medicalHistory !== 'None mentioned' && (
-                  <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
-                    <strong className="text-slate-700">Medical History:</strong> <span className="text-gray-700">{patientData.medicalHistory}</span>
+              <div className="prose prose-slate max-w-none text-gray-700">
+                {patientData.hasStructuredOverview ? (
+                  <ReactMarkdown>{patientData.overview}</ReactMarkdown>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {patientData.age && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <strong className="text-slate-700">Age:</strong> <span className="text-gray-700">{patientData.age}</span>
+                      </div>
+                    )}
+                    {patientData.gender && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <strong className="text-slate-700">Gender:</strong> <span className="text-gray-700">{patientData.gender}</span>
+                      </div>
+                    )}
+                    {patientData.role && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <strong className="text-slate-700">Role:</strong> <span className="text-gray-700">{patientData.role}</span>
+                      </div>
+                    )}
+                    {patientData.medication && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <strong className="text-slate-700">Medication:</strong> <span className="text-gray-700">{patientData.medication}</span>
+                      </div>
+                    )}
+                    {patientData.question && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
+                        <strong className="text-slate-700">Question/Concern:</strong> <span className="text-gray-700">{patientData.question}</span>
+                      </div>
+                    )}
+                    {patientData.symptoms && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
+                        <strong className="text-slate-700">Current Symptoms:</strong> <span className="text-gray-700">{patientData.symptoms}</span>
+                      </div>
+                    )}
+                    {patientData.duration && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200">
+                        <strong className="text-slate-700">Duration:</strong> <span className="text-gray-700">{patientData.duration}</span>
+                      </div>
+                    )}
+                    {patientData.otherMeds && patientData.otherMeds !== 'None mentioned' && patientData.otherMeds !== 'None reported' && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
+                        <strong className="text-slate-700">Other Medications:</strong> <span className="text-gray-700">{patientData.otherMeds}</span>
+                      </div>
+                    )}
+                    {patientData.medicalHistory && patientData.medicalHistory !== 'None mentioned' && (
+                      <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
+                        <strong className="text-slate-700">Medical History:</strong> <span className="text-gray-700">{patientData.medicalHistory}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

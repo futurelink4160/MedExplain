@@ -986,18 +986,6 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
           {showPgx && (
             <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
-              {/* Debug Info - Temporary */}
-              <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs">
-                <p className="font-bold text-blue-900 mb-2">Debug Info:</p>
-                <p className="text-blue-800">Drug Labels: {data.pgx_results.drug_labels?.length || 0} items</p>
-                <p className="text-blue-800">Genes: {data.pgx_results.genes?.length || 0} items</p>
-                <p className="text-blue-800">Variants: {data.pgx_results.variants?.length || 0} items</p>
-                <p className="text-blue-800">Phenotypes: {data.pgx_results.phenotypes?.length || 0} items</p>
-                {data.pgx_results.genes && data.pgx_results.genes.length > 0 && (
-                  <p className="text-blue-800 mt-2">Sample Gene: {data.pgx_results.genes[0]}</p>
-                )}
-              </div>
-
               {data.pgx_results.drug_labels && data.pgx_results.drug_labels.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
