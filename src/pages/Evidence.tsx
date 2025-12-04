@@ -10,6 +10,17 @@ interface Document {
     source?: string;
     blobType?: string;
     line?: number;
+    pdf?: {
+      info?: {
+        Title?: string;
+        Author?: string;
+      };
+      metadata?: {
+        _metadata?: {
+          'dc:title'?: string;
+        };
+      };
+    };
     [key: string]: unknown;
   };
   created_at: string;
@@ -63,6 +74,43 @@ export default function Evidence() {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  function getDocumentTitle(doc: Document): string {
+    if (doc.metadata.pdf?.metadata?._metadata?.['dc:title']) {
+      return doc.metadata.pdf.metadata._metadata['dc:title'];
+    }
+    if (doc.metadata.pdf?.info?.Title) {
+      return doc.metadata.pdf.info.Title;
+    }
+    return 'Pharmacogenomics Document';
+  }
+
+  function getDocumentType(doc: Document): string {
+    if (doc.metadata.blobType === 'application/pdf') return 'PDF';
+    if (doc.metadata.blobType === 'application/json') return 'Data';
+    return 'Document';
+  }
+
+  function highlightText(text: string, searchTerm: string): JSX.Element {
+    if (!searchTerm.trim()) return <>{text}</>;
+
+    const regex = new RegExp(`(${searchTerm})`, 'gi');
+    const parts = text.split(regex);
+
+    return (
+      <>
+        {parts.map((part, i) =>
+          regex.test(part) ? (
+            <mark key={i} className="bg-yellow-200 text-gray-900 px-1 rounded">
+              {part}
+            </mark>
+          ) : (
+            <span key={i}>{part}</span>
+          )
+        )}
+      </>
+    );
   }
 
   return (
@@ -209,25 +257,38 @@ export default function Evidence() {
                   className="group bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg hover:shadow-2xl transition-all overflow-hidden border border-purple-100 hover:border-purple-300 transform hover:-translate-y-1"
                 >
                   <div className="p-6">
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between mb-4">
                       <div className="flex items-start space-x-4 flex-1">
                         <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
                           <FileText className="w-6 h-6 text-purple-600" />
                         </div>
                         <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h3 className="text-lg font-bold text-gray-900">
+                              {getDocumentTitle(doc)}
+                            </h3>
+                            <span className="px-2 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-semibold rounded-lg">
+                              {getDocumentType(doc)}
+                            </span>
+                          </div>
+                          {doc.metadata.pdf?.info?.Author && (
+                            <p className="text-sm text-gray-600 mb-3">
+                              By {doc.metadata.pdf.info.Author}
+                            </p>
+                          )}
                           {isUrl(doc.content.trim()) ? (
                             <a
                               href={doc.content.trim()}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-purple-600 hover:underline font-semibold flex items-center group/link transition-colors"
+                              className="text-blue-600 hover:text-purple-600 hover:underline font-medium flex items-center group/link transition-colors"
                             >
                               <span className="break-all">{doc.content.trim()}</span>
                               <ExternalLink className="w-4 h-4 ml-2 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
                             </a>
                           ) : (
                             <p className="text-gray-800 leading-relaxed whitespace-pre-wrap break-words">
-                              {doc.content}
+                              {highlightText(doc.content, searchTerm)}
                             </p>
                           )}
                         </div>
@@ -236,16 +297,16 @@ export default function Evidence() {
 
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-purple-100">
                       <div className="flex items-center space-x-4 text-xs text-gray-600">
-                        {doc.metadata.source && (
-                          <span className="flex items-center">
-                            <span className="font-semibold text-gray-800 mr-1">Source:</span>
-                            {doc.metadata.source}
-                          </span>
-                        )}
                         <span className="flex items-center">
                           <Calendar className="w-3 h-3 mr-1 text-purple-500" />
                           {formatDate(doc.created_at)}
                         </span>
+                        {doc.metadata.pdf?.info?.Title && (
+                          <span className="flex items-center text-gray-500">
+                            <span className="mr-1">Pages:</span>
+                            {doc.metadata.pdf.totalPages || 'N/A'}
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-purple-400 font-mono">
                         ID: {doc.id.substring(0, 8)}
