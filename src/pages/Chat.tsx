@@ -219,7 +219,7 @@ export default function Chat() {
         submitted_at: new Date().toISOString()
       };
 
-      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://ftlteam4160.app.n8n.cloud/webhook-test/medexplain-query';
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL || 'https://ftlteam4160.app.n8n.cloud/webhook/medexplain-query';
 
       console.log('=== WEBHOOK REQUEST DEBUG ===');
       console.log('Webhook URL:', webhookUrl);
