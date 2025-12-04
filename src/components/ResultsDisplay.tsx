@@ -986,7 +986,19 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
           {showPgx && (
             <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
-              {data.pgx_results.drug_labels.length > 0 && (
+              {/* Debug Info - Temporary */}
+              <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs">
+                <p className="font-bold text-blue-900 mb-2">Debug Info:</p>
+                <p className="text-blue-800">Drug Labels: {data.pgx_results.drug_labels?.length || 0} items</p>
+                <p className="text-blue-800">Genes: {data.pgx_results.genes?.length || 0} items</p>
+                <p className="text-blue-800">Variants: {data.pgx_results.variants?.length || 0} items</p>
+                <p className="text-blue-800">Phenotypes: {data.pgx_results.phenotypes?.length || 0} items</p>
+                {data.pgx_results.genes && data.pgx_results.genes.length > 0 && (
+                  <p className="text-blue-800 mt-2">Sample Gene: {data.pgx_results.genes[0]}</p>
+                )}
+              </div>
+
+              {data.pgx_results.drug_labels && data.pgx_results.drug_labels.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
                   <div className="space-y-4">
@@ -1062,7 +1074,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 </div>
               )}
 
-              {data.pgx_results.genes.length > 0 && (
+              {data.pgx_results.genes && data.pgx_results.genes.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
                   <ul className="list-disc list-inside space-y-2 text-gray-700">
@@ -1073,7 +1085,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 </div>
               )}
 
-              {data.pgx_results.variants.length > 0 && (
+              {data.pgx_results.variants && data.pgx_results.variants.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Relevant Variants (General Education Only)</h3>
                   <ul className="list-disc list-inside space-y-2 text-gray-700">
@@ -1084,7 +1096,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 </div>
               )}
 
-              {data.pgx_results.phenotypes.length > 0 && (
+              {data.pgx_results.phenotypes && data.pgx_results.phenotypes.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Categories (General Info Only)</h3>
                   <ul className="list-disc list-inside space-y-2 text-gray-700">
@@ -1092,6 +1104,17 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                       <li key={idx}>{phenotype}</li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {/* Show message if no PGX data is available */}
+              {(!data.pgx_results.drug_labels || data.pgx_results.drug_labels.length === 0) &&
+               (!data.pgx_results.genes || data.pgx_results.genes.length === 0) &&
+               (!data.pgx_results.variants || data.pgx_results.variants.length === 0) &&
+               (!data.pgx_results.phenotypes || data.pgx_results.phenotypes.length === 0) && (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No additional genomic data available for this medication at this time.</p>
+                  <p className="text-sm text-gray-500 mt-2">This information may be added as more research becomes available.</p>
                 </div>
               )}
 
