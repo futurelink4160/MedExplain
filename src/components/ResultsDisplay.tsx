@@ -707,45 +707,80 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
       </div>
 
       {/* Patient Information */}
-      {(patientData.age || patientData.medication || patientData.symptoms || patientData.duration) && (
-        <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-600">
+      {patientData.age && (
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
           <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
               <User className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {patientData.age && (
-                  <div className="bg-white p-4 rounded-lg border border-slate-200">
-                    <p className="text-sm text-slate-600 font-medium mb-1">Patient</p>
-                    <p className="text-lg text-slate-900">{patientData.age}</p>
-                  </div>
-                )}
-                {patientData.medication && (
-                  <div className="bg-white p-4 rounded-lg border border-slate-200">
-                    <p className="text-sm text-slate-600 font-medium mb-1">Medication</p>
-                    <p className="text-lg text-slate-900">{patientData.medication}</p>
-                  </div>
-                )}
-                {patientData.symptoms && (
-                  <div className="bg-white p-4 rounded-lg border border-slate-200">
-                    <p className="text-sm text-slate-600 font-medium mb-1">Your Symptoms</p>
-                    <p className="text-lg text-slate-900">{patientData.symptoms}</p>
-                  </div>
-                )}
-                {patientData.duration && (
-                  <div className="bg-white p-4 rounded-lg border border-slate-200">
-                    <p className="text-sm text-slate-600 font-medium mb-1">Duration</p>
-                    <p className="text-lg text-slate-900">{patientData.duration}</p>
-                  </div>
-                )}
-                {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
-                  <div className="bg-white p-4 rounded-lg border border-slate-200">
-                    <p className="text-sm text-slate-600 font-medium mb-1">Other Medications</p>
-                    <p className="text-lg text-slate-900">{patientData.otherMeds}</p>
-                  </div>
-                )}
+              <h2 className="text-2xl font-bold text-blue-900 mb-4">Patient</h2>
+              <div className="prose prose-blue max-w-none text-gray-700">
+                <p className="text-xl">{patientData.age}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {patientData.medication && (
+        <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Pill className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-yellow-900 mb-4">Medication</h2>
+              <div className="prose prose-yellow max-w-none text-gray-700">
+                <p className="text-xl">{patientData.medication}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {patientData.symptoms && (
+        <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-lg p-6 border-l-4 border-red-500">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-red-900 mb-4">Your Symptoms</h2>
+              <div className="prose prose-red max-w-none text-gray-700">
+                <p className="text-xl">{patientData.symptoms}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {patientData.duration && (
+        <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-lg p-6 border-l-4 border-slate-500">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-slate-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Clock className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Duration</h2>
+              <div className="prose prose-slate max-w-none text-gray-700">
+                <p className="text-xl">{patientData.duration}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
+        <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-teal-500">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Pill className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-teal-900 mb-4">Other Medications</h2>
+              <div className="prose prose-teal max-w-none text-gray-700">
+                <p className="text-xl">{patientData.otherMeds}</p>
               </div>
             </div>
           </div>
