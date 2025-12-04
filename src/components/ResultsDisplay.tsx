@@ -346,27 +346,48 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
 
   // Extract patient data from markdown
   const extractPatientData = () => {
-    // Look for structured patient data with ** markers
-    const ageMatch = markdown.match(/\*\*Age:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i) ||
-                     markdown.match(/\*\*Patient:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i) ||
-                     markdown.match(/(?:^|\n)Age:\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i);
+    // Try structured format first
+    let ageMatch = markdown.match(/\*\*Age:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i) ||
+                   markdown.match(/\*\*Patient:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i);
 
-    const medicationMatch = markdown.match(/\*\*(?:Current )?Medication(?:s)?:\*\*\s*([^\n*]+)/i) ||
-                           markdown.match(/\*\*Drug:\*\*\s*([^\n*]+)/i) ||
-                           markdown.match(/(?:^|\n)(?:Current )?Medication:\s*([^\n]+)/im);
+    // Try natural language format from Understanding Your Concern section
+    if (!ageMatch) {
+      ageMatch = markdown.match(/(\d+)[- ]?year[- ]?old\s+(\w+)/i);
+    }
 
-    const symptomsMatch = markdown.match(/\*\*(?:Chief Complaint|Symptoms?|Presenting Symptoms?):\*\*\s*([^\n*]+)/i) ||
-                         markdown.match(/(?:^|\n)Symptoms?:\s*([^\n]+)/im);
+    // Try structured format for medication
+    let medicationMatch = markdown.match(/\*\*(?:Current )?Medication(?:s)?:\*\*\s*([^\n*]+)/i) ||
+                          markdown.match(/\*\*Drug:\*\*\s*([^\n*]+)/i);
 
-    const durationMatch = markdown.match(/\*\*Duration:\*\*\s*([^\n*]+)/i) ||
-                         markdown.match(/(?:symptoms?|complaint)[^.]*?for\s+(\d+\s+days?)/i);
+    // Try natural language format: "taking [Medication]" or "while taking [Medication]"
+    if (!medicationMatch) {
+      medicationMatch = markdown.match(/(?:taking|started|prescribed)\s+([A-Z][a-z]+(?:\s*\([A-Z][a-z]+\))?)/i) ||
+                       markdown.match(/while taking\s+([^\n,.]+?)(?:\s*\(|,|\.|for)/i);
+    }
 
-    const otherMedsMatch = markdown.match(/\*\*(?:Other|Concomitant) Medications?:\*\*\s*([^\n*]+)/i) ||
-                          markdown.match(/(?:^|\n)Other Medications?:\s*([^\n]+)/im);
+    // Try structured format for symptoms
+    let symptomsMatch = markdown.match(/\*\*(?:Chief Complaint|Symptoms?|Presenting Symptoms?):\*\*\s*([^\n*]+)/i);
+
+    // Try natural language format: "experiencing [symptoms]"
+    if (!symptomsMatch) {
+      symptomsMatch = markdown.match(/experiencing\s+([^.]+?)(?:\s+while taking|\s+with|\.)/i);
+    }
+
+    // Try structured format for duration
+    let durationMatch = markdown.match(/\*\*Duration:\*\*\s*([^\n*]+)/i);
+
+    // Try natural language format
+    if (!durationMatch) {
+      durationMatch = markdown.match(/for\s+(\d+\s+(?:days?|weeks?|months?))/i) ||
+                     markdown.match(/(\d+\s+(?:days?|weeks?|months?))\s+(?:ago|of)/i);
+    }
+
+    // Try structured format for other medications
+    let otherMedsMatch = markdown.match(/\*\*(?:Other|Concomitant) Medications?:\*\*\s*([^\n*]+)/i);
 
     return {
       age: ageMatch ? `${ageMatch[1]}-year-old ${ageMatch[2]}` : null,
-      medication: medicationMatch ? medicationMatch[1].trim() : null,
+      medication: medicationMatch ? medicationMatch[1].trim().replace(/\s*\(.*?\)\s*$/, '') : null,
       symptoms: symptomsMatch ? symptomsMatch[1].trim() : null,
       duration: durationMatch ? durationMatch[1].trim() : null,
       otherMeds: otherMedsMatch ? otherMedsMatch[1].trim() : 'None reported'
@@ -686,46 +707,50 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
       </div>
 
       {/* Patient Information */}
-      <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-600">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
-            <User className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {patientData.age && (
-                <div className="bg-white p-4 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-600 font-medium mb-1">Patient</p>
-                  <p className="text-lg text-slate-900">{patientData.age}</p>
-                </div>
-              )}
-              {patientData.medication && (
-                <div className="bg-white p-4 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-600 font-medium mb-1">Medication</p>
-                  <p className="text-lg text-slate-900">{patientData.medication}</p>
-                </div>
-              )}
-              {patientData.symptoms && (
-                <div className="bg-white p-4 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-600 font-medium mb-1">Your Symptoms</p>
-                  <p className="text-lg text-slate-900">{patientData.symptoms}</p>
-                </div>
-              )}
-              {patientData.duration && (
-                <div className="bg-white p-4 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-600 font-medium mb-1">Duration</p>
-                  <p className="text-lg text-slate-900">{patientData.duration}</p>
-                </div>
-              )}
-              <div className="bg-white p-4 rounded-lg border border-slate-200">
-                <p className="text-sm text-slate-600 font-medium mb-1">Other Medications</p>
-                <p className="text-lg text-slate-900">{patientData.otherMeds}</p>
+      {(patientData.age || patientData.medication || patientData.symptoms || patientData.duration) && (
+        <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-600">
+          <div className="flex items-start space-x-4">
+            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Your Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {patientData.age && (
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <p className="text-sm text-slate-600 font-medium mb-1">Patient</p>
+                    <p className="text-lg text-slate-900">{patientData.age}</p>
+                  </div>
+                )}
+                {patientData.medication && (
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <p className="text-sm text-slate-600 font-medium mb-1">Medication</p>
+                    <p className="text-lg text-slate-900">{patientData.medication}</p>
+                  </div>
+                )}
+                {patientData.symptoms && (
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <p className="text-sm text-slate-600 font-medium mb-1">Your Symptoms</p>
+                    <p className="text-lg text-slate-900">{patientData.symptoms}</p>
+                  </div>
+                )}
+                {patientData.duration && (
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <p className="text-sm text-slate-600 font-medium mb-1">Duration</p>
+                    <p className="text-lg text-slate-900">{patientData.duration}</p>
+                  </div>
+                )}
+                {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
+                  <div className="bg-white p-4 rounded-lg border border-slate-200">
+                    <p className="text-sm text-slate-600 font-medium mb-1">Other Medications</p>
+                    <p className="text-lg text-slate-900">{patientData.otherMeds}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-l-4 border-green-500">
         <div className="flex items-start space-x-4">
