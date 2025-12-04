@@ -132,6 +132,26 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role }: Clini
   const patientOverviewMatch = markdown.match(/\*\*Patient (?:Overview|Profile|Details):\*\*([\s\S]*?)(?=---|###)/i);
   const patientOverview = patientOverviewMatch ? patientOverviewMatch[1].trim() : '';
 
+  // Extract medication name from patient overview or markdown
+  const extractMedicationName = (): string => {
+    // Try to extract from "Current Medications:" line in patient overview
+    const medMatch = patientOverview.match(/\*\*Current Medications:\*\*\s*([^\n]+)/i);
+    if (medMatch) {
+      return medMatch[1].trim();
+    }
+
+    // Try to extract from markdown title or first heading
+    const titleMatch = markdown.match(/^#\s+(.+)/m);
+    if (titleMatch) {
+      return titleMatch[1].trim();
+    }
+
+    // Default fallback
+    return 'Medication Analysis';
+  };
+
+  const medicationTitle = extractMedicationName();
+
   return (
     <div className="space-y-6 mb-8">
       {/* Header */}
@@ -141,7 +161,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role }: Clini
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Clinical Pharmacogenomics Summary</h1>
-            <p className="text-slate-200 text-lg">Warfarin-Associated Symptom Analysis</p>
+            <p className="text-slate-200 text-lg">{medicationTitle}</p>
             <div className="mt-3 flex items-center space-x-4 text-sm">
               <span className="bg-white/20 px-3 py-1 rounded-full text-white">
                 {data.response_type || 'CLINICAL_PGX_SUMMARY'}
