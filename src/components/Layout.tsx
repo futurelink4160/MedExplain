@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, FolderOpen } from 'lucide-react';
+import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, Stethoscope } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -82,8 +82,8 @@ export default function Layout({ children }: LayoutProps) {
                       : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
                   }`}
                 >
-                  <FolderOpen className="w-4 h-4" />
-                  <span>My Cases</span>
+                  <Stethoscope className="w-4 h-4" />
+                  <span>Ask Pharmacist</span>
                 </Link>
                 {isAdmin && (
                   <Link
@@ -123,8 +123,8 @@ export default function Layout({ children }: LayoutProps) {
                         className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => setShowDropdown(false)}
                       >
-                        <BookmarkCheck className="w-4 h-4" />
-                        <span>My Saved</span>
+                        <Stethoscope className="w-4 h-4" />
+                        <span>Ask Pharmacist</span>
                       </Link>
                       <button
                         onClick={handleSignOut}

@@ -6,7 +6,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Chat from './pages/Chat';
 import Evidence from './pages/Evidence';
-import Cases from './pages/Cases';
+import AskPharmacist from './pages/AskPharmacist';
 import Admin from './pages/Admin';
 import Results from './pages/Results';
 import ResultsDemo from './pages/ResultsDemo';
@@ -54,7 +54,7 @@ function App() {
             path="/cases"
             element={
               <ProtectedRoute>
-                <Cases />
+                <AskPharmacist />
               </ProtectedRoute>
             }
           />
