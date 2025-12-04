@@ -286,26 +286,37 @@ I'm happy to provide general educational information about how medications work 
 
   return (
     <Layout>
-      <div className="max-w-5xl mx-auto px-4 py-8 h-[calc(100vh-200px)] flex flex-col">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
-              <MessageSquare className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
-                Ask My Pharmacist
-              </h2>
-              <p className="text-sm text-gray-600">Educational information about medications and genes</p>
-            </div>
-          </div>
-          <div className="hidden md:flex items-center space-x-2 bg-amber-50 px-4 py-2 rounded-lg border border-amber-200">
-            <Shield className="w-5 h-5 text-amber-600" />
-            <span className="text-sm font-medium text-amber-800">Educational Only</span>
-          </div>
-        </div>
+      <div className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden relative">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM4YjViZjYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE2YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6bTAgNDBjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMi0xMi01LjM3My0xMi0xMnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-40"></div>
 
-        <div className="flex-1 bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
+        <div className="relative max-w-5xl mx-auto px-4 pt-8 pb-8 flex flex-col h-[calc(100vh-200px)]">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full mb-4 shadow-sm">
+              <Shield className="w-4 h-4 text-purple-600" />
+              <span className="text-sm font-medium text-gray-700">
+                Educational Only - Not Medical Advice
+              </span>
+            </div>
+
+            <div className="flex items-center justify-center space-x-3 mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl transform hover:scale-105 transition-transform">
+                <MessageSquare className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Ask My Pharmacist
+              </h1>
+            </div>
+
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-2">
+              Get educational information about medications, genes, and pharmacogenomics
+            </p>
+
+            <p className="text-sm text-gray-500 italic">
+              Ask questions by typing or using voice input
+            </p>
+          </div>
+
+        <div className="flex-1 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-purple-100">
           <div className="flex-1 overflow-y-auto p-6 space-y-4">
             {messages.map((message) => (
               <div
@@ -313,14 +324,14 @@ I'm happy to provide general educational information about how medications work 
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-5 py-3 ${
+                  className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-md ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white'
+                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white'
                       : message.type === 'safety_alert'
                       ? 'bg-red-50 border-2 border-red-500 text-red-900'
                       : message.type === 'warning'
                       ? 'bg-amber-50 border-2 border-amber-400 text-amber-900'
-                      : 'bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-200 text-gray-800'
+                      : 'bg-white border border-purple-100 text-gray-800'
                   }`}
                 >
                   {message.type === 'safety_alert' && (
@@ -331,8 +342,8 @@ I'm happy to provide general educational information about how medications work 
                   )}
                   {message.type === 'info' && (
                     <div className="flex items-center space-x-2 mb-2">
-                      <Sparkles className="w-5 h-5 text-teal-600" />
-                      <span className="font-bold text-teal-700">Welcome</span>
+                      <Sparkles className="w-5 h-5 text-purple-600" />
+                      <span className="font-bold text-purple-700">Welcome</span>
                     </div>
                   )}
                   {message.type === 'warning' && (
@@ -349,9 +360,9 @@ I'm happy to provide general educational information about how medications work 
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gradient-to-br from-slate-50 to-gray-50 border border-slate-200 rounded-2xl px-5 py-3">
+                <div className="bg-white border border-purple-100 rounded-2xl px-5 py-3 shadow-md">
                   <div className="flex items-center space-x-2">
-                    <Loader2 className="w-5 h-5 text-teal-600 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-purple-600 animate-spin" />
                     <span className="text-gray-600">Thinking...</span>
                   </div>
                 </div>
@@ -369,15 +380,15 @@ I'm happy to provide general educational information about how medications work 
             </div>
           )}
 
-          <div className="p-4 border-t border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50">
+          <div className="p-4 border-t border-purple-100 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
             <div className="flex items-center space-x-2">
               <button
                 onClick={toggleVoiceInput}
                 disabled={isLoading}
                 className={`p-3 rounded-xl transition-all ${
                   isListening
-                    ? 'bg-red-500 text-white animate-pulse shadow-lg'
-                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-300'
+                    ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white animate-pulse shadow-lg'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-purple-200 shadow-sm'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                 title={isListening ? 'Stop recording' : 'Start voice input'}
               >
@@ -390,12 +401,12 @@ I'm happy to provide general educational information about how medications work 
                 onKeyPress={handleKeyPress}
                 disabled={isLoading || isListening}
                 placeholder="Ask about medications, genes, or side effects..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm"
               />
               <button
                 onClick={handleSendMessage}
                 disabled={!input.trim() || isLoading || isListening}
-                className="p-3 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-xl hover:from-teal-700 hover:to-cyan-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                className="p-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform hover:scale-105"
                 title="Send message"
               >
                 <Send className="w-5 h-5" />
@@ -406,6 +417,7 @@ I'm happy to provide general educational information about how medications work 
               <span>Educational purposes only - Always consult your healthcare provider</span>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </Layout>
