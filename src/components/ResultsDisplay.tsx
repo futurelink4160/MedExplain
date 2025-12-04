@@ -346,17 +346,29 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
 
   // Extract patient data from markdown
   const extractPatientData = () => {
-    const ageMatch = markdown.match(/(?:Age|age)[:/\s]*(\d+)[- ]?year[- ]?old\s+(\w+)/i);
-    const medicationMatch = markdown.match(/(?:Medication|medication)[:/\s]*([^\n,]+?)(?:\n|,|\*\*)/i);
-    const symptomsMatch = markdown.match(/(?:Symptoms|symptom|presents? with)[:/\s]*([^\n]+?)(?:\n|\*\*)/i);
-    const durationMatch = markdown.match(/(\d+\s+days?)/i);
-    const otherMedsMatch = markdown.match(/(?:Other medications|other medications|concomitant medications)[:/\s]*([^\n]+?)(?:\n|\*\*)/i);
+    // Look for structured patient data with ** markers
+    const ageMatch = markdown.match(/\*\*Age:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i) ||
+                     markdown.match(/\*\*Patient:\*\*\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i) ||
+                     markdown.match(/(?:^|\n)Age:\s*(\d+)[- ]?year[- ]?old\s+(\w+)/i);
+
+    const medicationMatch = markdown.match(/\*\*(?:Current )?Medication(?:s)?:\*\*\s*([^\n*]+)/i) ||
+                           markdown.match(/\*\*Drug:\*\*\s*([^\n*]+)/i) ||
+                           markdown.match(/(?:^|\n)(?:Current )?Medication:\s*([^\n]+)/im);
+
+    const symptomsMatch = markdown.match(/\*\*(?:Chief Complaint|Symptoms?|Presenting Symptoms?):\*\*\s*([^\n*]+)/i) ||
+                         markdown.match(/(?:^|\n)Symptoms?:\s*([^\n]+)/im);
+
+    const durationMatch = markdown.match(/\*\*Duration:\*\*\s*([^\n*]+)/i) ||
+                         markdown.match(/(?:symptoms?|complaint)[^.]*?for\s+(\d+\s+days?)/i);
+
+    const otherMedsMatch = markdown.match(/\*\*(?:Other|Concomitant) Medications?:\*\*\s*([^\n*]+)/i) ||
+                          markdown.match(/(?:^|\n)Other Medications?:\s*([^\n]+)/im);
 
     return {
       age: ageMatch ? `${ageMatch[1]}-year-old ${ageMatch[2]}` : null,
       medication: medicationMatch ? medicationMatch[1].trim() : null,
       symptoms: symptomsMatch ? symptomsMatch[1].trim() : null,
-      duration: durationMatch ? durationMatch[1] : null,
+      duration: durationMatch ? durationMatch[1].trim() : null,
       otherMeds: otherMedsMatch ? otherMedsMatch[1].trim() : 'None reported'
     };
   };
