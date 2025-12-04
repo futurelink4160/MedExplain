@@ -24,6 +24,7 @@ interface Document {
     [key: string]: unknown;
   };
   created_at: string;
+  associatedUrl?: string;
 }
 
 export default function Evidence() {
@@ -48,7 +49,35 @@ export default function Evidence() {
         .limit(50);
 
       if (error) throw error;
-      setDocuments(data || []);
+
+      // For each document, try to find associated URL (line 3 in same group)
+      const documentsWithUrls = await Promise.all(
+        (data || []).map(async (doc) => {
+          try {
+            // Documents in the same article group share the same created_at timestamp
+            // Look for line 3 with the same created_at
+            const { data: urlDoc } = await supabase
+              .from('documents')
+              .select('content')
+              .eq('created_at', doc.created_at)
+              .eq('metadata->>line', '3')
+              .maybeSingle();
+
+            if (urlDoc?.content && isUrl(urlDoc.content)) {
+              return {
+                ...doc,
+                associatedUrl: urlDoc.content
+              };
+            }
+
+            return doc;
+          } catch {
+            return doc;
+          }
+        })
+      );
+
+      setDocuments(documentsWithUrls);
     } catch (err) {
       console.error('Error searching documents:', err);
       setDocuments([]);
@@ -291,20 +320,20 @@ export default function Evidence() {
                               {highlightText(doc.content, searchTerm)}
                             </p>
                           )}
-                          {doc.metadata.source && isUrl(doc.metadata.source) && (
+                          {(doc.metadata.source && isUrl(doc.metadata.source)) || doc.associatedUrl ? (
                             <div className="mt-3 pt-3 border-t border-purple-100">
                               <p className="text-xs text-gray-600 mb-1 font-semibold">Source Article:</p>
                               <a
-                                href={doc.metadata.source}
+                                href={doc.associatedUrl || doc.metadata.source}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-blue-600 hover:text-purple-600 hover:underline text-sm font-medium flex items-center group/link transition-colors"
                               >
-                                <span className="break-all">{doc.metadata.source}</span>
+                                <span className="break-all">{doc.associatedUrl || doc.metadata.source}</span>
                                 <ExternalLink className="w-4 h-4 ml-2 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
                               </a>
                             </div>
-                          )}
+                          ) : null}
                         </div>
                       </div>
                     </div>
