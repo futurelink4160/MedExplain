@@ -518,7 +518,18 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
             {showPgx && (
               <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
-                {data.pgx_results.drug_labels.length > 0 && (
+                {/* Show message if no PGX data is available */}
+                {(!data.pgx_results.drug_labels || data.pgx_results.drug_labels.length === 0) &&
+                 (!data.pgx_results.genes || data.pgx_results.genes.length === 0) &&
+                 (!data.pgx_results.variants || data.pgx_results.variants.length === 0) &&
+                 (!data.pgx_results.phenotypes || data.pgx_results.phenotypes.length === 0) && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">No additional genomic data available for this query at this time.</p>
+                    <p className="text-sm text-gray-500 mt-2">Genomic information may be added as more research becomes available.</p>
+                  </div>
+                )}
+
+                {data.pgx_results.drug_labels && data.pgx_results.drug_labels.length > 0 && (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
                     <div className="space-y-4">
