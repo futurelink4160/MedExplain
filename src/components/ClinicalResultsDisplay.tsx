@@ -4,8 +4,6 @@ import {
   BookOpen,
   Shield,
   FileText,
-  ChevronDown,
-  ChevronUp,
   Download,
   Mail,
   RefreshCw,
@@ -69,7 +67,6 @@ interface ClinicalResultsDisplayProps {
 }
 
 export default function ClinicalResultsDisplay({ data, onNewQuery, role, patientData }: ClinicalResultsDisplayProps) {
-  const [showPgx, setShowPgx] = useState(true);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState('');
 
@@ -446,22 +443,17 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
         </div>
       )}
 
-      {/* Pharmacogenomic Results Details */}
-      {data.pgx_results && (
+      {/* Pharmacogenomic Results Details - Always visible for all roles */}
+      {data.pgx_results && (data.pgx_results.genes?.length > 0 || data.pgx_results.variants?.length > 0 || data.pgx_results.phenotypes?.length > 0) && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
-          <button
-            onClick={() => setShowPgx(!showPgx)}
-            className="w-full px-6 py-4 flex items-center justify-between bg-gradient-to-r from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 transition-colors"
-          >
+          <div className="w-full px-6 py-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200">
             <div className="flex items-center space-x-3">
               <Dna className="w-6 h-6 text-emerald-600" />
               <h3 className="text-xl font-bold text-slate-900">Pharmacogenomic Data Details</h3>
             </div>
-            {showPgx ? <ChevronUp className="w-5 h-5 text-slate-600" /> : <ChevronDown className="w-5 h-5 text-slate-600" />}
-          </button>
+          </div>
 
-          {showPgx && (
-            <div className="p-6 space-y-6">
+          <div className="p-6 space-y-6">
               {/* Testing Guidelines */}
               {data.pgx_results.testing_guidelines && (
                 <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
@@ -524,8 +516,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                   </div>
                 </div>
               )}
-            </div>
-          )}
+          </div>
         </div>
       )}
 
