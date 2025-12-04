@@ -555,6 +555,13 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
           <Printer className="w-5 h-5" />
           <span>Print</span>
         </button>
+        <button
+          onClick={() => setShowEmailModal(true)}
+          className="flex items-center space-x-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow-lg hover:shadow-xl"
+        >
+          <Mail className="w-5 h-5" />
+          <span>Email</span>
+        </button>
         {onNewQuery && (
           <button
             onClick={onNewQuery}
