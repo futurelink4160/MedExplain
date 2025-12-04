@@ -47,12 +47,27 @@ interface ResponseData {
   disclaimer?: string;
 }
 
+interface PatientQueryData {
+  age?: string;
+  gender?: string;
+  role?: string;
+  medication?: string;
+  question?: string;
+  symptoms?: string;
+  duration?: string;
+  otherMeds?: string;
+  medicalHistory?: string;
+  hasStructuredOverview?: boolean;
+  overview?: string;
+}
+
 interface ResultsDisplayProps {
   data: ResponseData;
   onNewQuery?: () => void;
+  patientData?: PatientQueryData;
 }
 
-export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps) {
+export default function ResultsDisplay({ data, onNewQuery, patientData }: ResultsDisplayProps) {
   console.log('ResultsDisplay received data:', data);
   console.log('ResultsDisplay data.final_answer_markdown:', data?.final_answer_markdown?.substring(0, 200));
   console.log('ResultsDisplay data.pgx_results:', data?.pgx_results);
@@ -405,7 +420,7 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
     };
   };
 
-  const patientData = extractPatientData();
+  const extractedPatientData = extractPatientData();
 
   // Get color scheme based on section title
   const getSectionStyle = (title: string) => {
@@ -718,7 +733,7 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
       </div>
 
       {/* Patient Information */}
-      {(patientData.hasStructuredOverview || patientData.age || patientData.medication || patientData.symptoms || patientData.duration) && (
+      {patientData && (patientData.hasStructuredOverview || patientData.age || patientData.medication || patientData.question || patientData.symptoms || patientData.duration) && (
         <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -730,33 +745,53 @@ export default function ResultsDisplay({ data, onNewQuery }: ResultsDisplayProps
                 {patientData.hasStructuredOverview ? (
                   <ReactMarkdown>{patientData.overview}</ReactMarkdown>
                 ) : (
-                  <ul className="space-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {patientData.age && (
-                      <li>
-                        <strong>Patient:</strong> {patientData.age}
-                      </li>
+                      <div className="bg-white p-3 rounded-lg">
+                        <strong className="text-blue-800">Age:</strong> <span className="text-gray-700">{patientData.age}</span>
+                      </div>
+                    )}
+                    {patientData.gender && (
+                      <div className="bg-white p-3 rounded-lg">
+                        <strong className="text-blue-800">Gender:</strong> <span className="text-gray-700">{patientData.gender}</span>
+                      </div>
+                    )}
+                    {patientData.role && (
+                      <div className="bg-white p-3 rounded-lg">
+                        <strong className="text-blue-800">Role:</strong> <span className="text-gray-700">{patientData.role}</span>
+                      </div>
                     )}
                     {patientData.medication && (
-                      <li>
-                        <strong>Medication:</strong> {patientData.medication}
-                      </li>
+                      <div className="bg-white p-3 rounded-lg">
+                        <strong className="text-blue-800">Medication:</strong> <span className="text-gray-700">{patientData.medication}</span>
+                      </div>
+                    )}
+                    {patientData.question && (
+                      <div className="bg-white p-3 rounded-lg md:col-span-2">
+                        <strong className="text-blue-800">Question/Concern:</strong> <span className="text-gray-700">{patientData.question}</span>
+                      </div>
                     )}
                     {patientData.symptoms && (
-                      <li>
-                        <strong>Your Symptoms:</strong> {patientData.symptoms}
-                      </li>
+                      <div className="bg-white p-3 rounded-lg md:col-span-2">
+                        <strong className="text-blue-800">Current Symptoms:</strong> <span className="text-gray-700">{patientData.symptoms}</span>
+                      </div>
                     )}
                     {patientData.duration && (
-                      <li>
-                        <strong>Duration:</strong> {patientData.duration}
-                      </li>
+                      <div className="bg-white p-3 rounded-lg">
+                        <strong className="text-blue-800">Duration:</strong> <span className="text-gray-700">{patientData.duration}</span>
+                      </div>
                     )}
-                    {patientData.otherMeds && patientData.otherMeds !== 'None reported' && (
-                      <li>
-                        <strong>Other Medications:</strong> {patientData.otherMeds}
-                      </li>
+                    {patientData.otherMeds && patientData.otherMeds !== 'None mentioned' && patientData.otherMeds !== 'None reported' && (
+                      <div className="bg-white p-3 rounded-lg md:col-span-2">
+                        <strong className="text-blue-800">Other Medications:</strong> <span className="text-gray-700">{patientData.otherMeds}</span>
+                      </div>
                     )}
-                  </ul>
+                    {patientData.medicalHistory && patientData.medicalHistory !== 'None mentioned' && (
+                      <div className="bg-white p-3 rounded-lg md:col-span-2">
+                        <strong className="text-blue-800">Medical History:</strong> <span className="text-gray-700">{patientData.medicalHistory}</span>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

@@ -933,9 +933,38 @@ export default function Chat() {
         {responseData && (
           <div ref={resultsRef} className="mt-8">
             {responseData.response_type === 'CLINICAL_PGX_SUMMARY' || responseData.response_type === 'CLINICAL_PATIENT_SUMMARY' ? (
-              <ClinicalResultsDisplay data={responseData} onNewQuery={handleNewQuery} role={role} />
+              <ClinicalResultsDisplay
+                data={responseData}
+                onNewQuery={handleNewQuery}
+                role={role}
+                patientData={{
+                  age,
+                  gender,
+                  role,
+                  medication,
+                  question,
+                  symptoms,
+                  duration,
+                  otherMeds,
+                  medicalHistory
+                }}
+              />
             ) : (
-              <ResultsDisplay data={responseData} onNewQuery={handleNewQuery} />
+              <ResultsDisplay
+                data={responseData}
+                onNewQuery={handleNewQuery}
+                patientData={{
+                  age,
+                  gender,
+                  role,
+                  medication,
+                  question,
+                  symptoms,
+                  duration,
+                  otherMeds,
+                  medicalHistory
+                }}
+              />
             )}
           </div>
         )}
