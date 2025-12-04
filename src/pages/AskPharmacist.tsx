@@ -146,137 +146,29 @@ What would you like to learn about today?`,
     return { isRestricted: false, type: '' };
   };
 
-  const extractKeywords = (query: string): { drugs: string[]; genes: string[] } => {
-    const words = query.toLowerCase().split(/\s+/);
-    const commonGenes = ['cyp2d6', 'cyp2c19', 'cyp2c9', 'cyp3a4', 'cyp3a5', 'slco1b1', 'vkorc1', 'dpyd', 'tpmt', 'ugt1a1'];
-
-    const foundGenes = words.filter(word =>
-      commonGenes.some(gene => word.includes(gene) || gene.includes(word))
-    );
-
-    const drugKeywords = words.filter(word => word.length > 3);
-
-    return { drugs: drugKeywords, genes: foundGenes };
-  };
-
-  const searchDocuments = async (query: string): Promise<DocumentMatch[]> => {
+  const getAIResponse = async (question: string): Promise<string> => {
     try {
-      const keywords = extractKeywords(query);
-      const allMatches: DocumentMatch[] = [];
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ask-pharmacist`;
 
-      if (keywords.drugs.length > 0 || keywords.genes.length > 0) {
-        const { data: drugData } = await supabase
-          .from('drugs')
-          .select('name, trade_names, generic_names')
-          .or(keywords.drugs.map(drug => `name.ilike.%${drug}%,trade_names.ilike.%${drug}%,generic_names.ilike.%${drug}%`).join(','))
-          .limit(3);
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question }),
+      });
 
-        const { data: geneData } = await supabase
-          .from('genes')
-          .select('symbol, name')
-          .or(keywords.genes.map(gene => `symbol.ilike.%${gene}%`).join(','))
-          .limit(3);
-
-        if (drugData && drugData.length > 0) {
-          const drugNames = drugData.map(d => d.name).join(', ');
-          allMatches.push({
-            id: 'drug-info',
-            content: `**Drug Information Found:**\n\nThe following medications were found: ${drugNames}.\n\nThese medications may have pharmacogenomic associations that affect how they work in your body.`,
-            similarity: 0.9
-          });
-
-          const drugName = drugData[0].name;
-          const { data: effectsData } = await supabase
-            .from('pgx_variant_effects')
-            .select('drug_name, gene_symbol, significance, notes, sentence')
-            .ilike('drug_name', `%${drugName}%`)
-            .limit(5);
-
-          if (effectsData && effectsData.length > 0) {
-            const uniqueGenes = [...new Set(effectsData.map(e => e.gene_symbol))];
-            let effectsContent = `**Pharmacogenomic Information for ${drugName}:**\n\n`;
-            effectsContent += `This medication has known interactions with genes: **${uniqueGenes.join(', ')}**.\n\n`;
-
-            effectsData.slice(0, 3).forEach(effect => {
-              if (effect.sentence) {
-                effectsContent += `- ${effect.sentence}\n`;
-              } else if (effect.notes) {
-                effectsContent += `- ${effect.notes}\n`;
-              }
-            });
-
-            effectsContent += `\n**Clinical Significance:** Genetic variations in these genes may affect how your body processes this medication, potentially influencing effectiveness and side effects.`;
-
-            allMatches.push({
-              id: 'effects-info',
-              content: effectsContent,
-              similarity: 0.95
-            });
-          }
-        }
-
-        if (geneData && geneData.length > 0) {
-          const geneSymbols = geneData.map(g => g.symbol).join(', ');
-          allMatches.push({
-            id: 'gene-info',
-            content: `**Gene Information Found:**\n\nGenes identified: ${geneSymbols}.\n\nThese genes encode enzymes that metabolize medications. Variations in these genes can affect drug response.`,
-            similarity: 0.9
-          });
-        }
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI assistant');
       }
 
-      const { data: docData } = await supabase
-        .from('documents')
-        .select('id, content, metadata')
-        .textSearch('content', query.split(' ').join(' | '))
-        .limit(3);
-
-      if (docData && docData.length > 0) {
-        docData.forEach(doc => {
-          allMatches.push({
-            id: doc.id,
-            content: doc.content,
-            similarity: 0.85
-          });
-        });
-      }
-
-      return allMatches;
+      const data = await response.json();
+      return data.answer || 'I was unable to process that question. Please try again.';
     } catch (err) {
-      console.error('Error in searchDocuments:', err);
-      return [];
+      console.error('Error getting AI response:', err);
+      return `I'm having trouble connecting to the assistant right now. Please try again in a moment.`;
     }
-  };
-
-  const generateResponse = (query: string, matches: DocumentMatch[]): string => {
-    if (matches.length === 0) {
-      return `I don't have specific information about that in my database yet.
-
-To get accurate information, I recommend:
-- Consulting with your pharmacist or healthcare provider
-- Asking about official drug information resources
-- Discussing any concerns about your medications
-
-Try asking about specific medications (e.g., "warfarin", "clopidogrel") or genes (e.g., "CYP2D6", "CYP2C19").`;
-    }
-
-    let response = '';
-
-    matches.forEach((match, index) => {
-      if (index > 0) response += '\n\n---\n\n';
-
-      const maxLength = 800;
-      if (match.content.length > maxLength) {
-        response += match.content.substring(0, maxLength) + '...';
-      } else {
-        response += match.content;
-      }
-    });
-
-    response += `\n\n---\n\n**Important Reminder:**\n`;
-    response += `This information is for educational purposes only. Genetic testing results should be interpreted by a qualified healthcare provider. Always consult your doctor or pharmacist before making any changes to your medications.`;
-
-    return response;
   };
 
   const handleSendMessage = async () => {
@@ -336,8 +228,7 @@ I'm happy to provide general educational information about how medications work 
         return;
       }
 
-      const matches = await searchDocuments(input);
-      const response = generateResponse(input, matches);
+      const response = await getAIResponse(input);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -401,14 +292,14 @@ I'm happy to provide general educational information about how medications work 
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-2xl px-5 py-3 shadow-md ${
+                  className={`max-w-[85%] rounded-2xl px-6 py-4 shadow-md ${
                     message.role === 'user'
                       ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white'
                       : message.type === 'safety_alert'
                       ? 'bg-red-50 border-2 border-red-500 text-red-900'
                       : message.type === 'warning'
                       ? 'bg-amber-50 border-2 border-amber-400 text-amber-900'
-                      : 'bg-white border border-purple-100 text-gray-800'
+                      : 'bg-gray-50 border border-gray-200 text-gray-900'
                   }`}
                 >
                   {message.type === 'safety_alert' && (
@@ -429,7 +320,17 @@ I'm happy to provide general educational information about how medications work 
                       <span className="font-bold">Educational Guidance</span>
                     </div>
                   )}
-                  <div className={`prose prose-sm max-w-none ${message.role === 'user' ? 'prose-invert' : ''}`}>
+                  <div className={`prose prose-sm max-w-none ${
+                    message.role === 'user'
+                      ? 'prose-invert'
+                      : 'prose-gray'
+                  }`}
+                  style={message.role !== 'user' ? {
+                    color: '#1f2937',
+                    fontSize: '15px',
+                    lineHeight: '1.7'
+                  } : {}}
+                  >
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
                 </div>
