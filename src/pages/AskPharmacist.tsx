@@ -146,24 +146,102 @@ What would you like to learn about today?`,
     return { isRestricted: false, type: '' };
   };
 
+  const extractKeywords = (query: string): { drugs: string[]; genes: string[] } => {
+    const words = query.toLowerCase().split(/\s+/);
+    const commonGenes = ['cyp2d6', 'cyp2c19', 'cyp2c9', 'cyp3a4', 'cyp3a5', 'slco1b1', 'vkorc1', 'dpyd', 'tpmt', 'ugt1a1'];
+
+    const foundGenes = words.filter(word =>
+      commonGenes.some(gene => word.includes(gene) || gene.includes(word))
+    );
+
+    const drugKeywords = words.filter(word => word.length > 3);
+
+    return { drugs: drugKeywords, genes: foundGenes };
+  };
+
   const searchDocuments = async (query: string): Promise<DocumentMatch[]> => {
     try {
-      const { data, error } = await supabase
-        .from('documents')
-        .select('id, content, metadata')
-        .ilike('content', `%${query.toLowerCase()}%`)
-        .limit(5);
+      const keywords = extractKeywords(query);
+      const allMatches: DocumentMatch[] = [];
 
-      if (error) {
-        console.error('Error searching documents:', error);
-        return [];
+      if (keywords.drugs.length > 0 || keywords.genes.length > 0) {
+        const { data: drugData } = await supabase
+          .from('drugs')
+          .select('name, trade_names, generic_names')
+          .or(keywords.drugs.map(drug => `name.ilike.%${drug}%,trade_names.ilike.%${drug}%,generic_names.ilike.%${drug}%`).join(','))
+          .limit(3);
+
+        const { data: geneData } = await supabase
+          .from('genes')
+          .select('symbol, name')
+          .or(keywords.genes.map(gene => `symbol.ilike.%${gene}%`).join(','))
+          .limit(3);
+
+        if (drugData && drugData.length > 0) {
+          const drugNames = drugData.map(d => d.name).join(', ');
+          allMatches.push({
+            id: 'drug-info',
+            content: `**Drug Information Found:**\n\nThe following medications were found: ${drugNames}.\n\nThese medications may have pharmacogenomic associations that affect how they work in your body.`,
+            similarity: 0.9
+          });
+
+          const drugName = drugData[0].name;
+          const { data: effectsData } = await supabase
+            .from('pgx_variant_effects')
+            .select('drug_name, gene_symbol, significance, notes, sentence')
+            .ilike('drug_name', `%${drugName}%`)
+            .limit(5);
+
+          if (effectsData && effectsData.length > 0) {
+            const uniqueGenes = [...new Set(effectsData.map(e => e.gene_symbol))];
+            let effectsContent = `**Pharmacogenomic Information for ${drugName}:**\n\n`;
+            effectsContent += `This medication has known interactions with genes: **${uniqueGenes.join(', ')}**.\n\n`;
+
+            effectsData.slice(0, 3).forEach(effect => {
+              if (effect.sentence) {
+                effectsContent += `- ${effect.sentence}\n`;
+              } else if (effect.notes) {
+                effectsContent += `- ${effect.notes}\n`;
+              }
+            });
+
+            effectsContent += `\n**Clinical Significance:** Genetic variations in these genes may affect how your body processes this medication, potentially influencing effectiveness and side effects.`;
+
+            allMatches.push({
+              id: 'effects-info',
+              content: effectsContent,
+              similarity: 0.95
+            });
+          }
+        }
+
+        if (geneData && geneData.length > 0) {
+          const geneSymbols = geneData.map(g => g.symbol).join(', ');
+          allMatches.push({
+            id: 'gene-info',
+            content: `**Gene Information Found:**\n\nGenes identified: ${geneSymbols}.\n\nThese genes encode enzymes that metabolize medications. Variations in these genes can affect drug response.`,
+            similarity: 0.9
+          });
+        }
       }
 
-      return (data || []).map(doc => ({
-        id: doc.id,
-        content: doc.content,
-        similarity: 0.8
-      }));
+      const { data: docData } = await supabase
+        .from('documents')
+        .select('id, content, metadata')
+        .textSearch('content', query.split(' ').join(' | '))
+        .limit(3);
+
+      if (docData && docData.length > 0) {
+        docData.forEach(doc => {
+          allMatches.push({
+            id: doc.id,
+            content: doc.content,
+            similarity: 0.85
+          });
+        });
+      }
+
+      return allMatches;
     } catch (err) {
       console.error('Error in searchDocuments:', err);
       return [];
@@ -172,32 +250,31 @@ What would you like to learn about today?`,
 
   const generateResponse = (query: string, matches: DocumentMatch[]): string => {
     if (matches.length === 0) {
-      return `I may not have specific information about that in my database yet, but I can provide some general educational guidance.
+      return `I don't have specific information about that in my database yet.
 
-To get the most accurate and personalized information, I recommend:
+To get accurate information, I recommend:
 - Consulting with your pharmacist or healthcare provider
 - Asking about official drug information resources
 - Discussing any concerns about your medications
 
-Is there something else I can help explain?`;
+Try asking about specific medications (e.g., "warfarin", "clopidogrel") or genes (e.g., "CYP2D6", "CYP2C19").`;
     }
 
-    let response = '**Based on educational resources:**\n\n';
+    let response = '';
 
-    const topMatch = matches[0].content;
-    const maxLength = 600;
+    matches.forEach((match, index) => {
+      if (index > 0) response += '\n\n---\n\n';
 
-    if (topMatch.length > maxLength) {
-      response += topMatch.substring(0, maxLength) + '...\n\n';
-    } else {
-      response += topMatch + '\n\n';
-    }
+      const maxLength = 800;
+      if (match.content.length > maxLength) {
+        response += match.content.substring(0, maxLength) + '...';
+      } else {
+        response += match.content;
+      }
+    });
 
-    response += `**Would you like to know more about:**\n`;
-    response += `- Common side effects\n`;
-    response += `- How this medication works\n`;
-    response += `- When to contact your doctor\n`;
-    response += `- Genetic factors that may affect this medication`;
+    response += `\n\n---\n\n**Important Reminder:**\n`;
+    response += `This information is for educational purposes only. Genetic testing results should be interpreted by a qualified healthcare provider. Always consult your doctor or pharmacist before making any changes to your medications.`;
 
     return response;
   };
@@ -289,8 +366,8 @@ I'm happy to provide general educational information about how medications work 
       <div className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden relative">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM4YjViZjYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE2YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6bTAgNDBjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMi0xMi01LjM3My0xMi0xMnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-40"></div>
 
-        <div className="relative max-w-5xl mx-auto px-4 pt-8 pb-8 flex flex-col h-[calc(100vh-200px)]">
-          <div className="text-center mb-8">
+        <div className="relative max-w-5xl mx-auto px-4 pt-8 pb-8">
+          <div className="text-center mb-6">
             <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full mb-4 shadow-sm">
               <Shield className="w-4 h-4 text-purple-600" />
               <span className="text-sm font-medium text-gray-700">
@@ -316,9 +393,9 @@ I'm happy to provide general educational information about how medications work 
             </p>
           </div>
 
-        <div className="flex-1 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-purple-100">
-          <div className="flex-1 overflow-y-auto p-6 space-y-4">
-            {messages.map((message) => (
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-purple-100 h-[calc(100vh-480px)] min-h-[400px]">
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -357,8 +434,8 @@ I'm happy to provide general educational information about how medications work 
                   </div>
                 </div>
               </div>
-            ))}
-            {isLoading && (
+              ))}
+              {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-white border border-purple-100 rounded-2xl px-5 py-3 shadow-md">
                   <div className="flex items-center space-x-2">
@@ -367,21 +444,21 @@ I'm happy to provide general educational information about how medications work 
                   </div>
                 </div>
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {error && (
-            <div className="px-6 py-3 bg-red-50 border-t border-red-200">
-              <div className="flex items-center space-x-2 text-red-800">
-                <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">{error}</span>
-              </div>
+              )}
+              <div ref={messagesEndRef} />
             </div>
-          )}
 
-          <div className="p-4 border-t border-purple-100 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
-            <div className="flex items-center space-x-2">
+            {error && (
+              <div className="px-6 py-3 bg-red-50 border-t border-red-200">
+                <div className="flex items-center space-x-2 text-red-800">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">{error}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="p-4 border-t border-purple-100 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+              <div className="flex items-center space-x-2">
               <button
                 onClick={toggleVoiceInput}
                 disabled={isLoading}
@@ -411,13 +488,13 @@ I'm happy to provide general educational information about how medications work 
               >
                 <Send className="w-5 h-5" />
               </button>
-            </div>
-            <div className="mt-2 flex items-center justify-center space-x-1 text-xs text-gray-500">
-              <Shield className="w-3 h-3" />
-              <span>Educational purposes only - Always consult your healthcare provider</span>
+              </div>
+              <div className="mt-2 flex items-center justify-center space-x-1 text-xs text-gray-500">
+                <Shield className="w-3 h-3" />
+                <span>Educational purposes only - Always consult your healthcare provider</span>
+              </div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </Layout>
