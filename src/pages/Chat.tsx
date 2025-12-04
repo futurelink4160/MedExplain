@@ -77,6 +77,14 @@ export default function Chat() {
   const resultsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log('responseData changed:', responseData ? 'HAS DATA' : 'NULL/UNDEFINED');
+    if (responseData) {
+      console.log('responseData type:', responseData.response_type);
+      console.log('responseData has final_answer_markdown:', !!responseData.final_answer_markdown);
+    }
+  }, [responseData]);
+
+  useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
       const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
@@ -516,10 +524,13 @@ export default function Chat() {
 
       console.log('✓ Response validated and converted successfully');
       console.log('Setting response data and scrolling to results...');
+      console.log('Response data being set:', data);
       setResponseData(data);
+      console.log('Response data set complete');
       setSuccess(true);
 
       setTimeout(() => {
+        console.log('Scrolling to results, responseData is:', data ? 'present' : 'missing');
         resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
 
@@ -529,6 +540,12 @@ export default function Chat() {
     } finally {
       setLoading(false);
     }
+  }
+
+  console.log('=== RENDER: responseData status:', responseData ? 'EXISTS' : 'NULL');
+  if (responseData) {
+    console.log('RENDER: responseData.response_type =', responseData.response_type);
+    console.log('RENDER: Will show results div:', true);
   }
 
   return (
@@ -932,6 +949,8 @@ export default function Chat() {
 
         {responseData && (
           <div ref={resultsRef} className="mt-8">
+            {console.log('=== RENDERING RESULTS SECTION ===')}
+            {console.log('Response type:', responseData.response_type)}
             {responseData.response_type === 'CLINICAL_PGX_SUMMARY' || responseData.response_type === 'CLINICAL_PATIENT_SUMMARY' ? (
               <ClinicalResultsDisplay
                 data={responseData}
