@@ -254,70 +254,70 @@ I'm happy to provide general educational information about how medications work 
 
   return (
     <Layout>
-      <div className="min-h-[calc(100vh-200px)] bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden relative">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden relative">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiM4YjViZjYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDE2YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6bTAgNDBjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMi0xMi01LjM3My0xMi0xMnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-40"></div>
 
-        <div className="relative max-w-5xl mx-auto px-4 pt-8 pb-8">
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full mb-4 shadow-sm">
-              <Shield className="w-4 h-4 text-purple-600" />
+        <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-gradient-to-br from-pink-400 to-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+
+        <div className="relative max-w-6xl mx-auto px-4 py-8">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full mb-6 shadow-sm">
+              <Shield className="w-4 h-4 text-blue-600" />
               <span className="text-sm font-medium text-gray-700">
                 Educational Only - Not Medical Advice
               </span>
             </div>
 
-            <div className="flex items-center justify-center space-x-3 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-xl transform hover:scale-105 transition-transform">
+            <div className="flex items-center justify-center space-x-4 mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
                 <MessageSquare className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Ask My Pharmacist
               </h1>
             </div>
 
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-2">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Get educational information about medications, genes, and pharmacogenomics
-            </p>
-
-            <p className="text-sm text-gray-500 italic">
-              Ask questions by typing or using voice input
             </p>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-purple-100 h-[calc(100vh-480px)] min-h-[400px]">
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-white/20 h-[calc(100vh-380px)] min-h-[500px]">
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
               {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
               >
                 <div
-                  className={`max-w-[85%] rounded-2xl px-6 py-4 shadow-md ${
+                  className={`max-w-[80%] rounded-2xl px-6 py-4 ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white'
+                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-lg'
                       : message.type === 'safety_alert'
-                      ? 'bg-red-50 border-2 border-red-500 text-red-900'
+                      ? 'bg-red-50 border-l-4 border-red-500 text-red-900 shadow-md'
                       : message.type === 'warning'
-                      ? 'bg-amber-50 border-2 border-amber-400 text-amber-900'
-                      : 'bg-gray-50 border border-gray-200 text-gray-900'
+                      ? 'bg-amber-50 border-l-4 border-amber-500 text-amber-900 shadow-md'
+                      : 'bg-white border border-gray-100 text-gray-900 shadow-md'
                   }`}
                 >
                   {message.type === 'safety_alert' && (
-                    <div className="flex items-center space-x-2 mb-2">
-                      <AlertCircle className="w-5 h-5 text-red-600" />
-                      <span className="font-bold">Safety Alert</span>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                      <span className="font-bold text-red-800">Safety Alert</span>
                     </div>
                   )}
                   {message.type === 'info' && (
-                    <div className="flex items-center space-x-2 mb-2">
-                      <Sparkles className="w-5 h-5 text-purple-600" />
-                      <span className="font-bold text-purple-700">Welcome</span>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                      <span className="font-bold text-gray-800">Welcome</span>
                     </div>
                   )}
                   {message.type === 'warning' && (
-                    <div className="flex items-center space-x-2 mb-2">
-                      <BookOpen className="w-5 h-5 text-amber-600" />
-                      <span className="font-bold">Educational Guidance</span>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <BookOpen className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                      <span className="font-bold text-amber-800">Educational Guidance</span>
                     </div>
                   )}
                   <div className={`prose prose-sm max-w-none ${
@@ -328,8 +328,8 @@ I'm happy to provide general educational information about how medications work 
                   style={message.role !== 'user' ? {
                     color: '#1f2937',
                     fontSize: '15px',
-                    lineHeight: '1.7'
-                  } : {}}
+                    lineHeight: '1.75'
+                  } : { fontSize: '15px', lineHeight: '1.65' }}
                   >
                     <ReactMarkdown>{message.content}</ReactMarkdown>
                   </div>
@@ -337,11 +337,11 @@ I'm happy to provide general educational information about how medications work 
               </div>
               ))}
               {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-white border border-purple-100 rounded-2xl px-5 py-3 shadow-md">
-                  <div className="flex items-center space-x-2">
-                    <Loader2 className="w-5 h-5 text-purple-600 animate-spin" />
-                    <span className="text-gray-600">Thinking...</span>
+              <div className="flex justify-start animate-fadeIn">
+                <div className="bg-white border border-gray-100 rounded-2xl px-6 py-4 shadow-md">
+                  <div className="flex items-center space-x-3">
+                    <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
+                    <span className="text-gray-700 font-medium">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -352,47 +352,49 @@ I'm happy to provide general educational information about how medications work 
             {error && (
               <div className="px-6 py-3 bg-red-50 border-t border-red-200">
                 <div className="flex items-center space-x-2 text-red-800">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">{error}</span>
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-sm font-medium">{error}</span>
                 </div>
               </div>
             )}
 
-            <div className="p-4 border-t border-purple-100 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
-              <div className="flex items-center space-x-2">
+            <div className="p-5 border-t border-gray-100 bg-white/50 backdrop-blur-sm">
+              <div className="flex items-end space-x-3">
               <button
                 onClick={toggleVoiceInput}
                 disabled={isLoading}
-                className={`p-3 rounded-xl transition-all ${
+                className={`p-3.5 rounded-xl transition-all flex-shrink-0 ${
                   isListening
                     ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white animate-pulse shadow-lg'
-                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-purple-200 shadow-sm'
+                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 hover:border-gray-300 shadow-sm'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                 title={isListening ? 'Stop recording' : 'Start voice input'}
               >
                 {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
               </button>
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                disabled={isLoading || isListening}
-                placeholder="Ask about medications, genes, or side effects..."
-                className="flex-1 px-4 py-3 border border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm"
-              />
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  disabled={isLoading || isListening}
+                  placeholder="Ask about medications, genes, or side effects..."
+                  className="w-full px-5 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none disabled:bg-gray-100 disabled:cursor-not-allowed shadow-sm text-gray-900 placeholder-gray-400"
+                />
+                <div className="mt-2 flex items-center space-x-1.5 text-xs text-gray-500">
+                  <Shield className="w-3 h-3 flex-shrink-0" />
+                  <span>Educational purposes only - Always consult your healthcare provider</span>
+                </div>
+              </div>
               <button
                 onClick={handleSendMessage}
                 disabled={!input.trim() || isLoading || isListening}
-                className="p-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform hover:scale-105"
+                className="p-3.5 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white rounded-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transform hover:scale-105 flex-shrink-0"
                 title="Send message"
               >
                 <Send className="w-5 h-5" />
               </button>
-              </div>
-              <div className="mt-2 flex items-center justify-center space-x-1 text-xs text-gray-500">
-                <Shield className="w-3 h-3" />
-                <span>Educational purposes only - Always consult your healthcare provider</span>
               </div>
             </div>
           </div>
