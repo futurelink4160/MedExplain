@@ -83,7 +83,16 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   const [emailBody, setEmailBody] = useState(data.final_answer_markdown || '');
 
   const handleDownloadPDF = () => {
-    window.print();
+    const content = data.final_answer_markdown || '';
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `MedExplain-Summary-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleSendEmail = () => {
@@ -245,7 +254,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
           >
             <Download className="w-5 h-5" />
-            <span>Download Summary as PDF</span>
+            <span>Download Summary</span>
           </button>
 
           <button
@@ -648,7 +657,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
           >
             <Download className="w-5 h-5" />
-            <span>Download Report as PDF</span>
+            <span>Download Report</span>
           </button>
 
           <button
@@ -1133,7 +1142,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
         >
           <Download className="w-5 h-5" />
-          <span>Download Summary as PDF</span>
+          <span>Download Summary</span>
         </button>
 
         <button

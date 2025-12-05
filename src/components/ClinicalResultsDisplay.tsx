@@ -71,7 +71,16 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   const [emailTo, setEmailTo] = useState('');
 
   const handleDownloadPDF = () => {
-    window.print();
+    const content = data.final_answer_markdown || '';
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Clinical-Summary-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const handleSendEmail = () => {
@@ -634,7 +643,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
           className="flex items-center space-x-2 px-6 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium shadow-lg hover:shadow-xl"
         >
           <Download className="w-5 h-5" />
-          <span>Download</span>
+          <span>Download Summary</span>
         </button>
         <button
           onClick={() => window.print()}
