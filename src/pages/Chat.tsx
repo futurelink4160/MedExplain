@@ -232,12 +232,14 @@ export default function Chat() {
       console.log('Payload Attachments value:', payload.Attachments);
       console.log('Full payload:', JSON.stringify(payload, null, 2));
 
+      // No timeout set - allow the request to run as long as needed (up to 5 minutes for n8n workflow)
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
+        keepalive: true,
       });
 
       console.log('=== WEBHOOK RESPONSE DEBUG ===');
