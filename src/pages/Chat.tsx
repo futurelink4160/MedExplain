@@ -232,31 +232,37 @@ export default function Chat() {
       console.log('Payload Attachments value:', payload.Attachments);
       console.log('Full payload:', JSON.stringify(payload, null, 2));
 
-      // No timeout set - allow the request to run as long as needed (up to 5 minutes for n8n workflow)
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-        keepalive: true,
-      });
+      // Set 10 minute timeout to allow long-running n8n workflows
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 minutes
 
-      console.log('=== WEBHOOK RESPONSE DEBUG ===');
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('=== WEBHOOK ERROR ===');
-        console.error('Error status:', response.status);
-        console.error('Error response:', errorText);
-        console.error('Was trying to send to:', webhookUrl);
-        throw new Error(`Failed to submit form: ${response.status} - ${errorText}`);
-      }
+        clearTimeout(timeoutId);
 
-      const responseText = await response.text();
+        console.log('=== WEBHOOK RESPONSE DEBUG ===');
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('=== WEBHOOK ERROR ===');
+          console.error('Error status:', response.status);
+          console.error('Error response:', errorText);
+          console.error('Was trying to send to:', webhookUrl);
+          throw new Error(`Failed to submit form: ${response.status} - ${errorText}`);
+        }
+
+        const responseText = await response.text();
       console.log('=== N8N RESPONSE DEBUG ===');
       console.log('Raw response text:', responseText);
       console.log('Response text length:', responseText.length);
@@ -524,17 +530,24 @@ export default function Chat() {
         throw new Error(`n8n response missing required fields: ${missingFields.join(', ')}. Check your n8n "Respond to Webhook" node.`);
       }
 
-      console.log('✓ Response validated and converted successfully');
-      console.log('Setting response data and scrolling to results...');
-      console.log('Response data being set:', data);
-      setResponseData(data);
-      console.log('Response data set complete');
-      setSuccess(true);
+        console.log('✓ Response validated and converted successfully');
+        console.log('Setting response data and scrolling to results...');
+        console.log('Response data being set:', data);
+        setResponseData(data);
+        console.log('Response data set complete');
+        setSuccess(true);
 
-      setTimeout(() => {
-        console.log('Scrolling to results, responseData is:', data ? 'present' : 'missing');
-        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+        setTimeout(() => {
+          console.log('Scrolling to results, responseData is:', data ? 'present' : 'missing');
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+        if (fetchError.name === 'AbortError') {
+          throw new Error('Request timed out after 10 minutes. The workflow may still be processing. Please try again or contact support if this persists.');
+        }
+        throw fetchError;
+      }
 
     } catch (err: any) {
       console.error('Submission error:', err);
@@ -933,9 +946,12 @@ export default function Chat() {
                 </button>
 
                 {loading && (
-                  <div className="mt-3 text-center">
+                  <div className="mt-3 text-center space-y-2">
                     <p className="text-sm text-gray-600 italic">
                       Please wait while we analyze your query. This typically takes 1-5 minutes.
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Please do not close or refresh this page. Your results will appear below when ready.
                     </p>
                   </div>
                 )}
