@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   Activity,
   BookOpen,
@@ -14,6 +14,7 @@ import {
   User
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import html2pdf from 'html2pdf.js';
 
 interface DrugLabel {
   drug_id?: string;
@@ -69,18 +70,24 @@ interface ClinicalResultsDisplayProps {
 export default function ClinicalResultsDisplay({ data, onNewQuery, role, patientData }: ClinicalResultsDisplayProps) {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState('');
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleDownloadPDF = () => {
-    const content = data.final_answer_markdown || '';
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `Clinical-Summary-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const handleDownloadPDF = async () => {
+    if (!contentRef.current) return;
+
+    const opt = {
+      margin: 0.5,
+      filename: `Clinical-Summary-${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    try {
+      await html2pdf().set(opt).from(contentRef.current).save();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
   };
 
   const handleSendEmail = () => {
@@ -175,7 +182,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   const medicationTitle = extractMedicationName();
 
   return (
-    <div className="space-y-6 mb-8">
+    <div ref={contentRef} className="space-y-6 mb-8">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>

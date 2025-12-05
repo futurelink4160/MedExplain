@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   AlertTriangle,
   Pill,
@@ -17,6 +17,7 @@ import {
   User
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import html2pdf from 'html2pdf.js';
 
 interface DrugLabel {
   drug_id?: string;
@@ -76,23 +77,29 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   console.log('ResultsDisplay pgx_results.phenotypes:', data?.pgx_results?.phenotypes);
   console.log('ResultsDisplay pgx_results.drug_labels:', data?.pgx_results?.drug_labels);
 
-  const [showPgx, setShowPgx] = useState(true); // Changed to true to show by default
+  const [showPgx, setShowPgx] = useState(true);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState('');
   const [emailSubject, setEmailSubject] = useState('My MedExplain Educational Summary');
   const [emailBody, setEmailBody] = useState(data.final_answer_markdown || '');
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleDownloadPDF = () => {
-    const content = data.final_answer_markdown || '';
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `MedExplain-Summary-${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const handleDownloadPDF = async () => {
+    if (!contentRef.current) return;
+
+    const opt = {
+      margin: 0.5,
+      filename: `MedExplain-Summary-${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    try {
+      await html2pdf().set(opt).from(contentRef.current).save();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
   };
 
   const handleSendEmail = () => {
@@ -164,7 +171,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   if (isClinicalFormat) {
     return (
-      <div className="space-y-6 mb-8">
+      <div ref={contentRef} className="space-y-6 mb-8">
         <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
@@ -470,7 +477,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   // If sections found, show them beautifully
   if (hasSections && !hasPatientSections) {
     return (
-      <div className="space-y-6 mb-8">
+      <div ref={contentRef} className="space-y-6 mb-8">
         <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
@@ -739,7 +746,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   }
 
   return (
-    <div className="space-y-6 mb-8">
+    <div ref={contentRef} className="space-y-6 mb-8">
       <div className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
