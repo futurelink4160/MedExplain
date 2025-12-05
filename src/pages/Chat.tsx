@@ -919,7 +919,7 @@ export default function Chat() {
                   {loading ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Submitting...</span>
+                      <span>Processing... This may take 1-5 minutes</span>
                     </>
                   ) : (
                     <>
@@ -929,6 +929,14 @@ export default function Chat() {
                     </>
                   )}
                 </button>
+
+                {loading && (
+                  <div className="mt-3 text-center">
+                    <p className="text-sm text-gray-600 italic">
+                      Please wait while we analyze your query. This typically takes 1-5 minutes.
+                    </p>
+                  </div>
+                )}
               </form>
 
               <div className="mt-6 p-4 bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-xl">
