@@ -3,7 +3,7 @@ import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
 import ResultsDisplay from '../components/ResultsDisplay';
 import ClinicalResultsDisplay from '../components/ClinicalResultsDisplay';
-import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus } from 'lucide-react';
+import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus, MicIcon, XCircle, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 
 interface DrugLabel {
   drug_id?: string;
@@ -75,6 +75,11 @@ export default function Chat() {
   const [responseData, setResponseData] = useState<ResponseData | null>(null);
   const recognitionRef = useRef<any>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+  const [isDictatingFullForm, setIsDictatingFullForm] = useState(false);
+  const [fullFormTranscript, setFullFormTranscript] = useState('');
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [parsingTranscript, setParsingTranscript] = useState(false);
+  const fullFormRecognitionRef = useRef<any>(null);
 
   useEffect(() => {
     console.log('responseData changed:', responseData ? 'HAS DATA' : 'NULL/UNDEFINED');
@@ -156,6 +161,132 @@ export default function Chat() {
       recognitionRef.current.stop();
       setIsListening(false);
       setActiveField(null);
+    }
+  }
+
+  function clearAllFields() {
+    setAge('');
+    setGender('');
+    setRole('');
+    setMedication('');
+    setQuestion('');
+    setSymptoms('');
+    setDuration('');
+    setOtherMeds('');
+    setMedicalHistory('');
+    setFiles(null);
+    setFullFormTranscript('');
+    setError('');
+    setSuccess(false);
+
+    const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    if (fileInput) fileInput.value = '';
+  }
+
+  function startFullFormDictation() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+      fullFormRecognitionRef.current = new SpeechRecognition();
+      fullFormRecognitionRef.current.continuous = true;
+      fullFormRecognitionRef.current.interimResults = true;
+
+      fullFormRecognitionRef.current.onresult = (event: any) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        setFullFormTranscript(prev => {
+          const updated = prev + finalTranscript;
+          return updated;
+        });
+      };
+
+      fullFormRecognitionRef.current.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsDictatingFullForm(false);
+      };
+
+      fullFormRecognitionRef.current.onend = () => {
+        if (isDictatingFullForm) {
+          fullFormRecognitionRef.current.start();
+        }
+      };
+
+      setIsDictatingFullForm(true);
+      setFullFormTranscript('');
+      fullFormRecognitionRef.current.start();
+    } else {
+      setError('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+    }
+  }
+
+  function stopFullFormDictation() {
+    if (fullFormRecognitionRef.current) {
+      setIsDictatingFullForm(false);
+      fullFormRecognitionRef.current.stop();
+    }
+  }
+
+  async function parseAndFillForm() {
+    if (!fullFormTranscript.trim()) {
+      setError('No transcript to parse. Please dictate your information first.');
+      return;
+    }
+
+    setParsingTranscript(true);
+    setError('');
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/parse-dictation`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ transcript: fullFormTranscript }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to parse dictation');
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.fields) {
+        const fields = data.fields;
+
+        if (fields.age) setAge(fields.age);
+        if (fields.gender) setGender(fields.gender);
+        if (fields.role) setRole(fields.role);
+        if (fields.medication) setMedication(fields.medication);
+        if (fields.question) setQuestion(fields.question);
+        if (fields.symptoms) setSymptoms(fields.symptoms);
+        if (fields.duration) setDuration(fields.duration);
+        if (fields.otherMeds) setOtherMeds(fields.otherMeds);
+        if (fields.medicalHistory) setMedicalHistory(fields.medicalHistory);
+
+        setSuccess(true);
+        setError('');
+        setTimeout(() => setSuccess(false), 3000);
+      } else {
+        throw new Error(data.error || 'Failed to parse transcript');
+      }
+    } catch (err: any) {
+      console.error('Parse error:', err);
+      setError(err.message || 'Failed to parse dictation. Please try again.');
+    } finally {
+      setParsingTranscript(false);
     }
   }
 
@@ -625,6 +756,139 @@ export default function Chat() {
                   </div>
                 </div>
               )}
+
+              <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 border-2 border-blue-300 rounded-xl p-5 mb-6 shadow-md">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                      <MicIcon className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900">Voice Dictation</h3>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowInstructions(!showInstructions)}
+                    className="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center space-x-1"
+                  >
+                    <span>{showInstructions ? 'Hide' : 'Show'} Instructions</span>
+                    {showInstructions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                </div>
+
+                {showInstructions && (
+                  <div className="bg-white rounded-lg p-4 mb-4 border border-blue-200">
+                    <h4 className="font-bold text-gray-900 mb-2 flex items-center">
+                      <Sparkles className="w-4 h-4 text-blue-600 mr-2" />
+                      How to Use Full-Form Dictation
+                    </h4>
+                    <p className="text-sm text-gray-700 mb-3">
+                      Speak naturally and include all the information below. The AI will automatically fill in the form fields for you.
+                    </p>
+                    <div className="bg-blue-50 rounded-lg p-3 mb-3">
+                      <p className="text-sm font-semibold text-gray-800 mb-2">Example Script:</p>
+                      <p className="text-sm text-gray-700 italic">
+                        "Hi, I'm 45 years old, female, and I'm a patient. I'm taking sertraline and experiencing headaches and dizziness.
+                        This has been happening for about 2 weeks. I also take vitamin D supplements. I have a history of anxiety and depression."
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-gray-800">Required Information:</p>
+                      <ul className="text-xs text-gray-600 space-y-0.5 ml-4 list-disc">
+                        <li>Your age</li>
+                        <li>Your role (Patient, Caregiver, Doctor, or Clinician)</li>
+                        <li>Your main question or concern</li>
+                      </ul>
+                      <p className="text-xs font-bold text-gray-800 mt-2">Optional but Helpful:</p>
+                      <ul className="text-xs text-gray-600 space-y-0.5 ml-4 list-disc">
+                        <li>Gender</li>
+                        <li>Medication name</li>
+                        <li>Symptoms or side effects</li>
+                        <li>How long symptoms have lasted</li>
+                        <li>Other medications or supplements</li>
+                        <li>Medical history or conditions</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row gap-3 mb-4">
+                  {!isDictatingFullForm ? (
+                    <button
+                      type="button"
+                      onClick={startFullFormDictation}
+                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+                    >
+                      <Mic className="w-5 h-5" />
+                      <span>Start Full Dictation</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={stopFullFormDictation}
+                      className="flex-1 bg-red-600 text-white py-3 px-5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center space-x-2 animate-pulse"
+                    >
+                      <MicOff className="w-5 h-5" />
+                      <span>Stop Dictation</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={clearAllFields}
+                    className="flex-1 bg-gray-600 text-white py-3 px-5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+                  >
+                    <XCircle className="w-5 h-5" />
+                    <span>Clear All Fields</span>
+                  </button>
+                </div>
+
+                {fullFormTranscript && (
+                  <div className="bg-white rounded-lg p-4 border-2 border-blue-300 mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-bold text-gray-900 text-sm flex items-center">
+                        <Activity className="w-4 h-4 text-blue-600 mr-2" />
+                        Live Transcript
+                      </h4>
+                      {isDictatingFullForm && (
+                        <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full animate-pulse font-semibold">
+                          Recording...
+                        </span>
+                      )}
+                    </div>
+                    <div className="bg-gray-50 rounded p-3 max-h-32 overflow-y-auto">
+                      <p className="text-sm text-gray-700">{fullFormTranscript}</p>
+                    </div>
+                    {!isDictatingFullForm && (
+                      <button
+                        type="button"
+                        onClick={parseAndFillForm}
+                        disabled={parsingTranscript}
+                        className="mt-3 w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2 px-4 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {parsingTranscript ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <span>Processing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            <span>Fill Form with AI</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {isDictatingFullForm && (
+                  <div className="bg-blue-100 border border-blue-300 rounded-lg p-3 flex items-start space-x-2">
+                    <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs text-blue-800">
+                      <strong>Listening:</strong> Speak clearly and naturally. When finished, click "Stop Dictation" and then "Fill Form with AI" to auto-populate the fields.
+                    </p>
+                  </div>
+                )}
+              </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="grid md:grid-cols-2 gap-5">
