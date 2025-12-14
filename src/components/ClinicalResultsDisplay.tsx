@@ -99,9 +99,42 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   const extractSection = (markdown: string | undefined, title: string): string => {
     if (!markdown) return '';
     const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
-    const regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|---|$)`, 'i');
-    const match = cleanedMarkdown.match(regex);
+    // Try ### headers first
+    let regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|---|$)`, 'i');
+    let match = cleanedMarkdown.match(regex);
+    if (match) return match[1].trim();
+
+    // Try ## headers
+    regex = new RegExp(`##\\s*${title}([\\s\\S]*?)(?=##|---|$)`, 'i');
+    match = cleanedMarkdown.match(regex);
+    if (match) return match[1].trim();
+
+    // Try # headers
+    regex = new RegExp(`#\\s*${title}([\\s\\S]*?)(?=#|---|$)`, 'i');
+    match = cleanedMarkdown.match(regex);
     return match ? match[1].trim() : '';
+  };
+
+  // Parse all sections dynamically from markdown
+  const parseAllSections = (markdown: string | undefined): Array<{ title: string; content: string; level: number }> => {
+    if (!markdown) return [];
+    const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
+    const sections: Array<{ title: string; content: string; level: number }> = [];
+
+    // Match all headers (###, ##, #) and their content
+    const regex = /(#{1,3})\s*([^\n]+)\n([\s\S]*?)(?=#{1,3}\s|$)/g;
+    let match;
+
+    while ((match = regex.exec(cleanedMarkdown)) !== null) {
+      const level = match[1].length; // Number of # characters
+      const title = match[2].trim();
+      const content = match[3].trim();
+      if (content) {
+        sections.push({ title, content, level });
+      }
+    }
+
+    return sections;
   };
 
   if (!data || !data.final_answer_markdown) {
@@ -180,6 +213,14 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   };
 
   const medicationTitle = extractMedicationName();
+
+  // Check if we have any structured sections
+  const hasStructuredSections = !!(pgxContext || clinicalInterpretation || recommendations ||
+                                    dosingConsiderations || riskAssessment || monitoringRequirements ||
+                                    drugInteractions || summary);
+
+  // If no structured sections found, parse all sections dynamically
+  const allSections = !hasStructuredSections ? parseAllSections(markdown) : [];
 
   return (
     <div ref={contentRef} className="space-y-6 mb-8">
@@ -292,8 +333,43 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
         </div>
       )}
 
+      {/* Dynamic sections if no structured sections found */}
+      {!hasStructuredSections && allSections.length > 0 && allSections.map((section, idx) => {
+        const getSectionColor = () => {
+          const title = section.title.toLowerCase();
+          if (title.includes('gene') || title.includes('pharmacogen')) return { bg: 'from-emerald-50 to-teal-50', border: 'border-emerald-600', iconBg: 'bg-emerald-600', icon: Dna };
+          if (title.includes('interpretation') || title.includes('analysis')) return { bg: 'from-amber-50 to-orange-50', border: 'border-amber-600', iconBg: 'bg-amber-600', icon: BookOpen };
+          if (title.includes('recommendation') || title.includes('action')) return { bg: 'from-cyan-50 to-blue-50', border: 'border-cyan-600', iconBg: 'bg-cyan-600', icon: Shield };
+          if (title.includes('dosing')) return { bg: 'from-violet-50 to-purple-50', border: 'border-violet-600', iconBg: 'bg-violet-600', icon: Activity };
+          if (title.includes('risk')) return { bg: 'from-orange-50 to-amber-50', border: 'border-orange-600', iconBg: 'bg-orange-600', icon: AlertTriangle };
+          if (title.includes('interaction')) return { bg: 'from-rose-50 to-pink-50', border: 'border-rose-600', iconBg: 'bg-rose-600', icon: Shield };
+          if (title.includes('monitor')) return { bg: 'from-teal-50 to-cyan-50', border: 'border-teal-600', iconBg: 'bg-teal-600', icon: CheckCircle };
+          if (title.includes('summary')) return { bg: 'from-slate-50 to-gray-50', border: 'border-slate-600', iconBg: 'bg-slate-600', icon: FileText };
+          return { bg: 'from-blue-50 to-slate-50', border: 'border-blue-600', iconBg: 'bg-blue-600', icon: FileText };
+        };
+
+        const style = getSectionColor();
+        const IconComponent = style.icon;
+
+        return (
+          <div key={idx} className={`bg-gradient-to-br ${style.bg} rounded-xl shadow-lg p-6 border-l-4 ${style.border}`}>
+            <div className="flex items-start space-x-4">
+              <div className={`w-12 h-12 ${style.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                <IconComponent className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-slate-900 mb-4">{section.title}</h2>
+                <div className="prose prose-slate max-w-none text-gray-700">
+                  <ReactMarkdown>{section.content}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+
       {/* Pharmacogenomic Context */}
-      {pgxContext && (
+      {hasStructuredSections && pgxContext && (
         <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl shadow-lg p-6 border-l-4 border-emerald-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-emerald-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -310,7 +386,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Clinical Interpretation */}
-      {clinicalInterpretation && (
+      {hasStructuredSections && clinicalInterpretation && (
         <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-lg p-6 border-l-4 border-amber-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-amber-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -327,7 +403,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Recommendations */}
-      {recommendations && (
+      {hasStructuredSections && recommendations && (
         <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-cyan-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -344,7 +420,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Clinician-specific sections */}
-      {isClinician && dosingConsiderations && (
+      {hasStructuredSections && isClinician && dosingConsiderations && (
         <div className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-xl shadow-lg p-6 border-l-4 border-violet-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-violet-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -360,7 +436,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
         </div>
       )}
 
-      {isClinician && riskAssessment && (
+      {hasStructuredSections && isClinician && riskAssessment && (
         <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl shadow-lg p-6 border-l-4 border-orange-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -376,7 +452,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
         </div>
       )}
 
-      {isClinician && drugInteractions && (
+      {hasStructuredSections && isClinician && drugInteractions && (
         <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl shadow-lg p-6 border-l-4 border-rose-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-rose-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -392,7 +468,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
         </div>
       )}
 
-      {isClinician && monitoringRequirements && (
+      {hasStructuredSections && isClinician && monitoringRequirements && (
         <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-teal-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -409,7 +485,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Patient/Caregiver-specific sections */}
-      {!isClinician && nextSteps && (
+      {hasStructuredSections && !isClinician && nextSteps && (
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -426,7 +502,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Warning Signs */}
-      {!isClinician && warningSignsSection && (
+      {hasStructuredSections && !isClinician && warningSignsSection && (
         <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-lg p-6 border-l-4 border-red-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -443,7 +519,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Summary */}
-      {summary && (
+      {hasStructuredSections && summary && (
         <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-lg p-6 border-l-4 border-slate-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
