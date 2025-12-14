@@ -10,7 +10,6 @@ import AskPharmacist from './pages/AskPharmacist';
 import Admin from './pages/Admin';
 import Results from './pages/Results';
 import ResultsDemo from './pages/ResultsDemo';
-import History from './pages/History';
 
 function DashboardRedirect() {
   const { user, loading } = useAuth();
@@ -78,14 +77,6 @@ function App() {
           <Route
             path="/results-demo"
             element={<ResultsDemo />}
-          />
-          <Route
-            path="/history"
-            element={
-              <ProtectedRoute>
-                <History />
-              </ProtectedRoute>
-            }
           />
         </Routes>
       </AuthProvider>

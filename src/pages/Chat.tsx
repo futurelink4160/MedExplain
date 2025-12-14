@@ -669,32 +669,6 @@ export default function Chat() {
         console.log('Response data set complete');
         setSuccess(true);
 
-        try {
-          const { error: saveError } = await supabase
-            .from('query_history')
-            .insert({
-              user_id: user?.id,
-              age: parseInt(age) || null,
-              gender: gender || null,
-              role: role,
-              medication: medication || null,
-              question: question,
-              symptoms: symptoms || null,
-              duration: duration || null,
-              other_meds: otherMeds || null,
-              medical_history: medicalHistory || null,
-              response_data: data
-            });
-
-          if (saveError) {
-            console.error('Error saving query to history:', saveError);
-          } else {
-            console.log('Query saved to history successfully');
-          }
-        } catch (saveError) {
-          console.error('Failed to save query to history:', saveError);
-        }
-
         setTimeout(() => {
           console.log('Scrolling to results, responseData is:', data ? 'present' : 'missing');
           resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });

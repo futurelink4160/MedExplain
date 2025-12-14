@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, Stethoscope, Clock } from 'lucide-react';
+import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, Stethoscope } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -84,17 +84,6 @@ export default function Layout({ children }: LayoutProps) {
                 >
                   <Stethoscope className="w-4 h-4" />
                   <span>Ask Pharmacist</span>
-                </Link>
-                <Link
-                  to="/history"
-                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
-                    isActive('/history')
-                      ? 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white shadow-md'
-                      : 'text-gray-700 hover:text-purple-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <Clock className="w-4 h-4" />
-                  <span>History</span>
                 </Link>
                 {isAdmin && (
                   <Link
