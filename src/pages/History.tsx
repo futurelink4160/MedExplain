@@ -279,6 +279,10 @@ export default function History() {
                 <ClinicalResultsDisplay
                   data={viewingQuery.response_data}
                   role={viewingQuery.role}
+                  onNewQuery={() => {
+                    setViewingQuery(null);
+                    navigate('/chat');
+                  }}
                   patientData={{
                     age: viewingQuery.age?.toString(),
                     gender: viewingQuery.gender,
@@ -294,6 +298,10 @@ export default function History() {
               ) : (
                 <ResultsDisplay
                   data={viewingQuery.response_data}
+                  onNewQuery={() => {
+                    setViewingQuery(null);
+                    navigate('/chat');
+                  }}
                   patientData={{
                     age: viewingQuery.age?.toString(),
                     gender: viewingQuery.gender,
