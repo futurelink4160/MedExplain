@@ -1241,8 +1241,9 @@ export default function Chat() {
         {responseData && (
           <div ref={resultsRef} className="mt-8">
             {console.log('=== RENDERING RESULTS SECTION ===')}
+            {console.log('User role:', role)}
             {console.log('Response type:', responseData.response_type)}
-            {responseData.response_type === 'CLINICAL_PGX_SUMMARY' || responseData.response_type === 'CLINICAL_PATIENT_SUMMARY' ? (
+            {role === 'Doctor' || role === 'Clinician' ? (
               <ClinicalResultsDisplay
                 data={responseData}
                 onNewQuery={handleNewQuery}
