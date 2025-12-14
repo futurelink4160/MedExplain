@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import Layout from '../components/Layout';
-import { Clock, Pill, MessageSquare, ChevronRight, Trash2, Loader2, AlertCircle, Calendar } from 'lucide-react';
+import ResultsDisplay from '../components/ResultsDisplay';
+import ClinicalResultsDisplay from '../components/ClinicalResultsDisplay';
+import { Clock, Pill, MessageSquare, ChevronRight, Trash2, Loader2, AlertCircle, Calendar, Eye, X } from 'lucide-react';
 
 interface QueryHistory {
   id: string;
@@ -27,6 +29,7 @@ export default function History() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [viewingQuery, setViewingQuery] = useState<QueryHistory | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -184,18 +187,27 @@ export default function History() {
                           </div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => deleteQuery(query.id)}
-                        disabled={deletingId === query.id}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
-                        title="Delete query"
-                      >
-                        {deletingId === query.id ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-5 h-5" />
-                        )}
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setViewingQuery(query)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          title="View results"
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
+                        <button
+                          onClick={() => deleteQuery(query.id)}
+                          disabled={deletingId === query.id}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all disabled:opacity-50"
+                          title="Delete query"
+                        >
+                          {deletingId === query.id ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-5 h-5" />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="space-y-3">
@@ -247,6 +259,58 @@ export default function History() {
           )}
         </div>
       </div>
+
+      {viewingQuery && viewingQuery.response_data && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto relative">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
+              <h2 className="text-2xl font-bold text-gray-900">Query Results</h2>
+              <button
+                onClick={() => setViewingQuery(null)}
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-all"
+                title="Close"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {viewingQuery.role === 'Doctor' || viewingQuery.role === 'Clinician' ? (
+                <ClinicalResultsDisplay
+                  data={viewingQuery.response_data}
+                  role={viewingQuery.role}
+                  patientData={{
+                    age: viewingQuery.age?.toString(),
+                    gender: viewingQuery.gender,
+                    role: viewingQuery.role,
+                    medication: viewingQuery.medication,
+                    question: viewingQuery.question,
+                    symptoms: viewingQuery.symptoms,
+                    duration: viewingQuery.duration,
+                    otherMeds: viewingQuery.other_meds,
+                    medicalHistory: viewingQuery.medical_history
+                  }}
+                />
+              ) : (
+                <ResultsDisplay
+                  data={viewingQuery.response_data}
+                  patientData={{
+                    age: viewingQuery.age?.toString(),
+                    gender: viewingQuery.gender,
+                    role: viewingQuery.role,
+                    medication: viewingQuery.medication,
+                    question: viewingQuery.question,
+                    symptoms: viewingQuery.symptoms,
+                    duration: viewingQuery.duration,
+                    otherMeds: viewingQuery.other_meds,
+                    medicalHistory: viewingQuery.medical_history
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }
