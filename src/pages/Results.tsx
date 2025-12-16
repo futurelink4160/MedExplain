@@ -153,25 +153,37 @@ export default function Results() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-purple-900 mb-4">Why These Symptoms May Happen</h2>
-                  <div className="prose prose-purple max-w-none text-gray-700">
-                    <ReactMarkdown>{extractSection(markdown, 'Why These Symptoms May Happen')}</ReactMarkdown>
+            {extractSection(markdown, 'Genetic Considerations') && (
+              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-teal-500">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Activity className="w-6 h-6 text-white" />
                   </div>
-                  <div className="mt-6">
-                    <h3 className="text-xl font-bold text-purple-900 mb-3">How Common Is This?</h3>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-teal-900 mb-4">Genetic Considerations</h2>
+                    <div className="prose prose-teal max-w-none text-gray-700">
+                      <ReactMarkdown>{extractSection(markdown, 'Genetic Considerations')}</ReactMarkdown>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {extractSection(markdown, 'How Common Is This') && (
+              <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-purple-900 mb-4">How Common Is This?</h2>
                     <div className="prose prose-purple max-w-none text-gray-700">
                       <ReactMarkdown>{extractSection(markdown, 'How Common Is This')}</ReactMarkdown>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
               <div className="flex items-start space-x-4">

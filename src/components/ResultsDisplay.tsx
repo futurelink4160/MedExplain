@@ -181,7 +181,8 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   const hasPatientSections = extractSection(markdown, 'Understanding Your Concern') ||
     extractSection(markdown, 'About This Medication') ||
-    extractSection(markdown, 'Why These Symptoms May Happen');
+    extractSection(markdown, 'Genetic Considerations') ||
+    extractSection(markdown, 'How Common Is This');
 
   // Check if this is clinical format response
   const isClinicalFormat = data.clinical_summary || data.pgx_interpretation || data.clinical_recommendations;
@@ -871,46 +872,49 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
-            <BookOpen className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-purple-900 mb-4">Why These Symptoms May Happen</h2>
-            <div className="prose prose-purple max-w-none text-gray-700">
-              <ReactMarkdown>{extractSection(markdown, 'Why These Symptoms May Happen')}</ReactMarkdown>
-            </div>
-            <div className="mt-6">
-              <h3 className="text-xl font-bold text-purple-900 mb-3">How Common Is This?</h3>
-              <div className="prose prose-purple max-w-none text-gray-700">
-                <ReactMarkdown>{extractSection(markdown, 'How Common Is This')}</ReactMarkdown>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {(() => {
-        const geneticInfo = extractSection(markdown, 'Relevant Genetic Information') ||
+        const geneticInfo = extractSection(markdown, 'Genetic Considerations') ||
+                           extractSection(markdown, 'Relevant Genetic Information') ||
                            extractSection(markdown, 'Genetic Information') ||
                            extractSection(markdown, 'Pharmacogenomic Information') ||
                            extractSection(markdown, 'Genetic Factors') ||
                            extractSection(markdown, 'Pharmacogenomic Context') ||
                            extractSection(markdown, 'How Your Genes May Play a Role');
 
-        if (!geneticInfo) return null;
+        if (geneticInfo) {
+          return (
+            <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-teal-500">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Activity className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-teal-900 mb-4">Genetic Considerations</h2>
+                  <div className="prose prose-teal max-w-none text-gray-700">
+                    <ReactMarkdown>{geneticInfo}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
+
+      {(() => {
+        const howCommon = extractSection(markdown, 'How Common Is This');
+        if (!howCommon) return null;
 
         return (
-          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+          <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Activity className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-indigo-900 mb-4">Relevant Genetic Information</h2>
-                <div className="prose prose-indigo max-w-none text-gray-700">
-                  <ReactMarkdown>{geneticInfo}</ReactMarkdown>
+                <h2 className="text-2xl font-bold text-purple-900 mb-4">How Common Is This?</h2>
+                <div className="prose prose-purple max-w-none text-gray-700">
+                  <ReactMarkdown>{howCommon}</ReactMarkdown>
                 </div>
               </div>
             </div>
