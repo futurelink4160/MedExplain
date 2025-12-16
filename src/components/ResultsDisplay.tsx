@@ -125,17 +125,33 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     if (!markdown) return '';
 
     const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
-    const regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|$)`, 'i');
-    const match = cleanedMarkdown.match(regex);
-    const extracted = match ? match[1].trim() : '';
 
-    if (extracted) {
-      console.log(`Extracted section "${title}":`, extracted.substring(0, 100) + '...');
-    } else {
-      console.log(`Section "${title}" not found in markdown`);
+    // Try ### headers first
+    let regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|##|#|$)`, 'i');
+    let match = cleanedMarkdown.match(regex);
+    if (match) {
+      console.log(`Extracted section "${title}" (###):`, match[1].trim().substring(0, 100) + '...');
+      return match[1].trim();
     }
 
-    return extracted;
+    // Try ## headers
+    regex = new RegExp(`##\\s*${title}([\\s\\S]*?)(?=##|#|$)`, 'i');
+    match = cleanedMarkdown.match(regex);
+    if (match) {
+      console.log(`Extracted section "${title}" (##):`, match[1].trim().substring(0, 100) + '...');
+      return match[1].trim();
+    }
+
+    // Try # headers
+    regex = new RegExp(`#\\s*${title}([\\s\\S]*?)(?=#|$)`, 'i');
+    match = cleanedMarkdown.match(regex);
+    if (match) {
+      console.log(`Extracted section "${title}" (#):`, match[1].trim().substring(0, 100) + '...');
+      return match[1].trim();
+    }
+
+    console.log(`Section "${title}" not found in markdown`);
+    return '';
   };
 
   const parseAllSections = (markdown: string | undefined): Array<{ title: string; content: string }> => {
@@ -144,12 +160,13 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
     const sections: Array<{ title: string; content: string }> = [];
 
-    const regex = /###\s*([^\n]+)\n([\s\S]*?)(?=###|$)/g;
+    // Match all headers (###, ##, #) and their content
+    const regex = /(#{1,3})\s*([^\n]+)\n([\s\S]*?)(?=#{1,3}\s|$)/g;
     let match;
 
     while ((match = regex.exec(cleanedMarkdown)) !== null) {
-      const title = match[1].trim();
-      const content = match[2].trim();
+      const title = match[2].trim();
+      const content = match[3].trim();
       if (content) {
         sections.push({ title, content });
       }
@@ -874,21 +891,32 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       </div>
 
-      {extractSection(markdown, 'Relevant Genetic Information') && (
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Activity className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-indigo-900 mb-4">Relevant Genetic Information</h2>
-              <div className="prose prose-indigo max-w-none text-gray-700">
-                <ReactMarkdown>{extractSection(markdown, 'Relevant Genetic Information')}</ReactMarkdown>
+      {(() => {
+        const geneticInfo = extractSection(markdown, 'Relevant Genetic Information') ||
+                           extractSection(markdown, 'Genetic Information') ||
+                           extractSection(markdown, 'Pharmacogenomic Information') ||
+                           extractSection(markdown, 'Genetic Factors') ||
+                           extractSection(markdown, 'Pharmacogenomic Context') ||
+                           extractSection(markdown, 'How Your Genes May Play a Role');
+
+        if (!geneticInfo) return null;
+
+        return (
+          <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-indigo-900 mb-4">Relevant Genetic Information</h2>
+                <div className="prose prose-indigo max-w-none text-gray-700">
+                  <ReactMarkdown>{geneticInfo}</ReactMarkdown>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
         <div className="flex items-start space-x-4">
