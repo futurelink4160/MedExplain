@@ -190,27 +190,27 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   if (isClinicalFormat) {
     return (
       <div ref={contentRef} className="space-y-6 mb-8">
-        <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
+        <div className="bg-primary rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-12 -mb-12"></div>
           <div className="relative z-10 flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">Clinical Pharmacogenomics Summary</h1>
-              <p className="text-blue-100 text-lg">Professional clinical insight for healthcare providers</p>
+              <p className="text-gray-200 text-lg">Professional clinical insight for healthcare providers</p>
             </div>
-            <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
+            <Activity className="w-20 h-20 text-secondary opacity-80 hidden md:block" />
           </div>
         </div>
 
         {data.clinical_summary && (
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-primary">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-blue-900 mb-4">Clinical Summary</h2>
-                <div className="prose prose-blue max-w-none text-gray-700">
+                <h2 className="text-2xl font-bold text-primary mb-4">Clinical Summary</h2>
+                <div className="prose max-w-none text-text-primary">
                   <p>{data.clinical_summary}</p>
                 </div>
               </div>
@@ -219,14 +219,14 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         )}
 
         {data.pgx_interpretation && (
-          <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-accent">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center flex-shrink-0">
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-purple-900 mb-4">Pharmacogenomic Interpretation</h2>
-                <div className="prose prose-purple max-w-none text-gray-700">
+                <h2 className="text-2xl font-bold text-accent-dark mb-4">Pharmacogenomic Interpretation</h2>
+                <div className="prose max-w-none text-text-primary">
                   <p>{data.pgx_interpretation}</p>
                 </div>
               </div>
@@ -235,20 +235,20 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         )}
 
         {data.clinical_recommendations && data.clinical_recommendations.length > 0 && (
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-success">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-status-success rounded-xl flex items-center justify-center flex-shrink-0">
                 <CheckCircle2 className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-green-900 mb-4">Clinical Recommendations</h2>
+                <h2 className="text-2xl font-bold text-status-success mb-4">Clinical Recommendations</h2>
                 <ol className="space-y-3">
                   {data.clinical_recommendations.map((rec, idx) => (
                     <li key={idx} className="flex items-start space-x-3">
-                      <span className="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
+                      <span className="flex-shrink-0 w-8 h-8 bg-status-success text-white rounded-full flex items-center justify-center font-bold">
                         {idx + 1}
                       </span>
-                      <span className="text-gray-700 pt-1">{rec}</span>
+                      <span className="text-text-primary pt-1">{rec}</span>
                     </li>
                   ))}
                 </ol>
@@ -258,14 +258,14 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         )}
 
         {data.disclaimer && (
-          <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl shadow-lg p-6 border-l-4 border-gray-500">
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-text-secondary">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-text-secondary rounded-xl flex items-center justify-center flex-shrink-0">
                 <Info className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Disclaimer</h2>
-                <div className="prose prose-gray max-w-none text-gray-700 italic">
+                <h2 className="text-2xl font-bold text-text-primary mb-4">Disclaimer</h2>
+                <div className="prose max-w-none text-text-secondary italic">
                   <p>{data.disclaimer}</p>
                 </div>
               </div>
@@ -276,7 +276,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={handleDownloadPDF}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-primary-light transition-all transform hover:scale-105"
           >
             <Download className="w-5 h-5" />
             <span>Download Summary</span>
@@ -284,7 +284,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
           <button
             onClick={() => setShowEmailModal(true)}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="flex items-center space-x-2 px-6 py-3 bg-secondary text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-secondary-dark transition-all transform hover:scale-105"
           >
             <Mail className="w-5 h-5" />
             <span>Email This Summary</span>
@@ -293,7 +293,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           {onNewQuery && (
             <button
               onClick={onNewQuery}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              className="flex items-center space-x-2 px-6 py-3 bg-status-success text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:brightness-110 transition-all transform hover:scale-105"
             >
               <RefreshCw className="w-5 h-5" />
               <span>Start New Query</span>
@@ -348,7 +348,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 </button>
                 <button
                   onClick={handleSendEmail}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition"
+                  className="px-4 py-2 bg-primary text-white rounded-lg font-bold hover:shadow-lg hover:bg-primary-light transition"
                 >
                   Send Email
                 </button>
@@ -362,26 +362,26 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   if (data.emergency_detected) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl overflow-hidden mb-8">
-        <div className="bg-red-50 border-4 border-red-600 rounded-2xl p-8">
+      <div className="bg-background-card rounded-2xl shadow-xl overflow-hidden mb-8">
+        <div className="bg-red-50 border-4 border-status-alert rounded-2xl p-8">
           <div className="text-center">
-            <div className="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+            <div className="w-24 h-24 bg-status-alert rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
               <AlertTriangle className="w-16 h-16 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-red-900 mb-4">EMERGENCY WARNING</h1>
-            <p className="text-xl text-red-800 mb-6 leading-relaxed">
+            <h1 className="text-4xl font-bold text-status-alert mb-4">EMERGENCY WARNING</h1>
+            <p className="text-xl text-text-primary mb-6 leading-relaxed">
               Your symptoms may represent a serious medical issue.
             </p>
-            <p className="text-2xl font-bold text-red-900 mb-6">
+            <p className="text-2xl font-bold text-status-alert mb-6">
               Please call 911 or go to the nearest emergency room immediately.
             </p>
-            <p className="text-sm text-red-700 italic">
+            <p className="text-sm text-text-secondary italic">
               This information is for educational purposes only.
             </p>
             {onNewQuery && (
               <button
                 onClick={onNewQuery}
-                className="mt-6 flex items-center space-x-2 px-6 py-3 bg-white text-red-600 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all mx-auto"
+                className="mt-6 flex items-center space-x-2 px-6 py-3 bg-background-card text-status-alert border-2 border-status-alert rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-red-50 transition-all mx-auto"
               >
                 <RefreshCw className="w-5 h-5" />
                 <span>Start New Query</span>
@@ -461,50 +461,50 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     const lowerTitle = title.toLowerCase();
 
     if (lowerTitle.includes('gene') || lowerTitle.includes('genetic') || lowerTitle.includes('pharmacogenomic') || lowerTitle.includes('pgx')) {
-      return { bg: 'from-teal-50 to-cyan-50', border: 'border-teal-500', iconBg: 'bg-teal-500', icon: Activity };
+      return { bg: 'bg-background-card', border: 'border-accent', iconBg: 'bg-accent', icon: Activity };
     }
     if (lowerTitle.includes('summary') || lowerTitle.includes('overview')) {
-      return { bg: 'from-blue-50 to-slate-50', border: 'border-blue-500', iconBg: 'bg-blue-500', icon: BookOpen };
+      return { bg: 'bg-background-card', border: 'border-primary', iconBg: 'bg-primary', icon: BookOpen };
     }
     if (lowerTitle.includes('interpretation') || lowerTitle.includes('analysis')) {
-      return { bg: 'from-cyan-50 to-sky-50', border: 'border-cyan-500', iconBg: 'bg-cyan-500', icon: Activity };
+      return { bg: 'bg-background-card', border: 'border-secondary', iconBg: 'bg-secondary', icon: Activity };
     }
     if (lowerTitle.includes('recommendation') || lowerTitle.includes('action')) {
-      return { bg: 'from-green-50 to-emerald-50', border: 'border-green-600', iconBg: 'bg-green-600', icon: CheckCircle2 };
+      return { bg: 'bg-background-card', border: 'border-status-success', iconBg: 'bg-status-success', icon: CheckCircle2 };
     }
     if (lowerTitle.includes('warning') || lowerTitle.includes('alert') || lowerTitle.includes('emergency')) {
-      return { bg: 'from-red-50 to-rose-50', border: 'border-red-600', iconBg: 'bg-red-600', icon: AlertTriangle };
+      return { bg: 'bg-background-card', border: 'border-status-alert', iconBg: 'bg-status-alert', icon: AlertTriangle };
     }
     if (lowerTitle.includes('medication') || lowerTitle.includes('drug')) {
-      return { bg: 'from-yellow-50 to-amber-50', border: 'border-yellow-500', iconBg: 'bg-yellow-500', icon: Pill };
+      return { bg: 'bg-background-card', border: 'border-status-warning', iconBg: 'bg-status-warning', icon: Pill };
     }
     if (lowerTitle.includes('safety') || lowerTitle.includes('precaution')) {
-      return { bg: 'from-orange-50 to-red-50', border: 'border-orange-500', iconBg: 'bg-orange-500', icon: Shield };
+      return { bg: 'bg-background-card', border: 'border-status-warning', iconBg: 'bg-status-warning', icon: Shield };
     }
     if (lowerTitle.includes('disclaimer') || lowerTitle.includes('note')) {
-      return { bg: 'from-gray-50 to-slate-50', border: 'border-gray-500', iconBg: 'bg-gray-600', icon: Info };
+      return { bg: 'bg-background-card', border: 'border-text-secondary', iconBg: 'bg-text-secondary', icon: Info };
     }
     if (lowerTitle.includes('contact') || lowerTitle.includes('doctor') || lowerTitle.includes('call')) {
-      return { bg: 'from-blue-50 to-cyan-50', border: 'border-blue-600', iconBg: 'bg-blue-600', icon: Phone };
+      return { bg: 'bg-background-card', border: 'border-primary', iconBg: 'bg-primary', icon: Phone };
     }
 
     // Default style
-    return { bg: 'from-slate-50 to-gray-50', border: 'border-slate-500', iconBg: 'bg-slate-500', icon: BookOpen };
+    return { bg: 'bg-background-card', border: 'border-text-secondary', iconBg: 'bg-text-secondary', icon: BookOpen };
   };
 
   // If sections found, show them beautifully
   if (hasSections && !hasPatientSections) {
     return (
       <div ref={contentRef} className="space-y-6 mb-8">
-        <div className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
+        <div className="bg-primary rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-12 -mb-12"></div>
           <div className="relative z-10 flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-white mb-2">Your Pharmacogenomic Report</h1>
-              <p className="text-blue-100 text-lg">Personalized medication and genetic information</p>
+              <p className="text-gray-200 text-lg">Personalized medication and genetic information</p>
             </div>
-            <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
+            <Activity className="w-20 h-20 text-secondary opacity-80 hidden md:block" />
           </div>
         </div>
 
@@ -513,14 +513,14 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           const IconComponent = style.icon;
 
           return (
-            <div key={idx} className={`bg-gradient-to-br ${style.bg} rounded-xl shadow-lg p-6 border-l-4 ${style.border}`}>
+            <div key={idx} className={`${style.bg} rounded-xl shadow-lg p-6 border-l-4 ${style.border}`}>
               <div className="flex items-start space-x-4">
                 <div className={`w-12 h-12 ${style.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
                   <IconComponent className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">{section.title}</h2>
-                  <div className="prose prose-blue max-w-none text-gray-700">
+                  <h2 className="text-2xl font-bold text-text-primary mb-4">{section.title}</h2>
+                  <div className="prose max-w-none text-text-primary">
                     <ReactMarkdown>{section.content}</ReactMarkdown>
                   </div>
                 </div>
@@ -530,23 +530,23 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         })}
 
         {data.pgx_results && (
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+          <div className="bg-background-card rounded-xl shadow-lg overflow-hidden border border-gray-200">
             <button
               onClick={() => setShowPgx(!showPgx)}
               className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition"
             >
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center">
                   <Info className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-900">
+                <h2 className="text-xl font-bold text-text-primary">
                   Additional Genomic Details (Genes, Variants & Drug Labels)
                 </h2>
               </div>
               {showPgx ? (
-                <ChevronUp className="w-6 h-6 text-gray-600" />
+                <ChevronUp className="w-6 h-6 text-text-secondary" />
               ) : (
-                <ChevronDown className="w-6 h-6 text-gray-600" />
+                <ChevronDown className="w-6 h-6 text-text-secondary" />
               )}
             </button>
 
@@ -679,7 +679,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <button
             onClick={handleDownloadPDF}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-primary-light transition-all transform hover:scale-105"
           >
             <Download className="w-5 h-5" />
             <span>Download Report</span>
@@ -687,7 +687,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
           <button
             onClick={() => setShowEmailModal(true)}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-teal-600 to-green-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="flex items-center space-x-2 px-6 py-3 bg-secondary text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-secondary-dark transition-all transform hover:scale-105"
           >
             <Mail className="w-5 h-5" />
             <span>Email This Report</span>
@@ -696,7 +696,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           {onNewQuery && (
             <button
               onClick={onNewQuery}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              className="flex items-center space-x-2 px-6 py-3 bg-status-success text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:brightness-110 transition-all transform hover:scale-105"
             >
               <RefreshCw className="w-5 h-5" />
               <span>Start New Query</span>
@@ -751,7 +751,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 </button>
                 <button
                   onClick={handleSendEmail}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg font-bold hover:shadow-lg transition"
+                  className="px-4 py-2 bg-primary text-white rounded-lg font-bold hover:shadow-lg hover:bg-primary-light transition"
                 >
                   Send Email
                 </button>
@@ -765,75 +765,75 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   return (
     <div ref={contentRef} className="space-y-6 mb-8">
-      <div className="bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 rounded-2xl shadow-2xl p-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
+      <div className="bg-primary rounded-2xl shadow-2xl p-8 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-5 rounded-full -ml-12 -mb-12"></div>
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Your Medication Insight Summary</h1>
-            <p className="text-blue-100 text-lg">Educational information to support your understanding</p>
+            <p className="text-gray-200 text-lg">Educational information to support your understanding</p>
           </div>
-          <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
+          <Activity className="w-20 h-20 text-secondary opacity-80 hidden md:block" />
         </div>
       </div>
 
       {/* Patient Information */}
       {patientData && (patientData.hasStructuredOverview || patientData.age || patientData.medication || patientData.question || patientData.symptoms || patientData.duration) && (
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+        <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-primary">
           <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
               <User className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-blue-900 mb-4">Your Information</h2>
-              <div className="prose prose-blue max-w-none text-gray-700">
+              <h2 className="text-2xl font-bold text-primary mb-4">Your Information</h2>
+              <div className="prose max-w-none text-text-primary">
                 {patientData.hasStructuredOverview ? (
                   <ReactMarkdown>{patientData.overview}</ReactMarkdown>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {patientData.age && (
-                      <div className="bg-white p-3 rounded-lg">
-                        <strong className="text-blue-800">Age:</strong> <span className="text-gray-700">{patientData.age}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Age:</strong> <span className="text-text-primary">{patientData.age}</span>
                       </div>
                     )}
                     {patientData.gender && (
-                      <div className="bg-white p-3 rounded-lg">
-                        <strong className="text-blue-800">Gender:</strong> <span className="text-gray-700">{patientData.gender}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Gender:</strong> <span className="text-text-primary">{patientData.gender}</span>
                       </div>
                     )}
                     {patientData.role && (
-                      <div className="bg-white p-3 rounded-lg">
-                        <strong className="text-blue-800">Role:</strong> <span className="text-gray-700">{patientData.role}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Role:</strong> <span className="text-text-primary">{patientData.role}</span>
                       </div>
                     )}
                     {patientData.medication && (
-                      <div className="bg-white p-3 rounded-lg">
-                        <strong className="text-blue-800">Medication:</strong> <span className="text-gray-700">{patientData.medication}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Medication:</strong> <span className="text-text-primary">{patientData.medication}</span>
                       </div>
                     )}
                     {patientData.question && (
-                      <div className="bg-white p-3 rounded-lg md:col-span-2">
-                        <strong className="text-blue-800">Question/Concern:</strong> <span className="text-gray-700">{patientData.question}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Question/Concern:</strong> <span className="text-text-primary">{patientData.question}</span>
                       </div>
                     )}
                     {patientData.symptoms && (
-                      <div className="bg-white p-3 rounded-lg md:col-span-2">
-                        <strong className="text-blue-800">Current Symptoms:</strong> <span className="text-gray-700">{patientData.symptoms}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Current Symptoms:</strong> <span className="text-text-primary">{patientData.symptoms}</span>
                       </div>
                     )}
                     {patientData.duration && (
-                      <div className="bg-white p-3 rounded-lg">
-                        <strong className="text-blue-800">Duration:</strong> <span className="text-gray-700">{patientData.duration}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Duration:</strong> <span className="text-text-primary">{patientData.duration}</span>
                       </div>
                     )}
                     {patientData.otherMeds && patientData.otherMeds !== 'None mentioned' && patientData.otherMeds !== 'None reported' && (
-                      <div className="bg-white p-3 rounded-lg md:col-span-2">
-                        <strong className="text-blue-800">Other Medications:</strong> <span className="text-gray-700">{patientData.otherMeds}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Other Medications:</strong> <span className="text-text-primary">{patientData.otherMeds}</span>
                       </div>
                     )}
                     {patientData.medicalHistory && patientData.medicalHistory !== 'None mentioned' && (
-                      <div className="bg-white p-3 rounded-lg md:col-span-2">
-                        <strong className="text-blue-800">Medical History:</strong> <span className="text-gray-700">{patientData.medicalHistory}</span>
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Medical History:</strong> <span className="text-text-primary">{patientData.medicalHistory}</span>
                       </div>
                     )}
                   </div>
@@ -844,28 +844,28 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       )}
 
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center flex-shrink-0">
             <Activity className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-green-900 mb-4">Understanding Your Concern</h2>
-            <div className="prose prose-green max-w-none text-gray-700">
+            <h2 className="text-2xl font-bold text-secondary mb-4">Understanding Your Concern</h2>
+            <div className="prose max-w-none text-text-primary">
               <ReactMarkdown>{extractSection(markdown, 'Understanding Your Concern')}</ReactMarkdown>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-warning">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-status-warning rounded-xl flex items-center justify-center flex-shrink-0">
             <Pill className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-yellow-900 mb-4">About This Medication</h2>
-            <div className="prose prose-yellow max-w-none text-gray-700">
+            <h2 className="text-2xl font-bold text-status-warning mb-4">About This Medication</h2>
+            <div className="prose max-w-none text-text-primary">
               <ReactMarkdown>{extractSection(markdown, 'About This Medication')}</ReactMarkdown>
             </div>
           </div>
@@ -883,14 +883,14 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
         if (geneticInfo) {
           return (
-            <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-teal-500">
+            <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-accent">
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center flex-shrink-0">
                   <Activity className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-teal-900 mb-4">Genetic Considerations</h2>
-                  <div className="prose prose-teal max-w-none text-gray-700">
+                  <h2 className="text-2xl font-bold text-accent mb-4">Genetic Considerations</h2>
+                  <div className="prose max-w-none text-text-primary">
                     <ReactMarkdown>{geneticInfo}</ReactMarkdown>
                   </div>
                 </div>
@@ -906,14 +906,14 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         if (!howCommon) return null;
 
         return (
-          <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center flex-shrink-0">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-purple-900 mb-4">How Common Is This?</h2>
-                <div className="prose prose-purple max-w-none text-gray-700">
+                <h2 className="text-2xl font-bold text-secondary mb-4">How Common Is This?</h2>
+                <div className="prose max-w-none text-text-primary">
                   <ReactMarkdown>{howCommon}</ReactMarkdown>
                 </div>
               </div>
@@ -922,19 +922,19 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         );
       })()}
 
-      <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl shadow-lg p-6 border-l-4 border-green-600">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-success">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-status-success rounded-xl flex items-center justify-center flex-shrink-0">
             <Shield className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-green-900 mb-4">What You Can Do Now</h2>
-            <div className="prose prose-green max-w-none text-gray-700">
+            <h2 className="text-2xl font-bold text-status-success mb-4">What You Can Do Now</h2>
+            <div className="prose max-w-none text-text-primary">
               <ReactMarkdown
                 components={{
                   li: ({ children }) => (
                     <li className="flex items-start space-x-2">
-                      <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="w-5 h-5 text-status-success mt-0.5 flex-shrink-0" />
                       <span>{children}</span>
                     </li>
                   ),
@@ -947,46 +947,46 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-600">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-primary">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
             <Phone className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-blue-900 mb-4">When to Contact Your Doctor</h2>
-            <div className="prose prose-blue max-w-none text-gray-700">
+            <h2 className="text-2xl font-bold text-primary mb-4">When to Contact Your Doctor</h2>
+            <div className="prose max-w-none text-text-primary">
               <ReactMarkdown>{extractSection(markdown, 'When to Contact Your Doctor')}</ReactMarkdown>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-xl shadow-lg p-6 border-l-4 border-red-600">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-alert">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-status-alert rounded-xl flex items-center justify-center flex-shrink-0">
             <AlertTriangle className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-red-900 mb-4">When to Seek Emergency Care</h2>
-            <div className="prose prose-red max-w-none text-gray-700">
+            <h2 className="text-2xl font-bold text-status-alert mb-4">When to Seek Emergency Care</h2>
+            <div className="prose max-w-none text-text-primary">
               <ReactMarkdown>{extractSection(markdown, 'When to Seek Emergency Care')}</ReactMarkdown>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl shadow-lg p-6 border-l-4 border-gray-500">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-text-secondary">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-gray-600 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-text-secondary rounded-xl flex items-center justify-center flex-shrink-0">
             <Shield className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Important Safety Reminders</h2>
-            <div className="prose prose-gray max-w-none text-gray-700">
+            <h2 className="text-2xl font-bold text-text-primary mb-4">Important Safety Reminders</h2>
+            <div className="prose max-w-none text-text-primary">
               <ReactMarkdown>{extractSection(markdown, 'Important Safety Reminders')}</ReactMarkdown>
             </div>
-            <div className="mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-600 rounded">
-              <p className="font-bold text-gray-900">
+            <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-status-warning rounded">
+              <p className="font-bold text-text-primary">
                 Do not stop taking your medication without medical guidance.
               </p>
             </div>
@@ -994,28 +994,28 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-lg p-6 border-l-4 border-amber-500">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center flex-shrink-0">
             <Clock className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-amber-900 mb-4">What to Expect Moving Forward</h2>
-            <div className="prose prose-amber max-w-none text-gray-700">
+            <h2 className="text-2xl font-bold text-secondary mb-4">What to Expect Moving Forward</h2>
+            <div className="prose max-w-none text-text-primary">
               <ReactMarkdown>{extractSection(markdown, 'What to Expect Going Forward')}</ReactMarkdown>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 border-l-4 border-blue-400">
+      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-text-secondary">
         <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-blue-400 rounded-xl flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 bg-text-secondary rounded-xl flex items-center justify-center flex-shrink-0">
             <BookOpen className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-blue-900 mb-4">Educational Purpose Only</h2>
-            <div className="prose prose-blue max-w-none text-gray-700 italic">
+            <h2 className="text-2xl font-bold text-text-primary mb-4">Educational Purpose Only</h2>
+            <div className="prose max-w-none text-text-secondary italic">
               <ReactMarkdown>{extractSection(markdown, 'Educational Purpose Only')}</ReactMarkdown>
             </div>
           </div>
@@ -1023,23 +1023,23 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       </div>
 
       {data.pgx_results && (
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <div className="bg-background-card rounded-xl shadow-lg overflow-hidden border border-gray-200">
           <button
             onClick={() => setShowPgx(!showPgx)}
             className="w-full flex items-center justify-between p-6 hover:bg-gray-50 transition"
           >
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center">
                 <Info className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-xl font-bold text-text-primary">
                 Additional Educational Insights (Genes, Drug Labels & Phenotypes)
               </h2>
             </div>
             {showPgx ? (
-              <ChevronUp className="w-6 h-6 text-gray-600" />
+              <ChevronUp className="w-6 h-6 text-text-secondary" />
             ) : (
-              <ChevronDown className="w-6 h-6 text-gray-600" />
+              <ChevronDown className="w-6 h-6 text-text-secondary" />
             )}
           </button>
 
@@ -1178,7 +1178,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
         <button
           onClick={handleDownloadPDF}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          className="flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-primary-light transition-all transform hover:scale-105"
         >
           <Download className="w-5 h-5" />
           <span>Download Summary</span>
@@ -1186,7 +1186,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
         <button
           onClick={() => setShowEmailModal(true)}
-          className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+          className="flex items-center space-x-2 px-6 py-3 bg-secondary text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:bg-secondary-dark transition-all transform hover:scale-105"
         >
           <Mail className="w-5 h-5" />
           <span>Email This Summary</span>
@@ -1195,7 +1195,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         {onNewQuery && (
           <button
             onClick={onNewQuery}
-            className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="flex items-center space-x-2 px-6 py-3 bg-status-success text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:brightness-110 transition-all transform hover:scale-105"
           >
             <RefreshCw className="w-5 h-5" />
             <span>Start New Query</span>
@@ -1250,7 +1250,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
               </button>
               <button
                 onClick={handleSendEmail}
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold hover:shadow-lg transition"
+                className="px-4 py-2 bg-primary text-white rounded-lg font-bold hover:shadow-lg hover:bg-primary-light transition"
               >
                 Send Email
               </button>

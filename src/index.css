@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply bg-background-main text-text-primary;
+  }
+}
+
 @layer utilities {
   @keyframes blob {
     0% {
