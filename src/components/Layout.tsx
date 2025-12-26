@@ -40,13 +40,13 @@ export default function Layout({ children }: LayoutProps) {
             </Link>
 
 {user && (
-              <nav className="hidden md:flex items-center space-x-6">
+              <nav className="hidden md:flex items-center space-x-2">
                 <Link
                   to="/home"
-                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
                     isActive('/home')
-                      ? 'bg-secondary text-white shadow-md'
-                      : 'text-gray-300 hover:text-white hover:bg-primary-light'
+                      ? 'bg-secondary text-white shadow-lg scale-105'
+                      : 'text-white hover:bg-white/20 hover:scale-105'
                   }`}
                 >
                   <Home className="w-4 h-4" />
@@ -54,10 +54,10 @@ export default function Layout({ children }: LayoutProps) {
                 </Link>
                 <Link
                   to="/chat"
-                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
                     isActive('/chat')
-                      ? 'bg-secondary text-white shadow-md'
-                      : 'text-gray-300 hover:text-white hover:bg-primary-light'
+                      ? 'bg-secondary text-white shadow-lg scale-105'
+                      : 'text-white hover:bg-white/20 hover:scale-105'
                   }`}
                 >
                   <MessageSquare className="w-4 h-4" />
@@ -65,10 +65,10 @@ export default function Layout({ children }: LayoutProps) {
                 </Link>
                 <Link
                   to="/evidence"
-                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
                     isActive('/evidence')
-                      ? 'bg-secondary text-white shadow-md'
-                      : 'text-gray-300 hover:text-white hover:bg-primary-light'
+                      ? 'bg-secondary text-white shadow-lg scale-105'
+                      : 'text-white hover:bg-white/20 hover:scale-105'
                   }`}
                 >
                   <FileText className="w-4 h-4" />
@@ -76,10 +76,10 @@ export default function Layout({ children }: LayoutProps) {
                 </Link>
                 <Link
                   to="/cases"
-                  className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
                     isActive('/cases')
-                      ? 'bg-secondary text-white shadow-md'
-                      : 'text-gray-300 hover:text-white hover:bg-primary-light'
+                      ? 'bg-secondary text-white shadow-lg scale-105'
+                      : 'text-white hover:bg-white/20 hover:scale-105'
                   }`}
                 >
                   <Stethoscope className="w-4 h-4" />
@@ -88,10 +88,10 @@ export default function Layout({ children }: LayoutProps) {
                 {isAdmin && (
                   <Link
                     to="/admin"
-                    className={`font-medium transition flex items-center space-x-1.5 px-3 py-2 rounded-lg ${
+                    className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
                       isActive('/admin')
-                        ? 'bg-secondary text-white shadow-md'
-                        : 'text-gray-300 hover:text-white hover:bg-primary-light'
+                        ? 'bg-status-warning text-white shadow-lg scale-105'
+                        : 'text-white hover:bg-white/20 hover:scale-105'
                     }`}
                   >
                     <Shield className="w-4 h-4" />
