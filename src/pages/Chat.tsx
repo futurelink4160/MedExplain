@@ -697,23 +697,23 @@ export default function Chat() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-8 px-4">
+      <div className="min-h-screen bg-background-main py-8 px-4">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full mb-3 shadow-lg">
+            <div className="inline-flex items-center space-x-2 px-3 py-1.5 bg-secondary text-white rounded-full mb-3 shadow-lg">
               <Sparkles className="w-3.5 h-3.5" />
               <span className="text-xs font-semibold">AI-Powered Educational Tool</span>
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">
               Side Effects & Medication Questions
             </h1>
-            <p className="text-base text-gray-600">
+            <p className="text-base text-text-secondary">
               Get personalized educational insights about your medications
             </p>
           </div>
 
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-4">
+            <div className="bg-primary p-4">
               <div className="flex items-start text-white">
                 <AlertCircle className="w-5 h-5 mt-0.5 mr-3 flex-shrink-0" />
                 <div>
@@ -758,10 +758,10 @@ export default function Chat() {
                 </div>
               )}
 
-              <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 border-2 border-blue-300 rounded-xl p-5 mb-6 shadow-md">
+              <div className="bg-blue-50 border-2 border-secondary rounded-xl p-5 mb-6 shadow-md">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                    <div className="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center">
                       <MicIcon className="w-5 h-5 text-white" />
                     </div>
                     <h3 className="text-lg font-bold text-gray-900">Voice Dictation</h3>
@@ -769,7 +769,7 @@ export default function Chat() {
                   <button
                     type="button"
                     onClick={() => setShowInstructions(!showInstructions)}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-semibold flex items-center space-x-1"
+                    className="text-secondary hover:text-secondary-dark text-sm font-semibold flex items-center space-x-1"
                   >
                     <span>{showInstructions ? 'Hide' : 'Show'} Instructions</span>
                     {showInstructions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -817,7 +817,7 @@ export default function Chat() {
                     <button
                       type="button"
                       onClick={startFullFormDictation}
-                      className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
+                      className="flex-1 bg-secondary text-white py-3 px-5 rounded-lg font-semibold text-sm shadow-lg hover:shadow-xl hover:bg-secondary-dark transition-all transform hover:scale-105 flex items-center justify-center space-x-2"
                     >
                       <Mic className="w-5 h-5" />
                       <span>Start Full Dictation</span>
@@ -863,7 +863,7 @@ export default function Chat() {
                         type="button"
                         onClick={parseAndFillForm}
                         disabled={parsingTranscript}
-                        className="mt-3 w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-2 px-4 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="mt-3 w-full bg-status-success text-white py-2 px-4 rounded-lg font-semibold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {parsingTranscript ? (
                           <>
@@ -895,10 +895,10 @@ export default function Chat() {
                 <div className="grid md:grid-cols-2 gap-5">
                   <div className="group">
                     <label htmlFor="age" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <User className="w-3.5 h-3.5 text-white" />
                       </div>
-                      Your Age <span className="text-red-500 ml-1">*</span>
+                      Your Age <span className="text-status-alert ml-1">*</span>
                     </label>
                     <div className="relative">
                       <input
@@ -909,7 +909,7 @@ export default function Chat() {
                         required
                         min="0"
                         max="120"
-                        className="w-full px-4 py-2.5 bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none transition-all text-sm font-medium"
+                        className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm font-medium"
                         placeholder="Enter your age"
                       />
                       <button
@@ -917,8 +917,8 @@ export default function Chat() {
                         onClick={() => isListening && activeField === 'age' ? stopListening() : startListening('age')}
                         className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
                           isListening && activeField === 'age'
-                            ? 'bg-red-500 text-white animate-pulse'
-                            : 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                            ? 'bg-status-alert text-white animate-pulse'
+                            : 'bg-secondary-light text-white hover:bg-secondary'
                         }`}
                       >
                         {isListening && activeField === 'age' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -928,7 +928,7 @@ export default function Chat() {
 
                   <div className="group">
                     <label htmlFor="gender" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-secondary rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <User className="w-3.5 h-3.5 text-white" />
                       </div>
                       Gender
@@ -937,7 +937,7 @@ export default function Chat() {
                       id="gender"
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-200 focus:border-purple-500 outline-none transition-all text-sm font-medium"
+                      className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm font-medium"
                     >
                       <option value="">Select gender</option>
                       <option value="Male">Male</option>
@@ -951,17 +951,17 @@ export default function Chat() {
                 <div className="grid md:grid-cols-2 gap-5">
                   <div className="group">
                     <label htmlFor="role" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-accent rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <FileText className="w-3.5 h-3.5 text-white" />
                       </div>
-                      Who Are You? <span className="text-red-500 ml-1">*</span>
+                      Who Are You? <span className="text-status-alert ml-1">*</span>
                     </label>
                     <select
                       id="role"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-200 focus:border-pink-500 outline-none transition-all text-sm font-medium"
+                      className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm font-medium"
                     >
                       <option value="">Select your role</option>
                       <option value="Patient">Patient</option>
@@ -973,7 +973,7 @@ export default function Chat() {
 
                   <div className="group">
                     <label htmlFor="medication" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-status-warning rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <Pill className="w-3.5 h-3.5 text-white" />
                       </div>
                       Medication You Want Information About
@@ -984,7 +984,7 @@ export default function Chat() {
                         type="text"
                         value={medication}
                         onChange={(e) => setMedication(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-200 focus:border-amber-500 outline-none transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm"
                         placeholder="Example: Sertraline, Metformin, Amoxicillin"
                       />
                       <button
@@ -992,8 +992,8 @@ export default function Chat() {
                         onClick={() => isListening && activeField === 'medication' ? stopListening() : startListening('medication')}
                         className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
                           isListening && activeField === 'medication'
-                            ? 'bg-red-500 text-white animate-pulse'
-                            : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                            ? 'bg-status-alert text-white animate-pulse'
+                            : 'bg-secondary-light text-white hover:bg-secondary'
                         }`}
                       >
                         {isListening && activeField === 'medication' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -1004,10 +1004,10 @@ export default function Chat() {
 
                 <div className="group">
                   <label htmlFor="question" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                    <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                       <MessageSquare className="w-3.5 h-3.5 text-white" />
                     </div>
-                    Your Question or Concern <span className="text-red-500 ml-1">*</span>
+                    Your Question or Concern <span className="text-status-alert ml-1">*</span>
                   </label>
                   <div className="relative">
                     <textarea
@@ -1016,7 +1016,7 @@ export default function Chat() {
                       onChange={(e) => setQuestion(e.target.value)}
                       required
                       rows={3}
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-cyan-50 to-blue-50 border-2 border-cyan-200 rounded-lg focus:ring-2 focus:ring-cyan-200 focus:border-cyan-500 outline-none transition-all resize-none text-sm"
+                      className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all resize-none text-sm"
                       placeholder="Describe your question or what you're curious about..."
                     />
                     <button
@@ -1024,8 +1024,8 @@ export default function Chat() {
                       onClick={() => isListening && activeField === 'question' ? stopListening() : startListening('question')}
                       className={`absolute right-2 top-2 p-1.5 rounded-lg transition-all ${
                         isListening && activeField === 'question'
-                          ? 'bg-red-500 text-white animate-pulse'
-                          : 'bg-cyan-100 text-cyan-600 hover:bg-cyan-200'
+                          ? 'bg-status-alert text-white animate-pulse'
+                          : 'bg-secondary-light text-white hover:bg-secondary'
                       }`}
                     >
                       {isListening && activeField === 'question' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -1036,7 +1036,7 @@ export default function Chat() {
                 <div className="grid md:grid-cols-2 gap-5">
                   <div className="group">
                     <label htmlFor="symptoms" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-status-alert rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <Activity className="w-3.5 h-3.5 text-white" />
                       </div>
                       Symptoms or Side Effects
@@ -1047,7 +1047,7 @@ export default function Chat() {
                         type="text"
                         value={symptoms}
                         onChange={(e) => setSymptoms(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-200 focus:border-orange-500 outline-none transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm"
                         placeholder="dizziness, nausea, headache..."
                       />
                       <button
@@ -1055,8 +1055,8 @@ export default function Chat() {
                         onClick={() => isListening && activeField === 'symptoms' ? stopListening() : startListening('symptoms')}
                         className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
                           isListening && activeField === 'symptoms'
-                            ? 'bg-red-500 text-white animate-pulse'
-                            : 'bg-orange-100 text-orange-600 hover:bg-orange-200'
+                            ? 'bg-status-alert text-white animate-pulse'
+                            : 'bg-secondary-light text-white hover:bg-secondary'
                         }`}
                       >
                         {isListening && activeField === 'symptoms' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -1066,7 +1066,7 @@ export default function Chat() {
 
                   <div className="group">
                     <label htmlFor="duration" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                      <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                      <div className="w-6 h-6 bg-status-success rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                         <Clock className="w-3.5 h-3.5 text-white" />
                       </div>
                       How Long Has This Been Going On?
@@ -1077,7 +1077,7 @@ export default function Chat() {
                         type="text"
                         value={duration}
                         onChange={(e) => setDuration(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-500 outline-none transition-all text-sm"
+                        className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm"
                         placeholder="2 days, 1 week, just started..."
                       />
                       <button
@@ -1085,8 +1085,8 @@ export default function Chat() {
                         onClick={() => isListening && activeField === 'duration' ? stopListening() : startListening('duration')}
                         className={`absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${
                           isListening && activeField === 'duration'
-                            ? 'bg-red-500 text-white animate-pulse'
-                            : 'bg-green-100 text-green-600 hover:bg-green-200'
+                            ? 'bg-status-alert text-white animate-pulse'
+                            : 'bg-secondary-light text-white hover:bg-secondary'
                         }`}
                       >
                         {isListening && activeField === 'duration' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -1097,7 +1097,7 @@ export default function Chat() {
 
                 <div className="group">
                   <label htmlFor="other-meds" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                    <div className="w-6 h-6 bg-accent rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                       <Plus className="w-3.5 h-3.5 text-white" />
                     </div>
                     Other Medications or Supplements
@@ -1108,7 +1108,7 @@ export default function Chat() {
                       value={otherMeds}
                       onChange={(e) => setOtherMeds(e.target.value)}
                       rows={3}
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-violet-200 rounded-lg focus:ring-2 focus:ring-violet-200 focus:border-violet-500 outline-none transition-all resize-none text-sm"
+                      className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all resize-none text-sm"
                       placeholder="Include anything else you're taking, if applicable..."
                     />
                     <button
@@ -1116,8 +1116,8 @@ export default function Chat() {
                       onClick={() => isListening && activeField === 'otherMeds' ? stopListening() : startListening('otherMeds')}
                       className={`absolute right-2 top-2 p-1.5 rounded-lg transition-all ${
                         isListening && activeField === 'otherMeds'
-                          ? 'bg-red-500 text-white animate-pulse'
-                          : 'bg-violet-100 text-violet-600 hover:bg-violet-200'
+                          ? 'bg-status-alert text-white animate-pulse'
+                          : 'bg-secondary-light text-white hover:bg-secondary'
                       }`}
                     >
                       {isListening && activeField === 'otherMeds' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -1127,7 +1127,7 @@ export default function Chat() {
 
                 <div className="group">
                   <label htmlFor="medical-history" className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                    <div className="w-6 h-6 bg-secondary rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                       <FileText className="w-3.5 h-3.5 text-white" />
                     </div>
                     Additional Relevant History
@@ -1138,7 +1138,7 @@ export default function Chat() {
                       value={medicalHistory}
                       onChange={(e) => setMedicalHistory(e.target.value)}
                       rows={3}
-                      className="w-full px-4 py-2.5 bg-gradient-to-br from-teal-50 to-cyan-50 border-2 border-teal-200 rounded-lg focus:ring-2 focus:ring-teal-200 focus:border-teal-500 outline-none transition-all resize-none text-sm"
+                      className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all resize-none text-sm"
                       placeholder="Medical conditions, allergies, surgeries, family history, or other relevant information..."
                     />
                     <button
@@ -1146,8 +1146,8 @@ export default function Chat() {
                       onClick={() => isListening && activeField === 'medicalHistory' ? stopListening() : startListening('medicalHistory')}
                       className={`absolute right-2 top-2 p-1.5 rounded-lg transition-all ${
                         isListening && activeField === 'medicalHistory'
-                          ? 'bg-red-500 text-white animate-pulse'
-                          : 'bg-teal-100 text-teal-600 hover:bg-teal-200'
+                          ? 'bg-status-alert text-white animate-pulse'
+                          : 'bg-secondary-light text-white hover:bg-secondary'
                       }`}
                     >
                       {isListening && activeField === 'medicalHistory' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -1157,12 +1157,12 @@ export default function Chat() {
 
                 <div className="group">
                   <label className="flex items-center text-xs font-bold text-gray-800 mb-2">
-                    <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
+                    <div className="w-6 h-6 bg-primary rounded-lg flex items-center justify-center mr-2 group-hover:scale-110 transition-transform">
                       <Upload className="w-3.5 h-3.5 text-white" />
                     </div>
                     Upload Files (optional)
                   </label>
-                  <div className="relative border-2 border-dashed border-indigo-300 rounded-lg bg-gradient-to-br from-indigo-50 to-blue-50 hover:border-indigo-500 transition-all overflow-hidden">
+                  <div className="relative border-2 border-dashed border-secondary rounded-lg bg-blue-50 hover:border-secondary-dark transition-all overflow-hidden">
                     <input
                       id="file-upload"
                       type="file"
@@ -1172,7 +1172,7 @@ export default function Chat() {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
                     <div className="px-6 py-6 text-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                      <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                         <Upload className="w-6 h-6 text-white" />
                       </div>
                       <p className="text-sm font-semibold text-gray-800 mb-1">
@@ -1182,7 +1182,7 @@ export default function Chat() {
                         PDF, JPG, PNG, DOC up to 10MB each
                       </p>
                       {files && files.length > 0 && (
-                        <div className="mt-3 inline-flex items-center space-x-2 px-3 py-1.5 bg-indigo-500 text-white rounded-full text-sm font-semibold">
+                        <div className="mt-3 inline-flex items-center space-x-2 px-3 py-1.5 bg-status-success text-white rounded-full text-sm font-semibold">
                           <CheckCircle className="w-4 h-4" />
                           <span>{files.length} file(s) selected</span>
                         </div>
@@ -1194,7 +1194,7 @@ export default function Chat() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white py-3 px-6 rounded-xl font-bold text-base shadow-xl hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-purple-300 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2 group"
+                  className="w-full bg-primary text-white py-3 px-6 rounded-xl font-bold text-base shadow-xl hover:shadow-2xl hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-secondary transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2 group"
                 >
                   {loading ? (
                     <>

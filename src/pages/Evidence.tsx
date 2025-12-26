@@ -144,46 +144,46 @@ export default function Evidence() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="min-h-screen bg-background-main">
         <div className="max-w-7xl mx-auto px-4 py-8">
           {/* Header Section */}
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-3xl shadow-2xl p-1 mb-8">
+          <div className="bg-primary rounded-3xl shadow-2xl p-1 mb-8">
             <div className="bg-white rounded-[22px] p-10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full opacity-10 -mr-20 -mt-20"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-10 -ml-16 -mb-16"></div>
+              <div className="absolute top-0 right-0 w-40 h-40 bg-secondary rounded-full opacity-10 -mr-20 -mt-20"></div>
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-accent rounded-full opacity-10 -ml-16 -mb-16"></div>
               <div className="relative z-10">
                 <div className="flex items-center space-x-4 mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-lg">
                     <Database className="w-9 h-9 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                    <h1 className="text-4xl font-bold text-primary mb-2">
                       Evidence Base
                     </h1>
-                    <p className="text-gray-700 text-lg">Search our comprehensive pharmacogenomics knowledge base</p>
+                    <p className="text-text-secondary text-lg">Search our comprehensive pharmacogenomics knowledge base</p>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-purple-100">
+                <div className="bg-blue-50 rounded-2xl p-6 border border-secondary">
                   <h3 className="text-gray-900 font-bold mb-3 flex items-center text-lg">
-                    <BookOpen className="w-5 h-5 mr-2 text-purple-600" />
+                    <BookOpen className="w-5 h-5 mr-2 text-secondary" />
                     How to Use This Tool
                   </h3>
                   <ul className="text-gray-700 text-sm space-y-2 ml-7">
                     <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
+                      <span className="text-secondary mr-2">•</span>
                       <span>Enter a medication name, gene symbol, or specific pharmacogenomic term</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
+                      <span className="text-secondary mr-2">•</span>
                       <span>Click "Search Evidence" or press Enter to find relevant documents</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
+                      <span className="text-secondary mr-2">•</span>
                       <span>Review the results to access detailed pharmacogenomic information</span>
                     </li>
                     <li className="flex items-start">
-                      <span className="text-purple-600 mr-2">•</span>
+                      <span className="text-secondary mr-2">•</span>
                       <span>Click on URLs to access original source materials</span>
                     </li>
                   </ul>
@@ -200,14 +200,14 @@ export default function Evidence() {
                   Search Terms
                 </label>
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-purple-400" />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-secondary" />
                   <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Enter medication, gene, or pharmacogenomic term..."
-                    className="w-full pl-12 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition text-gray-900 placeholder-gray-400 bg-white"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition text-gray-900 placeholder-gray-400 bg-white"
                   />
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function Evidence() {
                 <button
                   onClick={handleSearch}
                   disabled={!searchTerm.trim() || searching}
-                  className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-white font-semibold rounded-xl hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg transform hover:scale-105 flex items-center justify-center space-x-2"
+                  className="w-full md:w-auto px-8 py-3 bg-primary text-white font-semibold rounded-xl hover:shadow-xl hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg transform hover:scale-105 flex items-center justify-center space-x-2"
                 >
                   {searching ? (
                     <>
@@ -233,11 +233,11 @@ export default function Evidence() {
             </div>
 
             {searchPerformed && (
-              <div className="mt-6 pt-6 border-t border-purple-200">
+              <div className="mt-6 pt-6 border-t border-secondary">
                 <div className="flex items-center justify-between">
                   <p className="text-sm text-gray-700 flex items-center font-medium">
-                    <FileText className="w-4 h-4 mr-2 text-purple-600" />
-                    Found <span className="font-bold mx-1 text-purple-600">{documents.length}</span> document{documents.length !== 1 ? 's' : ''} matching "{searchTerm}"
+                    <FileText className="w-4 h-4 mr-2 text-secondary" />
+                    Found <span className="font-bold mx-1 text-secondary">{documents.length}</span> document{documents.length !== 1 ? 's' : ''} matching "{searchTerm}"
                   </p>
                   {documents.length > 0 && (
                     <p className="text-xs text-gray-500">Showing most recent 50 results</p>
@@ -250,8 +250,8 @@ export default function Evidence() {
           {/* Results Section */}
           {!searchPerformed ? (
             <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg p-12 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-10 h-10 text-purple-600" />
+              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="w-10 h-10 text-secondary" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Start Your Search</h3>
               <p className="text-gray-600 max-w-md mx-auto leading-relaxed">
@@ -273,7 +273,7 @@ export default function Evidence() {
                   setDocuments([]);
                   setSearchPerformed(false);
                 }}
-                className="text-purple-600 hover:text-purple-800 font-semibold underline"
+                className="text-secondary hover:text-secondary-dark font-semibold underline"
               >
                 Clear search
               </button>
@@ -283,20 +283,20 @@ export default function Evidence() {
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="group bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg hover:shadow-2xl transition-all overflow-hidden border border-purple-100 hover:border-purple-300 transform hover:-translate-y-1"
+                  className="group bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg hover:shadow-2xl transition-all overflow-hidden border border-gray-200 hover:border-secondary transform hover:-translate-y-1"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-start space-x-4 flex-1">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
-                          <FileText className="w-6 h-6 text-purple-600" />
+                        <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0 mt-1 group-hover:scale-110 transition-transform">
+                          <FileText className="w-6 h-6 text-secondary" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="text-lg font-bold text-gray-900">
                               {getDocumentTitle(doc)}
                             </h3>
-                            <span className="px-2 py-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-semibold rounded-lg">
+                            <span className="px-2 py-1 bg-secondary text-white text-xs font-semibold rounded-lg">
                               {getDocumentType(doc)}
                             </span>
                           </div>
@@ -310,7 +310,7 @@ export default function Evidence() {
                               href={doc.content.trim()}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-purple-600 hover:underline font-medium flex items-center group/link transition-colors"
+                              className="text-primary hover:text-secondary hover:underline font-medium flex items-center group/link transition-colors"
                             >
                               <span className="break-all">{doc.content.trim()}</span>
                               <ExternalLink className="w-4 h-4 ml-2 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
@@ -321,13 +321,13 @@ export default function Evidence() {
                             </p>
                           )}
                           {(doc.metadata.source && isUrl(doc.metadata.source)) || doc.associatedUrl ? (
-                            <div className="mt-3 pt-3 border-t border-purple-100">
+                            <div className="mt-3 pt-3 border-t border-gray-200">
                               <p className="text-xs text-gray-600 mb-1 font-semibold">Source Article:</p>
                               <a
                                 href={doc.associatedUrl || doc.metadata.source}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-purple-600 hover:underline text-sm font-medium flex items-center group/link transition-colors"
+                                className="text-primary hover:text-secondary hover:underline text-sm font-medium flex items-center group/link transition-colors"
                               >
                                 <span className="break-all">{doc.associatedUrl || doc.metadata.source}</span>
                                 <ExternalLink className="w-4 h-4 ml-2 flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
@@ -338,10 +338,10 @@ export default function Evidence() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-purple-100">
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                       <div className="flex items-center space-x-4 text-xs text-gray-600">
                         <span className="flex items-center">
-                          <Calendar className="w-3 h-3 mr-1 text-purple-500" />
+                          <Calendar className="w-3 h-3 mr-1 text-secondary" />
                           {formatDate(doc.created_at)}
                         </span>
                         {doc.metadata.pdf?.info?.Title && (
@@ -351,7 +351,7 @@ export default function Evidence() {
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-purple-400 font-mono">
+                      <div className="text-xs text-gray-400 font-mono">
                         ID: {doc.id.substring(0, 8)}
                       </div>
                     </div>
