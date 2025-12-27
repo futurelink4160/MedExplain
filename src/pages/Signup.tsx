@@ -35,9 +35,11 @@ export default function Signup() {
 
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 relative z-10 border border-gray-100">
         <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center shadow-lg">
-            <span className="text-white font-bold text-2xl">M</span>
-          </div>
+          <img
+            src="/medexplain_logo.png"
+            alt="MedExplain Logo"
+            className="h-20 w-20 object-contain"
+          />
         </div>
         <h1 className="text-3xl font-bold text-center text-primary mb-2">Create Account</h1>
         <p className="text-text-secondary text-center mb-6">Start exploring drug-gene interactions</p>

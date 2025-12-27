@@ -13,6 +13,14 @@ export default function Home() {
         <div className="relative">
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
           <div className="text-center mb-16">
+            <div className="flex items-center justify-center mb-8">
+              <img
+                src="/medexplain_logo.png"
+                alt="MedExplain Logo"
+                className="h-24 w-24 sm:h-32 sm:w-32 object-contain drop-shadow-lg"
+              />
+            </div>
+
             <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full mb-6 shadow-sm">
               <Sparkles className="w-4 h-4 text-secondary" />
               <span className="text-sm font-medium text-text-primary">

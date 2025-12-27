@@ -291,6 +291,36 @@ export default function Chat() {
     }
   }
 
+  async function saveQueryToHistory(responseData: ResponseData) {
+    if (!user) return;
+
+    try {
+      const { error: insertError } = await supabase.from('query_history').insert([
+        {
+          user_id: user.id,
+          age: parseInt(age) || null,
+          gender: gender || null,
+          role: role || null,
+          medication: medication || null,
+          question: question || null,
+          symptoms: symptoms || null,
+          duration: duration || null,
+          other_meds: otherMeds || null,
+          medical_history: medicalHistory || null,
+          response_data: responseData,
+        },
+      ]);
+
+      if (insertError) {
+        console.error('Error saving to history:', insertError);
+      } else {
+        console.log('Query saved to history successfully');
+      }
+    } catch (err) {
+      console.error('Failed to save query to history:', err);
+    }
+  }
+
   function handleNewQuery() {
     setResponseData(null);
     setAge('');
@@ -668,6 +698,8 @@ export default function Chat() {
         setResponseData(data);
         console.log('Response data set complete');
         setSuccess(true);
+
+        await saveQueryToHistory(data);
 
         setTimeout(() => {
           console.log('Scrolling to results, responseData is:', data ? 'present' : 'missing');

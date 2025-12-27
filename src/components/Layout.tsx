@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, Stethoscope } from 'lucide-react';
+import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, Stethoscope, Clock } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -30,10 +30,12 @@ export default function Layout({ children }: LayoutProps) {
       <header className="sticky top-0 z-50 bg-primary border-b border-primary-dark shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/home" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-white font-bold text-lg">M</span>
-              </div>
+            <Link to="/home" className="flex items-center space-x-3">
+              <img
+                src="/medexplain_logo.png"
+                alt="MedExplain Logo"
+                className="h-10 w-10 object-contain"
+              />
               <h1 className="text-xl font-bold text-white">
                 MedExplain
               </h1>
@@ -62,6 +64,17 @@ export default function Layout({ children }: LayoutProps) {
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Chat</span>
+                </Link>
+                <Link
+                  to="/history"
+                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
+                    isActive('/history')
+                      ? 'bg-secondary text-white shadow-lg scale-105'
+                      : 'text-white hover:bg-white/20 hover:scale-105'
+                  }`}
+                >
+                  <Clock className="w-4 h-4" />
+                  <span>History</span>
                 </Link>
                 <Link
                   to="/evidence"
