@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Database, Search, Sparkles, Activity, Dna, Microscope, Pill } from 'lucide-react';
+import { ArrowRight, Shield, Database, Search, Sparkles, Activity, Dna, Microscope, Pill, Clock, Users, MessageSquare, TrendingUp } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
 
@@ -49,8 +49,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-                A real-time AI that connects drug and genetic data and insights explaining why
-                side effects happen and how to make treatment safer and more effective.
+                An AI-powered tool that explains why you experience side effects and how your genetics affect how medications work for you.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
@@ -71,6 +70,13 @@ export default function Home() {
                     <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 )}
+                <Link
+                  to="/chat"
+                  className="group px-8 py-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:from-teal-700 hover:to-cyan-700 transition-all transform hover:scale-105 flex items-center space-x-2"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  <span>Start Inquiry</span>
+                </Link>
                 <Link
                   to="/evidence"
                   className="px-8 py-4 bg-white text-gray-700 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 border-2 border-gray-200 hover:border-blue-300"
@@ -122,6 +128,44 @@ export default function Home() {
               <p className="text-text-secondary leading-relaxed">
                 Designed to inform and educate, not to diagnose or treat.
                 Always consult healthcare professionals for medical decisions.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <TrendingUp className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Personalized for You
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Get answers tailored to your specific medications, genetic markers, and health profile.
+                No generic information.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Clock className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Available Anytime
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Access pharmacogenomic insights whenever you need them.
+                No appointments necessary.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Users className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                For Everyone
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Whether you're a patient, caregiver, or clinician, get information at the right level of detail for you.
               </p>
             </div>
           </div>

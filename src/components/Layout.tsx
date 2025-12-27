@@ -32,7 +32,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex justify-between items-center h-16">
             <Link to="/home" className="flex items-center space-x-3">
               <img
-                src="/medexplain_logo.png"
+                src="/medexplain_logo_updated.png"
                 alt="MedExplain Logo"
                 className="h-10 w-10 object-contain"
               />
@@ -55,17 +55,6 @@ export default function Layout({ children }: LayoutProps) {
                   <span>Home</span>
                 </Link>
                 <Link
-                  to="/dashboard"
-                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
-                    isActive('/dashboard')
-                      ? 'bg-secondary text-white shadow-lg scale-105'
-                      : 'text-white hover:bg-white/20 hover:scale-105'
-                  }`}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  <span>Dashboard</span>
-                </Link>
-                <Link
                   to="/chat"
                   className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
                     isActive('/chat')
@@ -74,7 +63,7 @@ export default function Layout({ children }: LayoutProps) {
                   }`}
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>Chat</span>
+                  <span>New Inquiry</span>
                 </Link>
                 <Link
                   to="/history"
@@ -108,6 +97,17 @@ export default function Layout({ children }: LayoutProps) {
                 >
                   <Stethoscope className="w-4 h-4" />
                   <span>Ask Pharmacist</span>
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
+                    isActive('/dashboard')
+                      ? 'bg-secondary text-white shadow-lg scale-105'
+                      : 'text-white hover:bg-white/20 hover:scale-105'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Dashboard</span>
                 </Link>
                 {isAdmin && (
                   <Link
