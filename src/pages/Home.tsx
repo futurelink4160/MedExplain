@@ -28,12 +28,11 @@ export default function Home() {
             <div className="relative z-10 text-center mb-16 pt-8">
               <div className="flex items-center justify-center mb-8">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-blue-400/40 blur-3xl rounded-full animate-pulse"></div>
+                  <div className="absolute inset-0 bg-blue-400/30 blur-3xl rounded-full animate-pulse"></div>
                   <img
-                    src="/medexplain_logo.png"
+                    src="/medexplain_logo_updated.png"
                     alt="MedExplain Logo"
-                    className="relative h-48 w-48 sm:h-64 sm:w-64 object-contain drop-shadow-2xl mix-blend-darken"
-                    style={{ filter: 'drop-shadow(0 25px 50px rgba(59, 130, 246, 0.5))' }}
+                    className="relative h-56 w-56 sm:h-72 sm:w-72 object-contain drop-shadow-2xl"
                   />
                 </div>
               </div>
@@ -45,15 +44,9 @@ export default function Home() {
                 </span>
               </div>
 
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
-                  MedExplain
-                </span>
-              </h1>
-
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 mb-6 leading-tight max-w-4xl mx-auto">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 mb-6 leading-tight max-w-4xl mx-auto">
                 Understand How Your Genetics Affect Drug Response and Side Effects
-              </h2>
+              </h1>
 
               <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
                 A real-time AI that connects drug and genetic data and insights explaining why
