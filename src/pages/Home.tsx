@@ -71,13 +71,6 @@ export default function Home() {
                   </Link>
                 )}
                 <Link
-                  to="/chat"
-                  className="group px-8 py-4 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:from-teal-700 hover:to-cyan-700 transition-all transform hover:scale-105 flex items-center space-x-2"
-                >
-                  <MessageSquare className="w-5 h-5" />
-                  <span>Start Inquiry</span>
-                </Link>
-                <Link
                   to="/evidence"
                   className="px-8 py-4 bg-white text-gray-700 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 border-2 border-gray-200 hover:border-blue-300"
                 >
@@ -170,147 +163,114 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="mt-32">
+          <div className="mt-20">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary text-center mb-4">
               Who Is MedExplain For?
             </h2>
             <p className="text-lg text-text-secondary text-center mb-16 max-w-3xl mx-auto">
-              Whether you're managing your own health, caring for a loved one, or treating patients, MedExplain provides the insights you need.
+              Choose your path to get medication insights tailored to your needs
             </p>
 
-            <div className="space-y-12">
-              <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-8 md:p-12 shadow-xl border border-rose-100">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-8 md:p-10 shadow-xl border border-rose-100 hover:shadow-2xl transition-all transform hover:-translate-y-1">
+                <div className="flex flex-col h-full">
+                  <div className="flex-shrink-0 mb-6">
+                    <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto">
                       <Heart className="w-10 h-10 text-white" />
                     </div>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 text-center">
                     <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
-                      For Patients & Individuals
+                      For Patients & Caregivers
                     </h3>
-                    <p className="text-lg text-gray-700 mb-6">
-                      Taking medications but confused about side effects? Get personalized answers about how your genetics might be affecting your treatment.
+                    <p className="text-base text-gray-700 mb-6">
+                      Get personalized answers about medication side effects and how your genetics might be affecting your treatment.
                     </p>
-                    <ul className="space-y-3 mb-8">
+                    <ul className="space-y-3 mb-8 text-left">
                       <li className="flex items-start space-x-3">
                         <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
-                        <span className="text-gray-700">Understand why you might experience certain side effects</span>
+                        <span className="text-sm text-gray-700">Understand why you experience certain side effects</span>
                       </li>
                       <li className="flex items-start space-x-3">
                         <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
-                        <span className="text-gray-700">Learn how your genetic markers affect drug metabolism</span>
+                        <span className="text-sm text-gray-700">Learn how genetic markers affect drug metabolism</span>
                       </li>
                       <li className="flex items-start space-x-3">
                         <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
-                        <span className="text-gray-700">Get plain-language explanations you can discuss with your doctor</span>
+                        <span className="text-sm text-gray-700">Get plain-language explanations for discussions with your doctor</span>
+                      </li>
+                      <li className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-white text-sm font-bold">✓</span>
+                        </div>
+                        <span className="text-sm text-gray-700">Research medications for yourself or a loved one</span>
                       </li>
                     </ul>
-                    <Link
-                      to="/chat"
-                      className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-rose-600 hover:to-pink-700 transition-all transform hover:scale-105"
-                    >
-                      <span>Start Your Inquiry</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </Link>
                   </div>
+                  <Link
+                    to="/patient-inquiry"
+                    className="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-rose-600 hover:to-pink-700 transition-all transform hover:scale-105"
+                  >
+                    <span>Start Patient Inquiry</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-3xl p-8 md:p-12 shadow-xl border border-amber-100">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
-                      <UserPlus className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
-                      For Caregivers & Family Members
-                    </h3>
-                    <p className="text-lg text-gray-700 mb-6">
-                      Caring for someone who's on multiple medications? Access evidence-based information to support better conversations with healthcare providers.
-                    </p>
-                    <ul className="space-y-3 mb-8">
-                      <li className="flex items-start space-x-3">
-                        <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-white text-sm font-bold">✓</span>
-                        </div>
-                        <span className="text-gray-700">Research genetic factors affecting your loved one's medications</span>
-                      </li>
-                      <li className="flex items-start space-x-3">
-                        <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-white text-sm font-bold">✓</span>
-                        </div>
-                        <span className="text-gray-700">Identify important questions to ask healthcare providers</span>
-                      </li>
-                      <li className="flex items-start space-x-3">
-                        <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <span className="text-white text-sm font-bold">✓</span>
-                        </div>
-                        <span className="text-gray-700">Make informed decisions as an advocate for better care</span>
-                      </li>
-                    </ul>
-                    <Link
-                      to="/chat"
-                      className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-amber-600 hover:to-orange-700 transition-all transform hover:scale-105"
-                    >
-                      <span>Start Your Inquiry</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 md:p-12 shadow-xl border border-blue-100">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-3xl p-8 md:p-10 shadow-xl border border-blue-100 hover:shadow-2xl transition-all transform hover:-translate-y-1">
+                <div className="flex flex-col h-full">
+                  <div className="flex-shrink-0 mb-6">
+                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto">
                       <Stethoscope className="w-10 h-10 text-white" />
                     </div>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 text-center">
                     <h3 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
-                      For Healthcare Professionals
+                      For Doctors & Clinicians
                     </h3>
-                    <p className="text-lg text-gray-700 mb-6">
-                      Need quick access to pharmacogenomic guidelines? Get clinical-level insights backed by FDA labels, CPIC recommendations, and PharmGKB data.
+                    <p className="text-base text-gray-700 mb-6">
+                      Access clinical-level pharmacogenomic insights backed by FDA labels, CPIC guidelines, and PharmGKB data.
                     </p>
-                    <ul className="space-y-3 mb-8">
+                    <ul className="space-y-3 mb-8 text-left">
                       <li className="flex items-start space-x-3">
                         <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
-                        <span className="text-gray-700">Access comprehensive drug-gene interaction data instantly</span>
+                        <span className="text-sm text-gray-700">Access comprehensive drug-gene interaction data instantly</span>
                       </li>
                       <li className="flex items-start space-x-3">
                         <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
-                        <span className="text-gray-700">Review evidence-based dosing recommendations</span>
+                        <span className="text-sm text-gray-700">Review evidence-based dosing recommendations</span>
                       </li>
                       <li className="flex items-start space-x-3">
                         <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
-                        <span className="text-gray-700">Stay updated with the latest pharmacogenomic guidelines</span>
+                        <span className="text-sm text-gray-700">Stay updated with latest pharmacogenomic guidelines</span>
+                      </li>
+                      <li className="flex items-start space-x-3">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-white text-sm font-bold">✓</span>
+                        </div>
+                        <span className="text-sm text-gray-700">Make informed prescribing decisions for your patients</span>
                       </li>
                     </ul>
-                    <Link
-                      to="/chat"
-                      className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-cyan-700 transition-all transform hover:scale-105"
-                    >
-                      <span>Start Your Inquiry</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </Link>
                   </div>
+                  <Link
+                    to="/clinical-inquiry"
+                    className="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-blue-600 hover:to-cyan-700 transition-all transform hover:scale-105"
+                  >
+                    <span>Start Clinical Inquiry</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
                 </div>
               </div>
             </div>

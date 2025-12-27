@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Chat from './pages/Chat';
+import PatientInquiry from './pages/PatientInquiry';
+import ClinicalInquiry from './pages/ClinicalInquiry';
 import History from './pages/History';
 import Evidence from './pages/Evidence';
 import AskPharmacist from './pages/AskPharmacist';
@@ -49,6 +51,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/patient-inquiry"
+            element={
+              <ProtectedRoute>
+                <PatientInquiry />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clinical-inquiry"
+            element={
+              <ProtectedRoute>
+                <ClinicalInquiry />
               </ProtectedRoute>
             }
           />
