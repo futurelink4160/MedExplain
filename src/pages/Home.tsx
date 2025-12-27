@@ -62,7 +62,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                 {user ? (
                   <Link
-                    to="/chat"
+                    to="/dashboard"
                     className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:from-blue-700 hover:to-teal-700 transition-all transform hover:scale-105 flex items-center space-x-2"
                   >
                     <span>Go to Dashboard</span>
@@ -143,7 +143,7 @@ export default function Home() {
               </p>
               {user ? (
                 <Link
-                  to="/chat"
+                  to="/dashboard"
                   className="inline-flex items-center space-x-2 px-8 py-4 bg-primary text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:bg-primary-light transition-all transform hover:scale-105"
                 >
                   <span>Go to Dashboard</span>
