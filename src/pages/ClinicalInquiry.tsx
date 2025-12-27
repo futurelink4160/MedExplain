@@ -8,6 +8,7 @@ export default function ClinicalInquiry() {
         defaultRole="Clinician"
         pageTitle="Clinical Professional Inquiry"
         pageSubtitle="Access clinical-level pharmacogenomic insights for healthcare professionals"
+        allowedRoles={['Doctor', 'Clinician']}
       />
     </Layout>
   );

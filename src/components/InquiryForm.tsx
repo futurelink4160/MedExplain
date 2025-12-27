@@ -59,9 +59,10 @@ interface InquiryFormProps {
   defaultRole?: string;
   pageTitle?: string;
   pageSubtitle?: string;
+  allowedRoles?: string[];
 }
 
-export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle }: InquiryFormProps) {
+export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle, allowedRoles }: InquiryFormProps) {
   const { user } = useAuth();
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
@@ -354,6 +355,12 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle 
     setFiles(null);
     setError('');
     setSuccess(false);
+    setFullFormTranscript('');
+    setIsDictatingFullForm(false);
+
+    if (fullFormRecognitionRef.current) {
+      fullFormRecognitionRef.current.stop();
+    }
 
     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
     if (fileInput) fileInput.value = '';
@@ -991,10 +998,10 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle 
                     className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm font-medium"
                   >
                     <option value="">Select your role</option>
-                    <option value="Patient">Patient</option>
-                    <option value="Caregiver">Caregiver</option>
-                    <option value="Doctor">Doctor</option>
-                    <option value="Clinician">Clinician</option>
+                    {(!allowedRoles || allowedRoles.includes('Patient')) && <option value="Patient">Patient</option>}
+                    {(!allowedRoles || allowedRoles.includes('Caregiver')) && <option value="Caregiver">Caregiver</option>}
+                    {(!allowedRoles || allowedRoles.includes('Doctor')) && <option value="Doctor">Doctor</option>}
+                    {(!allowedRoles || allowedRoles.includes('Clinician')) && <option value="Clinician">Clinician</option>}
                   </select>
                 </div>
 

@@ -8,6 +8,7 @@ export default function PatientInquiry() {
         defaultRole="Patient"
         pageTitle="Patient & Caregiver Inquiry"
         pageSubtitle="Get personalized medication insights for patients and caregivers"
+        allowedRoles={['Patient', 'Caregiver']}
       />
     </Layout>
   );
