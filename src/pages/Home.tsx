@@ -84,85 +84,6 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mt-20">
-            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Database className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-3">
-                Verified Sources
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                Curated from FDA labels, CPIC guidelines, and PharmGKB research.
-                Every recommendation is backed by peer-reviewed evidence.
-              </p>
-            </div>
-
-            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-              <div className="w-14 h-14 bg-secondary rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Search className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-3">
-                Instant Insights
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                Enter a drug and gene combination to receive tailored guidance.
-                Choose patient or clinician view for appropriate detail levels.
-              </p>
-            </div>
-
-            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-              <div className="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Shield className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-3">
-                Educational Only
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                Designed to inform and educate, not to diagnose or treat.
-                Always consult healthcare professionals for medical decisions.
-              </p>
-            </div>
-
-            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-              <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <TrendingUp className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-3">
-                Personalized for You
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                Get answers tailored to your specific medications, genetic markers, and health profile.
-                No generic information.
-              </p>
-            </div>
-
-            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-              <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Clock className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-3">
-                Available Anytime
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                Access pharmacogenomic insights whenever you need them.
-                No appointments necessary.
-              </p>
-            </div>
-
-            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
-              <div className="w-14 h-14 bg-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Users className="w-7 h-7 text-white" />
-              </div>
-              <h3 className="text-2xl font-bold text-text-primary mb-3">
-                For Everyone
-              </h3>
-              <p className="text-text-secondary leading-relaxed">
-                Whether you're a patient, caregiver, or clinician, get information at the right level of detail for you.
-              </p>
-            </div>
-          </div>
-
           <div className="mt-20">
             <h2 className="text-3xl sm:text-4xl font-bold text-text-primary text-center mb-4">
               Who Is MedExplain For?
@@ -273,6 +194,85 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mt-20">
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Database className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Verified Sources
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Curated from FDA labels, CPIC guidelines, and PharmGKB research.
+                Every recommendation is backed by peer-reviewed evidence.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-secondary rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Search className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Instant Insights
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Enter a drug and gene combination to receive tailored guidance.
+                Choose patient or clinician view for appropriate detail levels.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-accent rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Shield className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Educational Only
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Designed to inform and educate, not to diagnose or treat.
+                Always consult healthcare professionals for medical decisions.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <TrendingUp className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Personalized for You
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Get answers tailored to your specific medications, genetic markers, and health profile.
+                No generic information.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Clock className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                Available Anytime
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Access pharmacogenomic insights whenever you need them.
+                No appointments necessary.
+              </p>
+            </div>
+
+            <div className="group bg-background-card backdrop-blur-sm rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-2">
+              <div className="w-14 h-14 bg-cyan-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <Users className="w-7 h-7 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-text-primary mb-3">
+                For Everyone
+              </h3>
+              <p className="text-text-secondary leading-relaxed">
+                Whether you're a patient, caregiver, or clinician, get information at the right level of detail for you.
+              </p>
             </div>
           </div>
 
