@@ -89,42 +89,6 @@ export default function Home() {
                 50 free queries per month • No credit card required
               </p>
             </div>
-
-            <div className="relative mt-16 max-w-5xl mx-auto">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 rounded-3xl blur-2xl"></div>
-              <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-gray-200/50">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl mb-3">
-                      <Database className="w-8 h-8 text-blue-600" />
-                    </div>
-                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Verified Data</h4>
-                    <p className="text-xs text-gray-600">FDA & CPIC Sources</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl mb-3">
-                      <Dna className="w-8 h-8 text-teal-600" />
-                    </div>
-                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Genetic Insights</h4>
-                    <p className="text-xs text-gray-600">Personalized Analysis</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-2xl mb-3">
-                      <Activity className="w-8 h-8 text-cyan-600" />
-                    </div>
-                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Real-Time AI</h4>
-                    <p className="text-xs text-gray-600">Instant Results</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-200 rounded-2xl mb-3">
-                      <Shield className="w-8 h-8 text-blue-600" />
-                    </div>
-                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Educational</h4>
-                    <p className="text-xs text-gray-600">Safe & Informative</p>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 mt-20">
