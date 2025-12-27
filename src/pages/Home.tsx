@@ -93,10 +93,10 @@ export default function Home() {
             </p>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-3xl p-8 md:p-10 shadow-xl border border-rose-100 hover:shadow-2xl transition-all transform hover:-translate-y-1">
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-3xl p-8 md:p-10 shadow-xl border border-emerald-100 hover:shadow-2xl transition-all transform hover:-translate-y-1">
                 <div className="flex flex-col h-full">
                   <div className="flex-shrink-0 mb-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto">
+                    <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg mx-auto">
                       <Heart className="w-10 h-10 text-white" />
                     </div>
                   </div>
@@ -109,25 +109,25 @@ export default function Home() {
                     </p>
                     <ul className="space-y-3 mb-8 text-left">
                       <li className="flex items-start space-x-3">
-                        <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
                         <span className="text-sm text-gray-700">Understand why you experience certain side effects</span>
                       </li>
                       <li className="flex items-start space-x-3">
-                        <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
                         <span className="text-sm text-gray-700">Learn how genetic markers affect drug metabolism</span>
                       </li>
                       <li className="flex items-start space-x-3">
-                        <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
                         <span className="text-sm text-gray-700">Get plain-language explanations for discussions with your doctor</span>
                       </li>
                       <li className="flex items-start space-x-3">
-                        <div className="w-6 h-6 bg-rose-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                           <span className="text-white text-sm font-bold">✓</span>
                         </div>
                         <span className="text-sm text-gray-700">Research medications for yourself or a loved one</span>
@@ -136,7 +136,7 @@ export default function Home() {
                   </div>
                   <Link
                     to="/patient-inquiry"
-                    className="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-rose-500 to-pink-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-rose-600 hover:to-pink-700 transition-all transform hover:scale-105"
+                    className="inline-flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:from-emerald-600 hover:to-teal-700 transition-all transform hover:scale-105"
                   >
                     <span>Start Patient Inquiry</span>
                     <ArrowRight className="w-5 h-5" />
