@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Dashboard from './pages/Dashboard';
 import Chat from './pages/Chat';
 import History from './pages/History';
 import Evidence from './pages/Evidence';
@@ -23,7 +24,7 @@ function DashboardRedirect() {
     );
   }
 
-  return user ? <Navigate to="/chat" replace /> : <Navigate to="/home" replace />;
+  return user ? <Navigate to="/dashboard" replace /> : <Navigate to="/home" replace />;
 }
 
 function App() {
@@ -35,6 +36,14 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/chat"
             element={

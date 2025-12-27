@@ -315,6 +315,14 @@ export default function Chat() {
         console.error('Error saving to history:', insertError);
       } else {
         console.log('Query saved to history successfully');
+
+        const { error: usageError } = await supabase.rpc('increment_query_usage', {
+          p_user_id: user.id,
+        });
+
+        if (usageError) {
+          console.error('Error incrementing query usage:', usageError);
+        }
       }
     } catch (err) {
       console.error('Failed to save query to history:', err);

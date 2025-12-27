@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, BookmarkCheck, Shield, Home, MessageSquare, FileText, Stethoscope, Clock } from 'lucide-react';
+import { LogOut, User, BookmarkCheck, Shield, Home, LayoutDashboard, MessageSquare, FileText, Stethoscope, Clock } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,7 +15,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const isActive = (path: string) => {
     if (path === '/home') {
-      return location.pathname === '/home' || location.pathname === '/';
+      return location.pathname === '/home';
     }
     return location.pathname === path;
   };
@@ -53,6 +53,17 @@ export default function Layout({ children }: LayoutProps) {
                 >
                   <Home className="w-4 h-4" />
                   <span>Home</span>
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className={`font-semibold transition-all flex items-center space-x-1.5 px-4 py-2 rounded-lg ${
+                    isActive('/dashboard')
+                      ? 'bg-secondary text-white shadow-lg scale-105'
+                      : 'text-white hover:bg-white/20 hover:scale-105'
+                  }`}
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Dashboard</span>
                 </Link>
                 <Link
                   to="/chat"
