@@ -13,85 +13,116 @@ export default function Home() {
         <div className="relative">
           <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
 
-          <div className="relative mb-16 rounded-3xl overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-teal-500"></div>
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2YzAtNi42MjcgNS4zNzMtMTIgMTItMTJzMTIgNS4zNzMgMTIgMTItNS4zNzMgMTItMTIgMTItMTItNS4zNzMtMTItMTJ6bTAgNDBjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMi01LjM3MyAxMi0xMiAxMi0xMi01LjM3My0xMi0xMnoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
+          <div className="relative mb-16">
+            <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+            <div className="absolute top-0 right-1/4 w-96 h-96 bg-teal-400/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-cyan-400/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
 
-            <div className="absolute top-10 left-10 opacity-20">
-              <Dna className="w-32 h-32 text-white animate-pulse" />
+            <div className="absolute top-20 right-16 opacity-10">
+              <Dna className="w-64 h-64 text-blue-600" />
             </div>
-            <div className="absolute bottom-10 right-10 opacity-20">
-              <Microscope className="w-28 h-28 text-white animate-pulse" style={{ animationDelay: '1s' }} />
-            </div>
-            <div className="absolute top-1/2 right-1/4 opacity-15">
-              <Pill className="w-24 h-24 text-white animate-pulse" style={{ animationDelay: '0.5s' }} />
-            </div>
-            <div className="absolute bottom-1/3 left-1/4 opacity-15">
-              <Activity className="w-20 h-20 text-white animate-pulse" style={{ animationDelay: '1.5s' }} />
+            <div className="absolute bottom-10 left-16 opacity-10">
+              <Microscope className="w-48 h-48 text-teal-600" />
             </div>
 
-            <div className="relative z-10 px-6 py-16 sm:px-12 sm:py-24 lg:py-32">
-              <div className="text-center max-w-4xl mx-auto">
-                <div className="flex items-center justify-center mb-8">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-white/30 blur-xl rounded-full"></div>
-                    <img
-                      src="/medexplain_logo.png"
-                      alt="MedExplain Logo"
-                      className="relative h-24 w-24 sm:h-32 sm:w-32 object-contain drop-shadow-2xl"
-                    />
+            <div className="relative z-10 text-center mb-16 pt-8">
+              <div className="flex items-center justify-center mb-8">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-blue-400/40 blur-2xl rounded-full animate-pulse"></div>
+                  <img
+                    src="/medexplain_logo.png"
+                    alt="MedExplain Logo"
+                    className="relative h-28 w-28 sm:h-36 sm:w-36 object-contain drop-shadow-2xl"
+                  />
+                </div>
+              </div>
+
+              <div className="inline-flex items-center space-x-2 px-5 py-2.5 bg-gradient-to-r from-blue-50 to-teal-50 backdrop-blur-sm rounded-full mb-6 shadow-lg border border-blue-100">
+                <Sparkles className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent">
+                  Powered by FDA, CPIC & PharmGKB
+                </span>
+              </div>
+
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+                <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                  MedExplain
+                </span>
+              </h1>
+
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 mb-6 leading-tight max-w-4xl mx-auto">
+                Understand How Your Genetics Affect Drug Response and Side Effects
+              </h2>
+
+              <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+                A real-time AI that connects drug and genetic data and insights explaining why
+                side effects happen and how to make treatment safer and more effective.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                {user ? (
+                  <Link
+                    to="/chat"
+                    className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:from-blue-700 hover:to-teal-700 transition-all transform hover:scale-105 flex items-center space-x-2"
+                  >
+                    <span>Go to Dashboard</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                ) : (
+                  <Link
+                    to="/signup"
+                    className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:from-blue-700 hover:to-teal-700 transition-all transform hover:scale-105 flex items-center space-x-2"
+                  >
+                    <span>Get Started Free</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                )}
+                <Link
+                  to="/evidence"
+                  className="px-8 py-4 bg-white text-gray-700 rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 border-2 border-gray-200 hover:border-blue-300"
+                >
+                  Browse Evidence
+                </Link>
+              </div>
+
+              <p className="mt-8 text-sm text-gray-500 font-medium">
+                50 free queries per month • No credit card required
+              </p>
+            </div>
+
+            <div className="relative mt-16 max-w-5xl mx-auto">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-teal-500/20 rounded-3xl blur-2xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-gray-200/50">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl mb-3">
+                      <Database className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Verified Data</h4>
+                    <p className="text-xs text-gray-600">FDA & CPIC Sources</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl mb-3">
+                      <Dna className="w-8 h-8 text-teal-600" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Genetic Insights</h4>
+                    <p className="text-xs text-gray-600">Personalized Analysis</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-2xl mb-3">
+                      <Activity className="w-8 h-8 text-cyan-600" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Real-Time AI</h4>
+                    <p className="text-xs text-gray-600">Instant Results</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-cyan-200 rounded-2xl mb-3">
+                      <Shield className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <h4 className="text-sm font-semibold text-gray-800 mb-1">Educational</h4>
+                    <p className="text-xs text-gray-600">Safe & Informative</p>
                   </div>
                 </div>
-
-                <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white/90 backdrop-blur-sm rounded-full mb-6 shadow-lg">
-                  <Sparkles className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm font-semibold text-gray-800">
-                    Powered by FDA, CPIC & PharmGKB
-                  </span>
-                </div>
-
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                  MedExplain
-                </h1>
-
-                <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white mb-6 leading-tight drop-shadow-md">
-                  Understand How Your Genetics Affect Drug Response and Side Effects
-                </h2>
-
-                <p className="text-lg sm:text-xl text-white/95 mb-10 max-w-3xl mx-auto leading-relaxed drop-shadow">
-                  A real-time AI that connects drug and genetic data and insights explaining why
-                  side effects happen and how to make treatment safer and more effective.
-                </p>
-
-                <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                  {user ? (
-                    <Link
-                      to="/chat"
-                      className="group px-8 py-4 bg-white text-blue-600 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:bg-gray-50 transition-all transform hover:scale-105 flex items-center space-x-2"
-                    >
-                      <span>Go to Dashboard</span>
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  ) : (
-                    <Link
-                      to="/signup"
-                      className="group px-8 py-4 bg-white text-blue-600 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl hover:bg-gray-50 transition-all transform hover:scale-105 flex items-center space-x-2"
-                    >
-                      <span>Get Started Free</span>
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  )}
-                  <Link
-                    to="/evidence"
-                    className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl hover:bg-white/30 transition-all transform hover:scale-105 border-2 border-white/40"
-                  >
-                    Browse Evidence
-                  </Link>
-                </div>
-
-                <p className="mt-8 text-sm text-white/90 font-medium drop-shadow">
-                  50 free queries per month • No credit card required
-                </p>
               </div>
             </div>
           </div>
