@@ -28,11 +28,12 @@ export default function Home() {
             <div className="relative z-10 text-center mb-16 pt-8">
               <div className="flex items-center justify-center mb-8">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-blue-400/40 blur-2xl rounded-full animate-pulse"></div>
+                  <div className="absolute inset-0 bg-blue-400/40 blur-3xl rounded-full animate-pulse"></div>
                   <img
                     src="/medexplain_logo.png"
                     alt="MedExplain Logo"
-                    className="relative h-28 w-28 sm:h-36 sm:w-36 object-contain drop-shadow-2xl"
+                    className="relative h-48 w-48 sm:h-64 sm:w-64 object-contain drop-shadow-2xl mix-blend-darken"
+                    style={{ filter: 'drop-shadow(0 25px 50px rgba(59, 130, 246, 0.5))' }}
                   />
                 </div>
               </div>
