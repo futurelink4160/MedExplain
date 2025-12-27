@@ -15,18 +15,8 @@ import Admin from './pages/Admin';
 import Results from './pages/Results';
 import ResultsDemo from './pages/ResultsDemo';
 
-function DashboardRedirect() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  return user ? <Navigate to="/dashboard" replace /> : <Navigate to="/home" replace />;
+function HomeRedirect() {
+  return <Navigate to="/home" replace />;
 }
 
 function App() {
@@ -34,7 +24,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<DashboardRedirect />} />
+          <Route path="/" element={<HomeRedirect />} />
           <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
