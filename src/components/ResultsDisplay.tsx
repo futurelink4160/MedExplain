@@ -994,33 +994,57 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       </div>
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center flex-shrink-0">
-            <Clock className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-secondary mb-4">What to Expect Moving Forward</h2>
-            <div className="prose max-w-none text-text-primary">
-              <ReactMarkdown>{extractSection(markdown, 'What to Expect Going Forward')}</ReactMarkdown>
-            </div>
-          </div>
-        </div>
-      </div>
+      {(() => {
+        const expectationInfo = extractSection(markdown, 'What to Expect Moving Forward') ||
+                               extractSection(markdown, 'What to Expect Going Forward') ||
+                               extractSection(markdown, 'Moving Forward') ||
+                               extractSection(markdown, 'Going Forward') ||
+                               extractSection(markdown, 'What to Expect');
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-text-secondary">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-text-secondary rounded-xl flex items-center justify-center flex-shrink-0">
-            <BookOpen className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-text-primary mb-4">Educational Purpose Only</h2>
-            <div className="prose max-w-none text-text-secondary italic">
-              <ReactMarkdown>{extractSection(markdown, 'Educational Purpose Only')}</ReactMarkdown>
+        if (expectationInfo) {
+          return (
+            <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-secondary mb-4">What to Expect Moving Forward</h2>
+                  <div className="prose max-w-none text-text-primary">
+                    <ReactMarkdown>{expectationInfo}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          );
+        }
+        return null;
+      })()}
+
+      {(() => {
+        const educationalNote = extractSection(markdown, 'Educational Purpose Only') ||
+                               extractSection(markdown, 'Disclaimer') ||
+                               extractSection(markdown, 'Important Note');
+
+        if (educationalNote) {
+          return (
+            <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-text-secondary">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-text-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-text-primary mb-4">Educational Purpose Only</h2>
+                  <div className="prose max-w-none text-text-secondary italic">
+                    <ReactMarkdown>{educationalNote}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return null;
+      })()}
 
       {data.pgx_results && (
         <div className="bg-background-card rounded-xl shadow-lg overflow-hidden border border-gray-200">

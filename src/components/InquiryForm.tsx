@@ -881,7 +881,7 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle,
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-bold text-gray-900 text-sm flex items-center">
                       <Activity className="w-4 h-4 text-blue-600 mr-2" />
-                      Live Transcript
+                      {isDictatingFullForm ? 'Live Transcript' : 'Edit Your Transcript'}
                     </h4>
                     {isDictatingFullForm && (
                       <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full animate-pulse font-semibold">
@@ -889,9 +889,19 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle,
                       </span>
                     )}
                   </div>
-                  <div className="bg-gray-50 rounded p-3 max-h-32 overflow-y-auto">
-                    <p className="text-sm text-gray-700">{fullFormTranscript}</p>
-                  </div>
+                  {isDictatingFullForm ? (
+                    <div className="bg-gray-50 rounded p-3 max-h-32 overflow-y-auto">
+                      <p className="text-sm text-gray-700">{fullFormTranscript}</p>
+                    </div>
+                  ) : (
+                    <textarea
+                      value={fullFormTranscript}
+                      onChange={(e) => setFullFormTranscript(e.target.value)}
+                      rows={5}
+                      className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none text-sm"
+                      placeholder="Edit your transcript here before filling the form..."
+                    />
+                  )}
                   {!isDictatingFullForm && (
                     <button
                       type="button"
