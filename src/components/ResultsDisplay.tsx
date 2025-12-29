@@ -900,33 +900,47 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       )}
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center flex-shrink-0">
-            <Activity className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-secondary mb-4">Understanding Your Concern</h2>
-            <div className="prose max-w-none text-text-primary">
-              <ReactMarkdown>{extractSection(markdown, 'Understanding Your Concern')}</ReactMarkdown>
-            </div>
-          </div>
-        </div>
-      </div>
+      {(() => {
+        const concernContent = extractSection(markdown, 'Understanding Your Concern');
+        if (!concernContent) return null;
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-warning">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-status-warning rounded-xl flex items-center justify-center flex-shrink-0">
-            <Pill className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-status-warning mb-4">About This Medication</h2>
-            <div className="prose max-w-none text-text-primary">
-              <ReactMarkdown>{extractSection(markdown, 'About This Medication')}</ReactMarkdown>
+        return (
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                <Activity className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-secondary mb-4">Understanding Your Concern</h2>
+                <div className="prose max-w-none text-text-primary">
+                  <ReactMarkdown>{concernContent}</ReactMarkdown>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
+
+      {(() => {
+        const medicationContent = extractSection(markdown, 'About This Medication');
+        if (!medicationContent) return null;
+
+        return (
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-warning">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-status-warning rounded-xl flex items-center justify-center flex-shrink-0">
+                <Pill className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-status-warning mb-4">About This Medication</h2>
+                <div className="prose max-w-none text-text-primary">
+                  <ReactMarkdown>{medicationContent}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {(() => {
         const geneticInfo = extractSection(markdown, 'Genetic Considerations') ||
@@ -978,77 +992,105 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         );
       })()}
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-success">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-status-success rounded-xl flex items-center justify-center flex-shrink-0">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-status-success mb-4">What You Can Do Now</h2>
-            <div className="prose max-w-none text-text-primary">
-              <ReactMarkdown
-                components={{
-                  li: ({ children }) => (
-                    <li className="flex items-start space-x-2">
-                      <CheckCircle2 className="w-5 h-5 text-status-success mt-0.5 flex-shrink-0" />
-                      <span>{children}</span>
-                    </li>
-                  ),
-                }}
-              >
-                {extractSection(markdown, 'What You Can Do Now')}
-              </ReactMarkdown>
-            </div>
-          </div>
-        </div>
-      </div>
+      {(() => {
+        const whatToDoContent = extractSection(markdown, 'What You Can Do Now');
+        if (!whatToDoContent) return null;
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-primary">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
-            <Phone className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-primary mb-4">When to Contact Your Doctor</h2>
-            <div className="prose max-w-none text-text-primary">
-              <ReactMarkdown>{extractSection(markdown, 'When to Contact Your Doctor')}</ReactMarkdown>
+        return (
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-success">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-status-success rounded-xl flex items-center justify-center flex-shrink-0">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-status-success mb-4">What You Can Do Now</h2>
+                <div className="prose max-w-none text-text-primary">
+                  <ReactMarkdown
+                    components={{
+                      li: ({ children }) => (
+                        <li className="flex items-start space-x-2">
+                          <CheckCircle2 className="w-5 h-5 text-status-success mt-0.5 flex-shrink-0" />
+                          <span>{children}</span>
+                        </li>
+                      ),
+                    }}
+                  >
+                    {whatToDoContent}
+                  </ReactMarkdown>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-alert">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-status-alert rounded-xl flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-status-alert mb-4">When to Seek Emergency Care</h2>
-            <div className="prose max-w-none text-text-primary">
-              <ReactMarkdown>{extractSection(markdown, 'When to Seek Emergency Care')}</ReactMarkdown>
-            </div>
-          </div>
-        </div>
-      </div>
+      {(() => {
+        const contactDoctorContent = extractSection(markdown, 'When to Contact Your Doctor');
+        if (!contactDoctorContent) return null;
 
-      <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-text-secondary">
-        <div className="flex items-start space-x-4">
-          <div className="w-12 h-12 bg-text-secondary rounded-xl flex items-center justify-center flex-shrink-0">
-            <Shield className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-text-primary mb-4">Important Safety Reminders</h2>
-            <div className="prose max-w-none text-text-primary">
-              <ReactMarkdown>{extractSection(markdown, 'Important Safety Reminders')}</ReactMarkdown>
-            </div>
-            <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-status-warning rounded">
-              <p className="font-bold text-text-primary">
-                Do not stop taking your medication without medical guidance.
-              </p>
+        return (
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-primary">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
+                <Phone className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-primary mb-4">When to Contact Your Doctor</h2>
+                <div className="prose max-w-none text-text-primary">
+                  <ReactMarkdown>{contactDoctorContent}</ReactMarkdown>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
+
+      {(() => {
+        const emergencyCareContent = extractSection(markdown, 'When to Seek Emergency Care');
+        if (!emergencyCareContent) return null;
+
+        return (
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-status-alert">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-status-alert rounded-xl flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-status-alert mb-4">When to Seek Emergency Care</h2>
+                <div className="prose max-w-none text-text-primary">
+                  <ReactMarkdown>{emergencyCareContent}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {(() => {
+        const safetyRemindersContent = extractSection(markdown, 'Important Safety Reminders');
+        if (!safetyRemindersContent) return null;
+
+        return (
+          <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-text-secondary">
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-text-secondary rounded-xl flex items-center justify-center flex-shrink-0">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-text-primary mb-4">Important Safety Reminders</h2>
+                <div className="prose max-w-none text-text-primary">
+                  <ReactMarkdown>{safetyRemindersContent}</ReactMarkdown>
+                </div>
+                <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-status-warning rounded">
+                  <p className="font-bold text-text-primary">
+                    Do not stop taking your medication without medical guidance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {(() => {
         const expectationInfo = extractSection(markdown, 'What to Expect Moving Forward') ||
