@@ -335,7 +335,13 @@ export default function Results() {
                         <h3 className="text-lg font-bold text-gray-900 mb-3">Relevant Variants (General Education Only)</h3>
                         <ul className="list-disc list-inside space-y-2 text-gray-700">
                           {data.pgx_results.variants.map((variant, idx) => (
-                            <li key={idx}>{variant}</li>
+                            <li key={idx}>
+                              {typeof variant === 'string' ? variant : (
+                                <div>
+                                  <strong>{variant.gene}:</strong> {variant.role} - {variant.interpretation}
+                                </div>
+                              )}
+                            </li>
                           ))}
                         </ul>
                       </div>
