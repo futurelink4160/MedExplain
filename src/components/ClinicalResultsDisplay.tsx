@@ -229,8 +229,69 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                                     dosingConsiderations || riskAssessment || monitoringRequirements ||
                                     drugInteractions || summary);
 
-  // If no structured sections found, parse all sections dynamically
-  const allSections = !hasStructuredSections ? parseAllSections(markdown) : [];
+  // Parse all sections dynamically
+  const allSections = parseAllSections(markdown);
+
+  // Get titles of sections we've already displayed
+  const displayedSectionTitles = new Set<string>();
+  if (pgxContext) {
+    displayedSectionTitles.add('pharmacogenomic context');
+    displayedSectionTitles.add('pharmacogenomic overview');
+    displayedSectionTitles.add('pharmacogenomic considerations');
+  }
+  if (clinicalInterpretation) {
+    displayedSectionTitles.add('clinical interpretation');
+    displayedSectionTitles.add('clinical context and relevance');
+    displayedSectionTitles.add('clinical considerations');
+  }
+  if (recommendations) {
+    displayedSectionTitles.add('recommendations for clinical action');
+    displayedSectionTitles.add('recommendations for clinical management');
+    displayedSectionTitles.add('clinical recommendations');
+    displayedSectionTitles.add('recommendations for provider consideration');
+  }
+  if (dosingConsiderations) {
+    displayedSectionTitles.add('dosing considerations');
+    displayedSectionTitles.add('dosing recommendations');
+    displayedSectionTitles.add('dosage adjustments');
+  }
+  if (riskAssessment) {
+    displayedSectionTitles.add('risk assessment');
+    displayedSectionTitles.add('risk stratification');
+    displayedSectionTitles.add('clinical risk factors');
+  }
+  if (monitoringRequirements) {
+    displayedSectionTitles.add('monitoring requirements');
+    displayedSectionTitles.add('follow-up monitoring');
+    displayedSectionTitles.add('laboratory monitoring');
+  }
+  if (drugInteractions) {
+    displayedSectionTitles.add('drug interactions');
+    displayedSectionTitles.add('potential interactions');
+    displayedSectionTitles.add('interaction considerations');
+  }
+  if (nextSteps) {
+    displayedSectionTitles.add('next steps');
+    displayedSectionTitles.add('follow-up actions');
+    displayedSectionTitles.add('action steps');
+  }
+  if (warningSignsSection) {
+    displayedSectionTitles.add('warning signs');
+    displayedSectionTitles.add('red flags');
+    displayedSectionTitles.add('emergency signs');
+    displayedSectionTitles.add('when to seek immediate care');
+  }
+  if (summary) {
+    displayedSectionTitles.add('summary');
+  }
+  if (references) {
+    displayedSectionTitles.add('references');
+  }
+
+  // Filter out sections we've already displayed
+  const remainingSections = allSections.filter(section =>
+    !displayedSectionTitles.has(section.title.toLowerCase())
+  );
 
   return (
     <div ref={contentRef} className="space-y-6 mb-8">
@@ -544,6 +605,41 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
           </div>
         </div>
       )}
+
+      {/* Additional sections not covered above */}
+      {hasStructuredSections && remainingSections.length > 0 && remainingSections.map((section, idx) => {
+        const getSectionColor = () => {
+          const title = section.title.toLowerCase();
+          if (title.includes('gene') || title.includes('pharmacogen')) return { bg: 'from-emerald-50 to-teal-50', border: 'border-emerald-600', iconBg: 'bg-emerald-600', icon: Dna };
+          if (title.includes('interpretation') || title.includes('analysis')) return { bg: 'from-amber-50 to-orange-50', border: 'border-amber-600', iconBg: 'bg-amber-600', icon: BookOpen };
+          if (title.includes('recommendation') || title.includes('action')) return { bg: 'from-cyan-50 to-blue-50', border: 'border-cyan-600', iconBg: 'bg-cyan-600', icon: Shield };
+          if (title.includes('dosing')) return { bg: 'from-violet-50 to-purple-50', border: 'border-violet-600', iconBg: 'bg-violet-600', icon: Activity };
+          if (title.includes('risk')) return { bg: 'from-orange-50 to-amber-50', border: 'border-orange-600', iconBg: 'bg-orange-600', icon: AlertTriangle };
+          if (title.includes('interaction')) return { bg: 'from-rose-50 to-pink-50', border: 'border-rose-600', iconBg: 'bg-rose-600', icon: Shield };
+          if (title.includes('monitor')) return { bg: 'from-teal-50 to-cyan-50', border: 'border-teal-600', iconBg: 'bg-teal-600', icon: CheckCircle };
+          if (title.includes('summary')) return { bg: 'from-slate-50 to-gray-50', border: 'border-slate-600', iconBg: 'bg-slate-600', icon: FileText };
+          return { bg: 'from-blue-50 to-slate-50', border: 'border-blue-600', iconBg: 'bg-blue-600', icon: FileText };
+        };
+
+        const style = getSectionColor();
+        const IconComponent = style.icon;
+
+        return (
+          <div key={idx} className={`bg-gradient-to-br ${style.bg} rounded-xl shadow-lg p-6 border-l-4 ${style.border}`}>
+            <div className="flex items-start space-x-4">
+              <div className={`w-12 h-12 ${style.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                <IconComponent className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-slate-900 mb-4">{section.title}</h2>
+                <div className="prose prose-slate max-w-none text-gray-700">
+                  <ReactMarkdown>{section.content}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       {/* Pharmacogenomic Results Details - Always visible for all roles */}
       {data.pgx_results && (data.pgx_results.drug_labels?.length > 0 || data.pgx_results.genes?.length > 0 || data.pgx_results.phenotypes?.length > 0) && (
