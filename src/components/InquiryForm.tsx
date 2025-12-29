@@ -6,19 +6,29 @@ import ClinicalResultsDisplay from './ClinicalResultsDisplay';
 import { Send, Upload, AlertCircle, CheckCircle, Mic, MicOff, Sparkles, FileText, User, Calendar, Pill, MessageSquare, Activity, Clock, Plus, MicIcon, XCircle, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
 
 interface DrugLabel {
-  drug_id?: string;
-  known_side_effects?: string[];
-  box_warnings?: string[];
-  pharmacogenomic_considerations?: string[];
-  safety_notes?: string[];
-  when_to_call_doctor?: string[];
+  medication: string;
+  side_effects: string;
+  metabolism: string;
+  dosing_guideline: string;
+}
+
+interface GeneInfo {
+  gene: string;
+  role: string;
+  variants?: string[];
+  interpretation: string;
+}
+
+interface PhenotypeInfo {
+  gene: string;
+  phenotype: string;
+  clinical_implications: string;
 }
 
 interface PgxResults {
-  drug_labels: (string | DrugLabel)[];
-  genes: string[];
-  variants: string[];
-  phenotypes: string[];
+  drug_labels: DrugLabel[];
+  genes: GeneInfo[];
+  phenotypes: PhenotypeInfo[];
 }
 
 interface ClinicalSummary {
@@ -644,28 +654,13 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle,
         data.pgx_results = {
           drug_labels: [],
           genes: [],
-          variants: [],
           phenotypes: []
         };
       } else {
-        console.log('Validating pgx_results structure...');
-        if (!Array.isArray(data.pgx_results.drug_labels)) {
-          console.log('Converting drug_labels to array');
-          data.pgx_results.drug_labels = data.pgx_results.drug_labels ? [data.pgx_results.drug_labels] : [];
-        }
-        if (!Array.isArray(data.pgx_results.genes)) {
-          console.log('Converting genes to array');
-          data.pgx_results.genes = data.pgx_results.genes ? [data.pgx_results.genes] : [];
-        }
-        if (!Array.isArray(data.pgx_results.variants)) {
-          console.log('Converting variants to array');
-          data.pgx_results.variants = data.pgx_results.variants ? [data.pgx_results.variants] : [];
-        }
-        if (!Array.isArray(data.pgx_results.phenotypes)) {
-          console.log('Converting phenotypes to array');
-          data.pgx_results.phenotypes = data.pgx_results.phenotypes ? [data.pgx_results.phenotypes] : [];
-        }
-        console.log('After validation, pgx_results:', data.pgx_results);
+        console.log('PGX results present:', data.pgx_results);
+        if (!data.pgx_results.drug_labels) data.pgx_results.drug_labels = [];
+        if (!data.pgx_results.genes) data.pgx_results.genes = [];
+        if (!data.pgx_results.phenotypes) data.pgx_results.phenotypes = [];
       }
 
       if (data.final_answer_markdown && !data.response_type) {

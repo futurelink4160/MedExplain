@@ -17,19 +17,29 @@ import ReactMarkdown from 'react-markdown';
 import html2pdf from 'html2pdf.js';
 
 interface DrugLabel {
-  drug_id?: string;
-  known_side_effects?: string[];
-  box_warnings?: string[];
-  pharmacogenomic_considerations?: string[];
-  safety_notes?: string[];
-  when_to_call_doctor?: string[];
+  medication: string;
+  side_effects: string;
+  metabolism: string;
+  dosing_guideline: string;
+}
+
+interface GeneInfo {
+  gene: string;
+  role: string;
+  variants?: string[];
+  interpretation: string;
+}
+
+interface PhenotypeInfo {
+  gene: string;
+  phenotype: string;
+  clinical_implications: string;
 }
 
 interface PgxResults {
-  drug_labels: (string | DrugLabel)[];
-  genes: string[];
-  variants: string[];
-  phenotypes: string[];
+  drug_labels: DrugLabel[];
+  genes: GeneInfo[];
+  phenotypes: PhenotypeInfo[];
   testing_guidelines?: {
     fda_level?: string;
     cpic_dosing_info?: boolean;
@@ -536,7 +546,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Pharmacogenomic Results Details - Always visible for all roles */}
-      {data.pgx_results && (data.pgx_results.drug_labels?.length > 0 || data.pgx_results.genes?.length > 0 || data.pgx_results.variants?.length > 0 || data.pgx_results.phenotypes?.length > 0) && (
+      {data.pgx_results && (data.pgx_results.drug_labels?.length > 0 || data.pgx_results.genes?.length > 0 || data.pgx_results.phenotypes?.length > 0) && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
           <div className="w-full px-6 py-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-emerald-200">
             <div className="flex items-center space-x-3">
@@ -551,94 +561,45 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                 <div>
                   <h4 className="font-bold text-slate-900 mb-3 text-lg">Drug Label Information</h4>
                   <div className="space-y-4">
-                    {data.pgx_results.drug_labels.map((label, idx) => {
-                      if (typeof label === 'string') {
-                        return (
-                          <div key={idx} className="px-4 py-3 bg-slate-50 rounded border border-slate-200">
-                            <p className="text-gray-700">{label}</p>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div key={idx} className="space-y-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
-                          {label.drug_id && (
-                            <div className="mb-3">
-                              <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
-                                {label.drug_id}
-                              </span>
-                            </div>
-                          )}
-
-                          {label.known_side_effects && label.known_side_effects.length > 0 && (
-                            <div>
-                              <h5 className="font-bold text-gray-800 mb-2 flex items-center">
-                                <AlertTriangle className="w-4 h-4 mr-2 text-amber-600" />
-                                Known Side Effects:
-                              </h5>
-                              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
-                                {label.known_side_effects.map((effect, i) => (
-                                  <li key={i}>{effect}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {label.box_warnings && label.box_warnings.length > 0 && (
-                            <div className="bg-red-50 border-l-4 border-red-600 p-3 rounded">
-                              <h5 className="font-bold text-red-900 mb-2 flex items-center">
-                                <AlertTriangle className="w-4 h-4 mr-2" />
-                                Box Warnings:
-                              </h5>
-                              <ul className="list-disc list-inside space-y-1 text-red-800">
-                                {label.box_warnings.map((warning, i) => (
-                                  <li key={i}>{warning}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {label.pharmacogenomic_considerations && label.pharmacogenomic_considerations.length > 0 && (
-                            <div>
-                              <h5 className="font-bold text-gray-800 mb-2 flex items-center">
-                                <Dna className="w-4 h-4 mr-2 text-emerald-600" />
-                                Pharmacogenomic Considerations:
-                              </h5>
-                              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
-                                {label.pharmacogenomic_considerations.map((consideration, i) => (
-                                  <li key={i}>{consideration}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {label.safety_notes && label.safety_notes.length > 0 && (
-                            <div>
-                              <h5 className="font-bold text-gray-800 mb-2 flex items-center">
-                                <Shield className="w-4 h-4 mr-2 text-blue-600" />
-                                Safety Notes:
-                              </h5>
-                              <ul className="list-disc list-inside space-y-1 text-gray-700 ml-2">
-                                {label.safety_notes.map((note, i) => (
-                                  <li key={i}>{note}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {label.when_to_call_doctor && label.when_to_call_doctor.length > 0 && (
-                            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 rounded">
-                              <h5 className="font-bold text-yellow-900 mb-2">When to Contact Healthcare Provider:</h5>
-                              <ul className="list-disc list-inside space-y-1 text-yellow-800">
-                                {label.when_to_call_doctor.map((when, i) => (
-                                  <li key={i}>{when}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                    {data.pgx_results.drug_labels.map((label, idx) => (
+                      <div key={idx} className="space-y-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                        <div className="mb-3">
+                          <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                            {label.medication}
+                          </span>
                         </div>
-                      );
-                    })}
+
+                        {label.side_effects && (
+                          <div>
+                            <h5 className="font-bold text-gray-800 mb-2 flex items-center">
+                              <AlertTriangle className="w-4 h-4 mr-2 text-amber-600" />
+                              Side Effects:
+                            </h5>
+                            <p className="text-gray-700 ml-6">{label.side_effects}</p>
+                          </div>
+                        )}
+
+                        {label.metabolism && (
+                          <div>
+                            <h5 className="font-bold text-gray-800 mb-2 flex items-center">
+                              <Activity className="w-4 h-4 mr-2 text-blue-600" />
+                              Metabolism:
+                            </h5>
+                            <p className="text-gray-700 ml-6">{label.metabolism}</p>
+                          </div>
+                        )}
+
+                        {label.dosing_guideline && (
+                          <div className="bg-blue-50 border-l-4 border-blue-600 p-3 rounded">
+                            <h5 className="font-bold text-blue-900 mb-2 flex items-center">
+                              <FileText className="w-4 h-4 mr-2" />
+                              Dosing Guideline:
+                            </h5>
+                            <p className="text-blue-800">{label.dosing_guideline}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -668,30 +629,28 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
               {data.pgx_results.genes && data.pgx_results.genes.length > 0 && (
                 <div>
                   <h4 className="font-bold text-slate-900 mb-3">Relevant Genes</h4>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="space-y-3">
                     {data.pgx_results.genes.map((gene, idx) => (
-                      <span key={idx} className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
-                        {gene}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Variants */}
-              {data.pgx_results.variants && data.pgx_results.variants.length > 0 && (
-                <div>
-                  <h4 className="font-bold text-slate-900 mb-3">Genetic Variants</h4>
-                  <div className="space-y-2">
-                    {data.pgx_results.variants.map((variant, idx) => (
-                      <div key={idx} className="px-4 py-2 bg-slate-50 rounded border border-slate-200 text-sm">
-                        {typeof variant === 'string' ? variant : (
-                          <div>
-                            <div><strong>Gene:</strong> {variant.gene}</div>
-                            <div><strong>Role:</strong> {variant.role}</div>
-                            <div><strong>Interpretation:</strong> {variant.interpretation}</div>
-                          </div>
-                        )}
+                      <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                        <div className="mb-2">
+                          <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-bold">
+                            {gene.gene}
+                          </span>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <p><strong>Role:</strong> {gene.role}</p>
+                          {gene.variants && gene.variants.length > 0 && (
+                            <div>
+                              <strong>Variants:</strong>
+                              <ul className="list-disc list-inside ml-4 mt-1">
+                                {gene.variants.map((variant, vIdx) => (
+                                  <li key={vIdx}>{variant}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          <p><strong>Interpretation:</strong> {gene.interpretation}</p>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -702,10 +661,18 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
               {data.pgx_results.phenotypes && data.pgx_results.phenotypes.length > 0 && (
                 <div>
                   <h4 className="font-bold text-slate-900 mb-3">Phenotypes</h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {data.pgx_results.phenotypes.map((phenotype, idx) => (
-                      <div key={idx} className="px-4 py-2 bg-blue-50 rounded border border-blue-200 text-sm">
-                        {typeof phenotype === 'string' ? phenotype : phenotype.phenotype || phenotype.name}
+                      <div key={idx} className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="mb-2">
+                          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
+                            {phenotype.gene}
+                          </span>
+                        </div>
+                        <div className="space-y-2 text-sm">
+                          <p><strong>Phenotype:</strong> {phenotype.phenotype}</p>
+                          <p><strong>Clinical Implications:</strong> {phenotype.clinical_implications}</p>
+                        </div>
                       </div>
                     ))}
                   </div>

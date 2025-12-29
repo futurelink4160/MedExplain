@@ -18,11 +18,30 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
+interface DrugLabel {
+  medication: string;
+  side_effects: string;
+  metabolism: string;
+  dosing_guideline: string;
+}
+
+interface GeneInfo {
+  gene: string;
+  role: string;
+  variants?: string[];
+  interpretation: string;
+}
+
+interface PhenotypeInfo {
+  gene: string;
+  phenotype: string;
+  clinical_implications: string;
+}
+
 interface PgxResults {
-  drug_labels: string[];
-  genes: string[];
-  variants: string[];
-  phenotypes: string[];
+  drug_labels: DrugLabel[];
+  genes: GeneInfo[];
+  phenotypes: PhenotypeInfo[];
 }
 
 interface ResponseData {
