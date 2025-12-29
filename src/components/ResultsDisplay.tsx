@@ -191,7 +191,9 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   const hasPatientSections = extractSection(markdown, 'Understanding Your Concern') ||
     extractSection(markdown, 'About This Medication') ||
+    extractSection(markdown, 'About Eliquis') ||
     extractSection(markdown, 'Genetic Considerations') ||
+    extractSection(markdown, 'How Common Is This?') ||
     extractSection(markdown, 'How Common Is This');
 
   // Track which sections have been displayed to avoid duplicates
@@ -223,7 +225,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       titles.add('how your genes may play a role');
     }
 
-    if (extractSection(markdown, 'How Common Is This')) {
+    if (extractSection(markdown, 'How Common Is This?') || extractSection(markdown, 'How Common Is This')) {
       titles.add('how common is this');
     }
     if (extractSection(markdown, 'What You Can Do Now')) {
@@ -922,7 +924,9 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       })()}
 
       {(() => {
-        const medicationContent = extractSection(markdown, 'About This Medication');
+        const medicationContent = extractSection(markdown, 'About Eliquis') ||
+                                  extractSection(markdown, 'About This Medication') ||
+                                  extractSection(markdown, 'About');
         if (!medicationContent) return null;
 
         return (
@@ -940,6 +944,30 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             </div>
           </div>
         );
+      })()}
+
+      {(() => {
+        const whyHappen = extractSection(markdown, 'Why') ||
+                         extractSection(markdown, 'Why Bruising') ||
+                         extractSection(markdown, 'Why This Happens');
+        if (whyHappen) {
+          return (
+            <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-accent">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-accent rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Info className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-accent mb-4">Why This Happens</h2>
+                  <div className="prose max-w-none text-text-primary">
+                    <ReactMarkdown>{whyHappen}</ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        return null;
       })()}
 
       {(() => {
@@ -972,7 +1000,8 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       })()}
 
       {(() => {
-        const howCommon = extractSection(markdown, 'How Common Is This');
+        const howCommon = extractSection(markdown, 'How Common Is This?') ||
+                         extractSection(markdown, 'How Common Is This');
         if (!howCommon) return null;
 
         return (
