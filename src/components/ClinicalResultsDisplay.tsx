@@ -699,7 +699,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                   <div className="space-y-2">
                     {data.pgx_results.phenotypes.map((phenotype, idx) => (
                       <div key={idx} className="px-4 py-2 bg-blue-50 rounded border border-blue-200 text-sm">
-                        {phenotype}
+                        {typeof phenotype === 'string' ? phenotype : phenotype.phenotype || phenotype.name}
                       </div>
                     ))}
                   </div>

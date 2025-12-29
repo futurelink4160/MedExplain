@@ -666,7 +666,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Information</h3>
                     <ul className="list-disc list-inside space-y-2 text-gray-700">
                       {data.pgx_results.phenotypes.map((phenotype, idx) => (
-                        <li key={idx}>{phenotype}</li>
+                        <li key={idx}>{typeof phenotype === 'string' ? phenotype : phenotype.phenotype || phenotype.name}</li>
                       ))}
                     </ul>
                   </div>
@@ -1172,7 +1172,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                   <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Categories (General Info Only)</h3>
                   <ul className="list-disc list-inside space-y-2 text-gray-700">
                     {data.pgx_results.phenotypes.map((phenotype, idx) => (
-                      <li key={idx}>{phenotype}</li>
+                      <li key={idx}>{typeof phenotype === 'string' ? phenotype : phenotype.phenotype || phenotype.name}</li>
                     ))}
                   </ul>
                 </div>
