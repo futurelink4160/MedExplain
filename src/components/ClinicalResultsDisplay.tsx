@@ -685,7 +685,13 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                   <div className="space-y-2">
                     {data.pgx_results.variants.map((variant, idx) => (
                       <div key={idx} className="px-4 py-2 bg-slate-50 rounded border border-slate-200 text-sm">
-                        {variant}
+                        {typeof variant === 'string' ? variant : (
+                          <div>
+                            <div><strong>Gene:</strong> {variant.gene}</div>
+                            <div><strong>Role:</strong> {variant.role}</div>
+                            <div><strong>Interpretation:</strong> {variant.interpretation}</div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
