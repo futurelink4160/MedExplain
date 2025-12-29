@@ -194,6 +194,81 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     extractSection(markdown, 'Genetic Considerations') ||
     extractSection(markdown, 'How Common Is This');
 
+  // Track which sections have been displayed to avoid duplicates
+  const getDisplayedSectionTitles = () => {
+    const titles = new Set<string>();
+
+    // Add all known patient inquiry section titles
+    if (extractSection(markdown, 'Understanding Your Concern')) {
+      titles.add('understanding your concern');
+    }
+    if (extractSection(markdown, 'About This Medication')) {
+      titles.add('about this medication');
+    }
+
+    const geneticInfo = extractSection(markdown, 'Genetic Considerations') ||
+                       extractSection(markdown, 'Relevant Genetic Information') ||
+                       extractSection(markdown, 'Genetic Information') ||
+                       extractSection(markdown, 'Pharmacogenomic Information') ||
+                       extractSection(markdown, 'Genetic Factors') ||
+                       extractSection(markdown, 'Pharmacogenomic Context') ||
+                       extractSection(markdown, 'How Your Genes May Play a Role');
+    if (geneticInfo) {
+      titles.add('genetic considerations');
+      titles.add('relevant genetic information');
+      titles.add('genetic information');
+      titles.add('pharmacogenomic information');
+      titles.add('genetic factors');
+      titles.add('pharmacogenomic context');
+      titles.add('how your genes may play a role');
+    }
+
+    if (extractSection(markdown, 'How Common Is This')) {
+      titles.add('how common is this');
+    }
+    if (extractSection(markdown, 'What You Can Do Now')) {
+      titles.add('what you can do now');
+    }
+    if (extractSection(markdown, 'When to Contact Your Doctor')) {
+      titles.add('when to contact your doctor');
+    }
+    if (extractSection(markdown, 'When to Seek Emergency Care')) {
+      titles.add('when to seek emergency care');
+    }
+    if (extractSection(markdown, 'Important Safety Reminders')) {
+      titles.add('important safety reminders');
+    }
+
+    const expectationInfo = extractSection(markdown, 'What to Expect Moving Forward') ||
+                           extractSection(markdown, 'What to Expect Going Forward') ||
+                           extractSection(markdown, 'Moving Forward') ||
+                           extractSection(markdown, 'Going Forward') ||
+                           extractSection(markdown, 'What to Expect');
+    if (expectationInfo) {
+      titles.add('what to expect moving forward');
+      titles.add('what to expect going forward');
+      titles.add('moving forward');
+      titles.add('going forward');
+      titles.add('what to expect');
+    }
+
+    const educationalNote = extractSection(markdown, 'Educational Purpose Only') ||
+                           extractSection(markdown, 'Disclaimer') ||
+                           extractSection(markdown, 'Important Note');
+    if (educationalNote) {
+      titles.add('educational purpose only');
+      titles.add('disclaimer');
+      titles.add('important note');
+    }
+
+    return titles;
+  };
+
+  const displayedSectionTitles = getDisplayedSectionTitles();
+  const remainingSections = allSections.filter(section =>
+    !displayedSectionTitles.has(section.title.toLowerCase())
+  );
+
   // Check if this is clinical format response
   const isClinicalFormat = data.clinical_summary || data.pgx_interpretation || data.clinical_recommendations;
 
@@ -1026,6 +1101,28 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         }
         return null;
       })()}
+
+      {/* Additional sections not covered above */}
+      {remainingSections.length > 0 && remainingSections.map((section, idx) => {
+        const style = getSectionStyle(section.title);
+        const IconComponent = style.icon;
+
+        return (
+          <div key={idx} className={`${style.bg} rounded-xl shadow-lg p-6 border-l-4 ${style.border}`}>
+            <div className="flex items-start space-x-4">
+              <div className={`w-12 h-12 ${style.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                <IconComponent className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold text-text-primary mb-4">{section.title}</h2>
+                <div className="prose max-w-none text-text-primary">
+                  <ReactMarkdown>{section.content}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
 
       {data.pgx_results && (
         <div className="bg-background-card rounded-xl shadow-lg overflow-hidden border border-gray-200">
