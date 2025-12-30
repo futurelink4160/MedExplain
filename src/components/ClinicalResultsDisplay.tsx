@@ -834,6 +834,10 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
 
               {/* Testing Guidelines */}
               {data.pgx_results.testing_guidelines && (
+                data.pgx_results.testing_guidelines.fda_level ||
+                data.pgx_results.testing_guidelines.cpic_dosing_info !== undefined ||
+                data.pgx_results.testing_guidelines.has_dosing_guideline !== undefined
+              ) && (
                 <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
                   <h4 className="font-bold text-emerald-900 mb-3 flex items-center">
                     <Shield className="w-5 h-5 mr-2" />
@@ -854,19 +858,25 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
               )}
 
               {/* Genes */}
-              {data.pgx_results.genes && data.pgx_results.genes.length > 0 && (
+              {data.pgx_results.genes && data.pgx_results.genes.filter(gene =>
+                gene.gene || gene.role || gene.interpretation
+              ).length > 0 && (
                 <div>
                   <h4 className="font-bold text-slate-900 mb-3">Relevant Genes</h4>
                   <div className="space-y-3">
-                    {data.pgx_results.genes.map((gene, idx) => (
+                    {data.pgx_results.genes.filter(gene =>
+                      gene.gene || gene.role || gene.interpretation
+                    ).map((gene, idx) => (
                       <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                        <div className="mb-2">
-                          <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-bold">
-                            {gene.gene}
-                          </span>
-                        </div>
+                        {gene.gene && (
+                          <div className="mb-2">
+                            <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-bold">
+                              {gene.gene}
+                            </span>
+                          </div>
+                        )}
                         <div className="space-y-2 text-sm">
-                          <p><strong>Role:</strong> {gene.role}</p>
+                          {gene.role && <p><strong>Role:</strong> {gene.role}</p>}
                           {gene.variants && gene.variants.length > 0 && (
                             <div>
                               <strong>Variants:</strong>
@@ -877,7 +887,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                               </ul>
                             </div>
                           )}
-                          <p><strong>Interpretation:</strong> {gene.interpretation}</p>
+                          {gene.interpretation && <p><strong>Interpretation:</strong> {gene.interpretation}</p>}
                         </div>
                       </div>
                     ))}
@@ -886,20 +896,26 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
               )}
 
               {/* Phenotypes */}
-              {data.pgx_results.phenotypes && data.pgx_results.phenotypes.length > 0 && (
+              {data.pgx_results.phenotypes && data.pgx_results.phenotypes.filter(phenotype =>
+                phenotype.gene || phenotype.phenotype || phenotype.clinical_implications
+              ).length > 0 && (
                 <div>
                   <h4 className="font-bold text-slate-900 mb-3">Phenotypes</h4>
                   <div className="space-y-3">
-                    {data.pgx_results.phenotypes.map((phenotype, idx) => (
+                    {data.pgx_results.phenotypes.filter(phenotype =>
+                      phenotype.gene || phenotype.phenotype || phenotype.clinical_implications
+                    ).map((phenotype, idx) => (
                       <div key={idx} className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="mb-2">
-                          <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
-                            {phenotype.gene}
-                          </span>
-                        </div>
+                        {phenotype.gene && (
+                          <div className="mb-2">
+                            <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
+                              {phenotype.gene}
+                            </span>
+                          </div>
+                        )}
                         <div className="space-y-2 text-sm">
-                          <p><strong>Phenotype:</strong> {phenotype.phenotype}</p>
-                          <p><strong>Clinical Implications:</strong> {phenotype.clinical_implications}</p>
+                          {phenotype.phenotype && <p><strong>Phenotype:</strong> {phenotype.phenotype}</p>}
+                          {phenotype.clinical_implications && <p><strong>Clinical Implications:</strong> {phenotype.clinical_implications}</p>}
                         </div>
                       </div>
                     ))}
