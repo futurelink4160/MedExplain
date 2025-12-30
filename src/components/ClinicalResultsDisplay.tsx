@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Activity,
   BookOpen,
@@ -11,7 +11,9 @@ import {
   AlertTriangle,
   CheckCircle,
   Printer,
-  User
+  User,
+  Volume2,
+  Square
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import html2pdf from 'html2pdf.js';
@@ -81,6 +83,9 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailTo, setEmailTo] = useState('');
   const contentRef = useRef<HTMLDivElement>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [speechSpeed, setSpeechSpeed] = useState(1.0);
 
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
@@ -105,6 +110,88 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
     window.location.href = mailtoLink;
     setShowEmailModal(false);
   };
+
+  const stripMarkdown = (text: string): string => {
+    return text
+      .replace(/\\n/g, '\n')
+      .replace(/#{1,6}\s+/g, '')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+      .replace(/`(.+?)`/g, '$1')
+      .replace(/^[-*+]\s+/gm, '')
+      .replace(/^\d+\.\s+/gm, '')
+      .trim();
+  };
+
+  const getFemaleVoice = (): SpeechSynthesisVoice | null => {
+    const voices = window.speechSynthesis.getVoices();
+    const femaleVoice = voices.find(voice =>
+      voice.name.toLowerCase().includes('female') ||
+      voice.name.toLowerCase().includes('samantha') ||
+      voice.name.toLowerCase().includes('victoria') ||
+      voice.name.toLowerCase().includes('karen') ||
+      voice.name.toLowerCase().includes('zira')
+    );
+    return femaleVoice || voices.find(voice => voice.lang.startsWith('en')) || voices[0] || null;
+  };
+
+  const handleStartSpeech = () => {
+    if (!data?.final_answer_markdown) return;
+
+    const textToSpeak = stripMarkdown(data.final_answer_markdown);
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    const voice = getFemaleVoice();
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.rate = speechSpeed;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      utteranceRef.current = null;
+    };
+
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      utteranceRef.current = null;
+    };
+
+    utteranceRef.current = utterance;
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleStopSpeech = () => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    utteranceRef.current = null;
+  };
+
+  const handleSpeedChange = (newSpeed: number) => {
+    setSpeechSpeed(newSpeed);
+    if (isSpeaking && utteranceRef.current) {
+      handleStopSpeech();
+      setTimeout(() => {
+        handleStartSpeech();
+      }, 100);
+    }
+  };
+
+  useEffect(() => {
+    window.speechSynthesis.getVoices();
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    handleStopSpeech();
+  }, [data]);
 
   const extractSection = (markdown: string | undefined, title: string): string => {
     if (!markdown) return '';
@@ -317,6 +404,45 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
             </div>
           </div>
           <Activity className="w-20 h-20 text-white opacity-80 hidden md:block" />
+        </div>
+      </div>
+
+      {/* Speech Controls */}
+      <div className="flex flex-col items-center gap-4 bg-white rounded-lg shadow-md p-4">
+        <button
+          onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
+          className="flex items-center gap-2 px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-all shadow-md"
+        >
+          {isSpeaking ? (
+            <>
+              <Square className="w-5 h-5" />
+              <span>Stop</span>
+            </>
+          ) : (
+            <>
+              <Volume2 className="w-5 h-5" />
+              <span>Listen to Summary</span>
+            </>
+          )}
+        </button>
+
+        <div className="flex items-center gap-3 w-full max-w-md">
+          <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Speed:</span>
+          <div className="flex gap-2">
+            {[0.75, 1.0, 1.25, 1.5].map((speed) => (
+              <button
+                key={speed}
+                onClick={() => handleSpeedChange(speed)}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                  speechSpeed === speed
+                    ? 'bg-slate-700 text-white'
+                    : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                }`}
+              >
+                {speed}x
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

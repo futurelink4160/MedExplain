@@ -97,6 +97,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   const contentRef = useRef<HTMLDivElement>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const [speechSpeed, setSpeechSpeed] = useState(1.0);
 
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
@@ -135,13 +136,30 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       .trim();
   };
 
+  const getFemaleVoice = (): SpeechSynthesisVoice | null => {
+    const voices = window.speechSynthesis.getVoices();
+    const femaleVoice = voices.find(voice =>
+      voice.name.toLowerCase().includes('female') ||
+      voice.name.toLowerCase().includes('samantha') ||
+      voice.name.toLowerCase().includes('victoria') ||
+      voice.name.toLowerCase().includes('karen') ||
+      voice.name.toLowerCase().includes('zira')
+    );
+    return femaleVoice || voices.find(voice => voice.lang.startsWith('en')) || voices[0] || null;
+  };
+
   const handleStartSpeech = () => {
     if (!data?.final_answer_markdown) return;
 
     const textToSpeak = stripMarkdown(data.final_answer_markdown);
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
-    utterance.rate = 1.0;
+    const voice = getFemaleVoice();
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.rate = speechSpeed;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
 
@@ -166,7 +184,18 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     utteranceRef.current = null;
   };
 
+  const handleSpeedChange = (newSpeed: number) => {
+    setSpeechSpeed(newSpeed);
+    if (isSpeaking && utteranceRef.current) {
+      handleStopSpeech();
+      setTimeout(() => {
+        handleStartSpeech();
+      }, 100);
+    }
+  };
+
   useEffect(() => {
+    window.speechSynthesis.getVoices();
     return () => {
       window.speechSynthesis.cancel();
     };
@@ -347,7 +376,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-4 bg-white rounded-lg shadow-md p-4">
           <button
             onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
             className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
@@ -364,6 +393,25 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
               </>
             )}
           </button>
+
+          <div className="flex items-center gap-3 w-full max-w-md">
+            <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Speed:</span>
+            <div className="flex gap-2">
+              {[0.75, 1.0, 1.25, 1.5].map((speed) => (
+                <button
+                  key={speed}
+                  onClick={() => handleSpeedChange(speed)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    speechSpeed === speed
+                      ? 'bg-secondary text-white'
+                      : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                  }`}
+                >
+                  {speed}x
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {data.clinical_summary && (
@@ -672,7 +720,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-4 bg-white rounded-lg shadow-md p-4">
           <button
             onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
             className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
@@ -689,6 +737,25 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
               </>
             )}
           </button>
+
+          <div className="flex items-center gap-3 w-full max-w-md">
+            <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Speed:</span>
+            <div className="flex gap-2">
+              {[0.75, 1.0, 1.25, 1.5].map((speed) => (
+                <button
+                  key={speed}
+                  onClick={() => handleSpeedChange(speed)}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                    speechSpeed === speed
+                      ? 'bg-secondary text-white'
+                      : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                  }`}
+                >
+                  {speed}x
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         {allSections.map((section, idx) => {
