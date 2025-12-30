@@ -45,7 +45,7 @@ export default function Home() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 mb-6 leading-tight max-w-4xl mx-auto">
-                Pharmacogenetics Explained <p>Understand How Your Genetics Affect Drug Response</p>
+                Pharmacogenetics Explained : <p>Understand How Your Genetics Affect Drug Response</p>
               </h1>
 
               <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
