@@ -48,7 +48,7 @@ export default function Home() {
                 Pharmacogenomics Explained 
               </h1>
 
-              <p className="text-lg sm:text-xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-lg sm:text-xl text-gray-800 mb-10 max-w-3xl mx-auto leading-relaxed">
                 AI-Driven Insights Into How Your Genetics Affect Medication Response and Side Effects
               </p>
 
