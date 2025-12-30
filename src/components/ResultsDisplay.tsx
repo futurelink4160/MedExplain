@@ -685,6 +685,36 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   const extractedPatientData = extractPatientData();
 
+  // Helper function to check if a value is meaningful (not placeholder text)
+  const isMeaningfulValue = (value: any): boolean => {
+    if (!value) return false;
+    if (typeof value !== 'string') return true;
+    const trimmed = value.trim().toLowerCase();
+    const placeholders = ['none', 'none mentioned', 'not specified', 'none reported', 'n/a', 'na', 'not applicable'];
+    return trimmed.length > 0 && !placeholders.includes(trimmed);
+  };
+
+  // Determine whether to show patient data from form or markdown
+  const hasFormPatientData = patientData && (
+    isMeaningfulValue(patientData.age) ||
+    isMeaningfulValue(patientData.gender) ||
+    isMeaningfulValue(patientData.medication) ||
+    isMeaningfulValue(patientData.question) ||
+    isMeaningfulValue(patientData.symptoms) ||
+    isMeaningfulValue(patientData.duration) ||
+    isMeaningfulValue(patientData.otherMeds) ||
+    isMeaningfulValue(patientData.medicalHistory)
+  );
+
+  const hasMarkdownPatientData = extractedPatientData.hasStructuredOverview ||
+    extractedPatientData.age ||
+    extractedPatientData.medication ||
+    extractedPatientData.symptoms ||
+    extractedPatientData.duration;
+
+  // Prioritize form data over markdown extraction to avoid redundancy
+  const shouldShowPatientSection = hasFormPatientData || (hasMarkdownPatientData && !hasFormPatientData);
+
   // Get color scheme based on section title
   const getSectionStyle = (title: string) => {
     const lowerTitle = title.toLowerCase();
@@ -817,100 +847,138 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
               )}
             </button>
 
-            {showPgx && (
-              <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
-                {/* Show message if no PGX data is available */}
-                {(!data.pgx_results.drug_labels || data.pgx_results.drug_labels.length === 0) &&
-                 (!data.pgx_results.genes || data.pgx_results.genes.length === 0) &&
-                 (!data.pgx_results.phenotypes || data.pgx_results.phenotypes.length === 0) && (
-                  <div className="text-center py-8">
-                    <p className="text-gray-600">No additional genomic data available for this query at this time.</p>
-                    <p className="text-sm text-gray-500 mt-2">Genomic information may be added as more research becomes available.</p>
-                  </div>
-                )}
+            {showPgx && (() => {
+              // Filter drug labels to only show those with meaningful content
+              const filteredDrugLabels = data.pgx_results.drug_labels?.filter(label =>
+                isMeaningfulValue(label.medication) ||
+                isMeaningfulValue(label.side_effects) ||
+                isMeaningfulValue(label.metabolism) ||
+                isMeaningfulValue(label.dosing_guideline)
+              ) || [];
 
-                {data.pgx_results.drug_labels && data.pgx_results.drug_labels.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
-                    <div className="space-y-4">
-                      {data.pgx_results.drug_labels.map((label, idx) => (
-                        <div key={idx} className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                          <h4 className="font-bold text-gray-900 text-lg">{label.medication}</h4>
+              // Filter genes to only show those with meaningful content
+              const filteredGenes = data.pgx_results.genes?.filter(gene =>
+                isMeaningfulValue(gene.gene) ||
+                isMeaningfulValue(gene.role) ||
+                isMeaningfulValue(gene.interpretation)
+              ) || [];
 
-                          {label.side_effects && (
-                            <div>
-                              <h5 className="font-semibold text-gray-800 mb-1">Side Effects:</h5>
-                              <p className="text-gray-700">{label.side_effects}</p>
-                            </div>
-                          )}
+              // Filter phenotypes to only show those with meaningful content
+              const filteredPhenotypes = data.pgx_results.phenotypes?.filter(phenotype =>
+                isMeaningfulValue(phenotype.gene) ||
+                isMeaningfulValue(phenotype.phenotype) ||
+                isMeaningfulValue(phenotype.clinical_implications)
+              ) || [];
 
-                          {label.metabolism && (
-                            <div>
-                              <h5 className="font-semibold text-gray-800 mb-1">Metabolism:</h5>
-                              <p className="text-gray-700">{label.metabolism}</p>
-                            </div>
-                          )}
+              const hasAnyPgxData = filteredDrugLabels.length > 0 || filteredGenes.length > 0 || filteredPhenotypes.length > 0;
 
-                          {label.dosing_guideline && (
-                            <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
-                              <h5 className="font-semibold text-blue-900 mb-1">Dosing Guideline:</h5>
-                              <p className="text-blue-800">{label.dosing_guideline}</p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              return (
+                <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
+                  {filteredDrugLabels.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
+                      <div className="space-y-4">
+                        {filteredDrugLabels.map((label, idx) => (
+                          <div key={idx} className="space-y-3 p-4 bg-white rounded-lg border border-gray-200">
+                            {isMeaningfulValue(label.medication) && (
+                              <h4 className="font-bold text-gray-900 text-lg">{label.medication}</h4>
+                            )}
 
-                {data.pgx_results.genes.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
-                    <div className="space-y-4">
-                      {data.pgx_results.genes.map((gene, idx) => (
-                        <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                          <h4 className="font-bold text-emerald-900 mb-2">{gene.gene}</h4>
-
-                          <div className="space-y-2 text-gray-700">
-                            <p><span className="font-semibold">Role:</span> {gene.role}</p>
-
-                            {gene.variants && gene.variants.length > 0 && (
+                            {isMeaningfulValue(label.side_effects) && (
                               <div>
-                                <span className="font-semibold">Variants:</span>
-                                <ul className="list-disc list-inside ml-4 mt-1">
-                                  {gene.variants.map((variant, vIdx) => (
-                                    <li key={vIdx}>{variant}</li>
-                                  ))}
-                                </ul>
+                                <h5 className="font-semibold text-gray-800 mb-1">Side Effects:</h5>
+                                <p className="text-gray-700">{label.side_effects}</p>
                               </div>
                             )}
 
-                            <p><span className="font-semibold">Interpretation:</span> {gene.interpretation}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                            {isMeaningfulValue(label.metabolism) && (
+                              <div>
+                                <h5 className="font-semibold text-gray-800 mb-1">Metabolism:</h5>
+                                <p className="text-gray-700">{label.metabolism}</p>
+                              </div>
+                            )}
 
-                {data.pgx_results.phenotypes.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Information</h3>
-                    <div className="space-y-4">
-                      {data.pgx_results.phenotypes.map((phenotype, idx) => (
-                        <div key={idx} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                          <h4 className="font-bold text-purple-900 mb-2">{phenotype.gene}</h4>
-                          <div className="space-y-2 text-gray-700">
-                            <p><span className="font-semibold">Phenotype:</span> {phenotype.phenotype}</p>
-                            <p><span className="font-semibold">Clinical Implications:</span> {phenotype.clinical_implications}</p>
+                            {isMeaningfulValue(label.dosing_guideline) && (
+                              <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                                <h5 className="font-semibold text-blue-900 mb-1">Dosing Guideline:</h5>
+                                <p className="text-blue-800">{label.dosing_guideline}</p>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            )}
+                  )}
+
+                  {filteredGenes.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
+                      <div className="space-y-4">
+                        {filteredGenes.map((gene, idx) => (
+                          <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                            {isMeaningfulValue(gene.gene) && (
+                              <h4 className="font-bold text-emerald-900 mb-2">{gene.gene}</h4>
+                            )}
+
+                            <div className="space-y-2 text-gray-700">
+                              {isMeaningfulValue(gene.role) && (
+                                <p><span className="font-semibold">Role:</span> {gene.role}</p>
+                              )}
+
+                              {gene.variants && gene.variants.length > 0 && (
+                                <div>
+                                  <span className="font-semibold">Variants:</span>
+                                  <ul className="list-disc list-inside ml-4 mt-1">
+                                    {gene.variants.map((variant, vIdx) => (
+                                      <li key={vIdx}>{variant}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+
+                              {isMeaningfulValue(gene.interpretation) && (
+                                <p><span className="font-semibold">Interpretation:</span> {gene.interpretation}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {filteredPhenotypes.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Information</h3>
+                      <div className="space-y-4">
+                        {filteredPhenotypes.map((phenotype, idx) => (
+                          <div key={idx} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                            {isMeaningfulValue(phenotype.gene) && (
+                              <h4 className="font-bold text-purple-900 mb-2">{phenotype.gene}</h4>
+                            )}
+                            <div className="space-y-2 text-gray-700">
+                              {isMeaningfulValue(phenotype.phenotype) && (
+                                <p><span className="font-semibold">Phenotype:</span> {phenotype.phenotype}</p>
+                              )}
+                              {isMeaningfulValue(phenotype.clinical_implications) && (
+                                <p><span className="font-semibold">Clinical Implications:</span> {phenotype.clinical_implications}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show message if no PGX data is available */}
+                  {!hasAnyPgxData && (
+                    <div className="text-center py-8">
+                      <p className="text-gray-600">No additional genomic data available for this query at this time.</p>
+                      <p className="text-sm text-gray-500 mt-2">Genomic information may be added as more research becomes available.</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -1034,8 +1102,8 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </button>
       </div>
 
-      {/* Patient Information */}
-      {patientData && (patientData.hasStructuredOverview || patientData.age || patientData.medication || patientData.question || patientData.symptoms || patientData.duration) && (
+      {/* Patient Information - Only show if we have meaningful data and avoid redundancy */}
+      {shouldShowPatientSection && (
         <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-primary">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
@@ -1044,53 +1112,81 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-primary mb-4">Your Information</h2>
               <div className="prose max-w-none text-text-primary">
-                {patientData.hasStructuredOverview ? (
-                  <ReactMarkdown>{patientData.overview}</ReactMarkdown>
+                {hasFormPatientData ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {isMeaningfulValue(patientData?.age) && (
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Age:</strong> <span className="text-text-primary">{patientData?.age}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.gender) && (
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Gender:</strong> <span className="text-text-primary">{patientData?.gender}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.role) && (
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Role:</strong> <span className="text-text-primary">{patientData?.role}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.medication) && (
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Medication:</strong> <span className="text-text-primary">{patientData?.medication}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.question) && (
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Question/Concern:</strong> <span className="text-text-primary">{patientData?.question}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.symptoms) && (
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Current Symptoms:</strong> <span className="text-text-primary">{patientData?.symptoms}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.duration) && (
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <strong className="text-primary">Duration:</strong> <span className="text-text-primary">{patientData?.duration}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.otherMeds) && (
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Other Medications:</strong> <span className="text-text-primary">{patientData?.otherMeds}</span>
+                      </div>
+                    )}
+                    {isMeaningfulValue(patientData?.medicalHistory) && (
+                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
+                        <strong className="text-primary">Medical History:</strong> <span className="text-text-primary">{patientData?.medicalHistory}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : extractedPatientData.hasStructuredOverview ? (
+                  <ReactMarkdown>{extractedPatientData.overview}</ReactMarkdown>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {patientData.age && (
+                    {extractedPatientData.age && (
                       <div className="bg-gray-50 p-3 rounded-lg">
-                        <strong className="text-primary">Age:</strong> <span className="text-text-primary">{patientData.age}</span>
+                        <strong className="text-primary">Age:</strong> <span className="text-text-primary">{extractedPatientData.age}</span>
                       </div>
                     )}
-                    {patientData.gender && (
+                    {extractedPatientData.medication && (
                       <div className="bg-gray-50 p-3 rounded-lg">
-                        <strong className="text-primary">Gender:</strong> <span className="text-text-primary">{patientData.gender}</span>
+                        <strong className="text-primary">Medication:</strong> <span className="text-text-primary">{extractedPatientData.medication}</span>
                       </div>
                     )}
-                    {patientData.role && (
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                        <strong className="text-primary">Role:</strong> <span className="text-text-primary">{patientData.role}</span>
-                      </div>
-                    )}
-                    {patientData.medication && (
-                      <div className="bg-gray-50 p-3 rounded-lg">
-                        <strong className="text-primary">Medication:</strong> <span className="text-text-primary">{patientData.medication}</span>
-                      </div>
-                    )}
-                    {patientData.question && (
+                    {extractedPatientData.symptoms && (
                       <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
-                        <strong className="text-primary">Question/Concern:</strong> <span className="text-text-primary">{patientData.question}</span>
+                        <strong className="text-primary">Current Symptoms:</strong> <span className="text-text-primary">{extractedPatientData.symptoms}</span>
                       </div>
                     )}
-                    {patientData.symptoms && (
-                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
-                        <strong className="text-primary">Current Symptoms:</strong> <span className="text-text-primary">{patientData.symptoms}</span>
-                      </div>
-                    )}
-                    {patientData.duration && (
+                    {extractedPatientData.duration && (
                       <div className="bg-gray-50 p-3 rounded-lg">
-                        <strong className="text-primary">Duration:</strong> <span className="text-text-primary">{patientData.duration}</span>
+                        <strong className="text-primary">Duration:</strong> <span className="text-text-primary">{extractedPatientData.duration}</span>
                       </div>
                     )}
-                    {patientData.otherMeds && patientData.otherMeds !== 'None mentioned' && patientData.otherMeds !== 'None reported' && (
+                    {isMeaningfulValue(extractedPatientData.otherMeds) && (
                       <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
-                        <strong className="text-primary">Other Medications:</strong> <span className="text-text-primary">{patientData.otherMeds}</span>
-                      </div>
-                    )}
-                    {patientData.medicalHistory && patientData.medicalHistory !== 'None mentioned' && (
-                      <div className="bg-gray-50 p-3 rounded-lg md:col-span-2">
-                        <strong className="text-primary">Medical History:</strong> <span className="text-text-primary">{patientData.medicalHistory}</span>
+                        <strong className="text-primary">Other Medications:</strong> <span className="text-text-primary">{extractedPatientData.otherMeds}</span>
                       </div>
                     )}
                   </div>
@@ -1415,106 +1511,144 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             )}
           </button>
 
-          {showPgx && (
-            <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
-              {data.pgx_results.drug_labels && data.pgx_results.drug_labels.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
-                  <div className="space-y-4">
-                    {data.pgx_results.drug_labels.map((label, idx) => (
-                      <div key={idx} className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                        <h4 className="font-bold text-gray-900 text-lg">{label.medication}</h4>
+          {showPgx && (() => {
+            // Filter drug labels to only show those with meaningful content
+            const filteredDrugLabels = data.pgx_results.drug_labels?.filter(label =>
+              isMeaningfulValue(label.medication) ||
+              isMeaningfulValue(label.side_effects) ||
+              isMeaningfulValue(label.metabolism) ||
+              isMeaningfulValue(label.dosing_guideline)
+            ) || [];
 
-                        {label.side_effects && (
-                          <div>
-                            <h5 className="font-semibold text-gray-800 mb-1">Side Effects:</h5>
-                            <p className="text-gray-700">{label.side_effects}</p>
-                          </div>
-                        )}
+            // Filter genes to only show those with meaningful content
+            const filteredGenes = data.pgx_results.genes?.filter(gene =>
+              isMeaningfulValue(gene.gene) ||
+              isMeaningfulValue(gene.role) ||
+              isMeaningfulValue(gene.interpretation)
+            ) || [];
 
-                        {label.metabolism && (
-                          <div>
-                            <h5 className="font-semibold text-gray-800 mb-1">Metabolism:</h5>
-                            <p className="text-gray-700">{label.metabolism}</p>
-                          </div>
-                        )}
+            // Filter phenotypes to only show those with meaningful content
+            const filteredPhenotypes = data.pgx_results.phenotypes?.filter(phenotype =>
+              isMeaningfulValue(phenotype.gene) ||
+              isMeaningfulValue(phenotype.phenotype) ||
+              isMeaningfulValue(phenotype.clinical_implications)
+            ) || [];
 
-                        {label.dosing_guideline && (
-                          <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
-                            <h5 className="font-semibold text-blue-900 mb-1">Dosing Guideline:</h5>
-                            <p className="text-blue-800">{label.dosing_guideline}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+            const hasAnyPgxData = filteredDrugLabels.length > 0 || filteredGenes.length > 0 || filteredPhenotypes.length > 0;
 
-              {data.pgx_results.genes && data.pgx_results.genes.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
-                  <div className="space-y-4">
-                    {data.pgx_results.genes.map((gene, idx) => (
-                      <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                        <h4 className="font-bold text-emerald-900 mb-2">{gene.gene}</h4>
+            return (
+              <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
+                {filteredDrugLabels.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
+                    <div className="space-y-4">
+                      {filteredDrugLabels.map((label, idx) => (
+                        <div key={idx} className="space-y-3 p-4 bg-white rounded-lg border border-gray-200">
+                          {isMeaningfulValue(label.medication) && (
+                            <h4 className="font-bold text-gray-900 text-lg">{label.medication}</h4>
+                          )}
 
-                        <div className="space-y-2 text-gray-700">
-                          <p><span className="font-semibold">Role:</span> {gene.role}</p>
-
-                          {gene.variants && gene.variants.length > 0 && (
+                          {isMeaningfulValue(label.side_effects) && (
                             <div>
-                              <span className="font-semibold">Variants:</span>
-                              <ul className="list-disc list-inside ml-4 mt-1">
-                                {gene.variants.map((variant, vIdx) => (
-                                  <li key={vIdx}>{variant}</li>
-                                ))}
-                              </ul>
+                              <h5 className="font-semibold text-gray-800 mb-1">Side Effects:</h5>
+                              <p className="text-gray-700">{label.side_effects}</p>
                             </div>
                           )}
 
-                          <p><span className="font-semibold">Interpretation:</span> {gene.interpretation}</p>
+                          {isMeaningfulValue(label.metabolism) && (
+                            <div>
+                              <h5 className="font-semibold text-gray-800 mb-1">Metabolism:</h5>
+                              <p className="text-gray-700">{label.metabolism}</p>
+                            </div>
+                          )}
+
+                          {isMeaningfulValue(label.dosing_guideline) && (
+                            <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                              <h5 className="font-semibold text-blue-900 mb-1">Dosing Guideline:</h5>
+                              <p className="text-blue-800">{label.dosing_guideline}</p>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {data.pgx_results.phenotypes && data.pgx_results.phenotypes.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Categories (General Info Only)</h3>
-                  <div className="space-y-4">
-                    {data.pgx_results.phenotypes.map((phenotype, idx) => (
-                      <div key={idx} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                        <h4 className="font-bold text-purple-900 mb-2">{phenotype.gene}</h4>
-                        <div className="space-y-2 text-gray-700">
-                          <p><span className="font-semibold">Phenotype:</span> {phenotype.phenotype}</p>
-                          <p><span className="font-semibold">Clinical Implications:</span> {phenotype.clinical_implications}</p>
+                {filteredGenes.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
+                    <div className="space-y-4">
+                      {filteredGenes.map((gene, idx) => (
+                        <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                          {isMeaningfulValue(gene.gene) && (
+                            <h4 className="font-bold text-emerald-900 mb-2">{gene.gene}</h4>
+                          )}
+
+                          <div className="space-y-2 text-gray-700">
+                            {isMeaningfulValue(gene.role) && (
+                              <p><span className="font-semibold">Role:</span> {gene.role}</p>
+                            )}
+
+                            {gene.variants && gene.variants.length > 0 && (
+                              <div>
+                                <span className="font-semibold">Variants:</span>
+                                <ul className="list-disc list-inside ml-4 mt-1">
+                                  {gene.variants.map((variant, vIdx) => (
+                                    <li key={vIdx}>{variant}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+
+                            {isMeaningfulValue(gene.interpretation) && (
+                              <p><span className="font-semibold">Interpretation:</span> {gene.interpretation}</p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Show message if no PGX data is available */}
-              {(!data.pgx_results.drug_labels || data.pgx_results.drug_labels.length === 0) &&
-               (!data.pgx_results.genes || data.pgx_results.genes.length === 0) &&
-               (!data.pgx_results.phenotypes || data.pgx_results.phenotypes.length === 0) && (
-                <div className="text-center py-8">
-                  <p className="text-gray-600">No additional genomic data available for this medication at this time.</p>
-                  <p className="text-sm text-gray-500 mt-2">This information may be added as more research becomes available.</p>
-                </div>
-              )}
+                {filteredPhenotypes.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Categories (General Info Only)</h3>
+                    <div className="space-y-4">
+                      {filteredPhenotypes.map((phenotype, idx) => (
+                        <div key={idx} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                          {isMeaningfulValue(phenotype.gene) && (
+                            <h4 className="font-bold text-purple-900 mb-2">{phenotype.gene}</h4>
+                          )}
+                          <div className="space-y-2 text-gray-700">
+                            {isMeaningfulValue(phenotype.phenotype) && (
+                              <p><span className="font-semibold">Phenotype:</span> {phenotype.phenotype}</p>
+                            )}
+                            {isMeaningfulValue(phenotype.clinical_implications) && (
+                              <p><span className="font-semibold">Clinical Implications:</span> {phenotype.clinical_implications}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-              <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded">
-                <p className="text-sm text-gray-700 italic">
-                  <strong>Note:</strong> These genetic insights are general education only — they are NOT your genetic results.
-                </p>
+                {/* Show message if no PGX data is available */}
+                {!hasAnyPgxData && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600">No additional genomic data available for this medication at this time.</p>
+                    <p className="text-sm text-gray-500 mt-2">This information may be added as more research becomes available.</p>
+                  </div>
+                )}
+
+                <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-600 rounded">
+                  <p className="text-sm text-gray-700 italic">
+                    <strong>Note:</strong> These genetic insights are general education only — they are NOT your genetic results.
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
 

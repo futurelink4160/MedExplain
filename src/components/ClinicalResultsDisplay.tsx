@@ -124,6 +124,15 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       .trim();
   };
 
+  // Helper function to check if a value is meaningful (not placeholder text)
+  const isMeaningfulValue = (value: any): boolean => {
+    if (!value) return false;
+    if (typeof value !== 'string') return true;
+    const trimmed = value.trim().toLowerCase();
+    const placeholders = ['none', 'none mentioned', 'not specified', 'none reported', 'n/a', 'na', 'not applicable'];
+    return trimmed.length > 0 && !placeholders.includes(trimmed);
+  };
+
   const getFemaleVoice = (): SpeechSynthesisVoice | null => {
     const voices = window.speechSynthesis.getVoices();
     const femaleVoice = voices.find(voice =>
@@ -447,7 +456,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       </div>
 
       {/* Patient Information */}
-      {patientData && (patientData.hasStructuredOverview || patientData.age || patientData.medication || patientData.question || patientData.symptoms || patientData.duration) && (
+      {patientData && (patientData.hasStructuredOverview || isMeaningfulValue(patientData.age) || isMeaningfulValue(patientData.medication) || isMeaningfulValue(patientData.question) || isMeaningfulValue(patientData.symptoms) || isMeaningfulValue(patientData.duration)) && (
         <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl shadow-lg p-6 border-l-4 border-cyan-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-cyan-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -460,47 +469,47 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                   <ReactMarkdown>{patientData.overview}</ReactMarkdown>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {patientData.age && (
+                    {isMeaningfulValue(patientData.age) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200">
                         <strong className="text-slate-700">Age:</strong> <span className="text-gray-700">{patientData.age}</span>
                       </div>
                     )}
-                    {patientData.gender && (
+                    {isMeaningfulValue(patientData.gender) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200">
                         <strong className="text-slate-700">Gender:</strong> <span className="text-gray-700">{patientData.gender}</span>
                       </div>
                     )}
-                    {patientData.role && (
+                    {isMeaningfulValue(patientData.role) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200">
                         <strong className="text-slate-700">Role:</strong> <span className="text-gray-700">{patientData.role}</span>
                       </div>
                     )}
-                    {patientData.medication && (
+                    {isMeaningfulValue(patientData.medication) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200">
                         <strong className="text-slate-700">Medication:</strong> <span className="text-gray-700">{patientData.medication}</span>
                       </div>
                     )}
-                    {patientData.question && (
+                    {isMeaningfulValue(patientData.question) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
                         <strong className="text-slate-700">Question/Concern:</strong> <span className="text-gray-700">{patientData.question}</span>
                       </div>
                     )}
-                    {patientData.symptoms && (
+                    {isMeaningfulValue(patientData.symptoms) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
                         <strong className="text-slate-700">Current Symptoms:</strong> <span className="text-gray-700">{patientData.symptoms}</span>
                       </div>
                     )}
-                    {patientData.duration && (
+                    {isMeaningfulValue(patientData.duration) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200">
                         <strong className="text-slate-700">Duration:</strong> <span className="text-gray-700">{patientData.duration}</span>
                       </div>
                     )}
-                    {patientData.otherMeds && patientData.otherMeds !== 'None mentioned' && patientData.otherMeds !== 'None reported' && (
+                    {isMeaningfulValue(patientData.otherMeds) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
                         <strong className="text-slate-700">Other Medications:</strong> <span className="text-gray-700">{patientData.otherMeds}</span>
                       </div>
                     )}
-                    {patientData.medicalHistory && patientData.medicalHistory !== 'None mentioned' && (
+                    {isMeaningfulValue(patientData.medicalHistory) && (
                       <div className="bg-white p-3 rounded-lg border border-slate-200 md:col-span-2">
                         <strong className="text-slate-700">Medical History:</strong> <span className="text-gray-700">{patientData.medicalHistory}</span>
                       </div>
@@ -780,16 +789,16 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
           <div className="p-6 space-y-6">
               {/* Drug Labels */}
               {data.pgx_results.drug_labels && data.pgx_results.drug_labels.filter(label =>
-                label.medication || label.side_effects || label.metabolism || label.dosing_guideline
+                isMeaningfulValue(label.medication) || isMeaningfulValue(label.side_effects) || isMeaningfulValue(label.metabolism) || isMeaningfulValue(label.dosing_guideline)
               ).length > 0 && (
                 <div>
                   <h4 className="font-bold text-slate-900 mb-3 text-lg">Drug Label Information</h4>
                   <div className="space-y-4">
                     {data.pgx_results.drug_labels.filter(label =>
-                      label.medication || label.side_effects || label.metabolism || label.dosing_guideline
+                      isMeaningfulValue(label.medication) || isMeaningfulValue(label.side_effects) || isMeaningfulValue(label.metabolism) || isMeaningfulValue(label.dosing_guideline)
                     ).map((label, idx) => (
                       <div key={idx} className="space-y-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
-                        {label.medication && (
+                        {isMeaningfulValue(label.medication) && (
                           <div className="mb-3">
                             <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
                               {label.medication}
@@ -797,7 +806,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                           </div>
                         )}
 
-                        {label.side_effects && (
+                        {isMeaningfulValue(label.side_effects) && (
                           <div>
                             <h5 className="font-bold text-gray-800 mb-2 flex items-center">
                               <AlertTriangle className="w-4 h-4 mr-2 text-amber-600" />
@@ -807,7 +816,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                           </div>
                         )}
 
-                        {label.metabolism && (
+                        {isMeaningfulValue(label.metabolism) && (
                           <div>
                             <h5 className="font-bold text-gray-800 mb-2 flex items-center">
                               <Activity className="w-4 h-4 mr-2 text-blue-600" />
@@ -817,7 +826,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                           </div>
                         )}
 
-                        {label.dosing_guideline && (
+                        {isMeaningfulValue(label.dosing_guideline) && (
                           <div className="bg-blue-50 border-l-4 border-blue-600 p-3 rounded">
                             <h5 className="font-bold text-blue-900 mb-2 flex items-center">
                               <FileText className="w-4 h-4 mr-2" />
