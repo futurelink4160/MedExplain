@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   AlertTriangle,
   Pill,
@@ -14,7 +14,9 @@ import {
   Clock,
   Info,
   RefreshCw,
-  User
+  User,
+  Volume2,
+  Square
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import html2pdf from 'html2pdf.js';
@@ -93,6 +95,8 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   const [emailSubject, setEmailSubject] = useState('My MedExplain Educational Summary');
   const [emailBody, setEmailBody] = useState(data.final_answer_markdown || '');
   const contentRef = useRef<HTMLDivElement>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
@@ -117,6 +121,60 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     window.location.href = mailtoLink;
     setShowEmailModal(false);
   };
+
+  const stripMarkdown = (text: string): string => {
+    return text
+      .replace(/\\n/g, '\n')
+      .replace(/#{1,6}\s+/g, '')
+      .replace(/\*\*(.+?)\*\*/g, '$1')
+      .replace(/\*(.+?)\*/g, '$1')
+      .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+      .replace(/`(.+?)`/g, '$1')
+      .replace(/^[-*+]\s+/gm, '')
+      .replace(/^\d+\.\s+/gm, '')
+      .trim();
+  };
+
+  const handleStartSpeech = () => {
+    if (!data?.final_answer_markdown) return;
+
+    const textToSpeak = stripMarkdown(data.final_answer_markdown);
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      utteranceRef.current = null;
+    };
+
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      utteranceRef.current = null;
+    };
+
+    utteranceRef.current = utterance;
+    setIsSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleStopSpeech = () => {
+    window.speechSynthesis.cancel();
+    setIsSpeaking(false);
+    utteranceRef.current = null;
+  };
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis.cancel();
+    };
+  }, []);
+
+  useEffect(() => {
+    handleStopSpeech();
+  }, [data]);
 
   if (!data || !data.final_answer_markdown) {
     return (
@@ -287,6 +345,25 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             </div>
             <Activity className="w-20 h-20 text-secondary opacity-80 hidden md:block" />
           </div>
+        </div>
+
+        <div className="flex justify-center">
+          <button
+            onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
+            className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
+          >
+            {isSpeaking ? (
+              <>
+                <Square className="w-5 h-5" />
+                <span>Stop</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-5 h-5" />
+                <span>Listen to Summary</span>
+              </>
+            )}
+          </button>
         </div>
 
         {data.clinical_summary && (
@@ -595,6 +672,25 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           </div>
         </div>
 
+        <div className="flex justify-center">
+          <button
+            onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
+            className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
+          >
+            {isSpeaking ? (
+              <>
+                <Square className="w-5 h-5" />
+                <span>Stop</span>
+              </>
+            ) : (
+              <>
+                <Volume2 className="w-5 h-5" />
+                <span>Listen to Summary</span>
+              </>
+            )}
+          </button>
+        </div>
+
         {allSections.map((section, idx) => {
           const style = getSectionStyle(section.title);
           const IconComponent = style.icon;
@@ -833,6 +929,25 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           </div>
           <Activity className="w-20 h-20 text-secondary opacity-80 hidden md:block" />
         </div>
+      </div>
+
+      <div className="flex justify-center">
+        <button
+          onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
+          className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
+        >
+          {isSpeaking ? (
+            <>
+              <Square className="w-5 h-5" />
+              <span>Stop</span>
+            </>
+          ) : (
+            <>
+              <Volume2 className="w-5 h-5" />
+              <span>Listen to Summary</span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* Patient Information */}
