@@ -99,7 +99,7 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle,
   const fullFormRecognitionRef = useRef<any>(null);
 
   useEffect(() => {
-    if (defaultRole && !role) {
+    if (defaultRole) {
       setRole(defaultRole);
     }
   }, [defaultRole]);
@@ -1000,9 +1000,10 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle,
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     required
-                    className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm font-medium"
+                    disabled={!!defaultRole}
+                    className="w-full px-4 py-2.5 bg-blue-50 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all text-sm font-medium disabled:opacity-75 disabled:cursor-not-allowed"
                   >
-                    <option value="">Select your role</option>
+                    {!defaultRole && <option value="">Select your role</option>}
                     {(!allowedRoles || allowedRoles.includes('Patient')) && <option value="Patient">Patient</option>}
                     {(!allowedRoles || allowedRoles.includes('Caregiver')) && <option value="Caregiver">Caregiver</option>}
                     {(!allowedRoles || allowedRoles.includes('Doctor')) && <option value="Doctor">Doctor</option>}
