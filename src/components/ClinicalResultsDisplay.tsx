@@ -779,17 +779,23 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
 
           <div className="p-6 space-y-6">
               {/* Drug Labels */}
-              {data.pgx_results.drug_labels && data.pgx_results.drug_labels.length > 0 && (
+              {data.pgx_results.drug_labels && data.pgx_results.drug_labels.filter(label =>
+                label.medication || label.side_effects || label.metabolism || label.dosing_guideline
+              ).length > 0 && (
                 <div>
                   <h4 className="font-bold text-slate-900 mb-3 text-lg">Drug Label Information</h4>
                   <div className="space-y-4">
-                    {data.pgx_results.drug_labels.map((label, idx) => (
+                    {data.pgx_results.drug_labels.filter(label =>
+                      label.medication || label.side_effects || label.metabolism || label.dosing_guideline
+                    ).map((label, idx) => (
                       <div key={idx} className="space-y-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
-                        <div className="mb-3">
-                          <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
-                            {label.medication}
-                          </span>
-                        </div>
+                        {label.medication && (
+                          <div className="mb-3">
+                            <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm font-medium">
+                              {label.medication}
+                            </span>
+                          </div>
+                        )}
 
                         {label.side_effects && (
                           <div>
