@@ -45,11 +45,11 @@ export default function Home() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 mb-6 leading-tight max-w-4xl mx-auto">
-                Pharmacogenomics: Why Medications Affect You Differently
+                AI-Driven Insights Into How Your Genetics Affect Medication Response and Side Effects
               </h1>
 
               <p className="text-lg sm:text-xl text-gray-800 mb-7 max-w-3xl mx-auto leading-relaxed">
-                AI-Driven Insights Into How Your Genetics Affect Medication Response and Side Effects
+                Pharmacogenomics: Why Medications Affect You Differently
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
