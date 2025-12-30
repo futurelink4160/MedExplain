@@ -291,8 +291,24 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     if (extractSection(markdown, 'Understanding Your Concern')) {
       titles.add('understanding your concern');
     }
-    if (extractSection(markdown, 'About This Medication')) {
+
+    const medicationContent = extractSection(markdown, 'About Eliquis') ||
+                              extractSection(markdown, 'About This Medication') ||
+                              extractSection(markdown, 'About');
+    if (medicationContent) {
       titles.add('about this medication');
+      titles.add('about eliquis');
+      titles.add('about');
+      titles.add('about medication');
+    }
+
+    const whyHappen = extractSection(markdown, 'Why') ||
+                     extractSection(markdown, 'Why Bruising') ||
+                     extractSection(markdown, 'Why This Happens');
+    if (whyHappen) {
+      titles.add('why');
+      titles.add('why bruising');
+      titles.add('why this happens');
     }
 
     const geneticInfo = extractSection(markdown, 'Genetic Considerations') ||
@@ -314,6 +330,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
     if (extractSection(markdown, 'How Common Is This?') || extractSection(markdown, 'How Common Is This')) {
       titles.add('how common is this');
+      titles.add('how common is this?');
     }
     if (extractSection(markdown, 'What You Can Do Now')) {
       titles.add('what you can do now');
