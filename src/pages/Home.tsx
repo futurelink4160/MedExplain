@@ -45,7 +45,7 @@ export default function Home() {
               </div>
 
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-800 mb-6 leading-tight max-w-4xl mx-auto">
-                Pharmacogenomics: Why Medications Affect You Differently
+                Pharmacogenomics for Personalized Medication Response
               </h1>
 
               <p className="text-lg sm:text-xl text-gray-800 mb-7 max-w-3xl mx-auto leading-relaxed">
