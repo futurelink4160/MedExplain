@@ -663,21 +663,21 @@ export default function InquiryForm({ defaultRole = '', pageTitle, pageSubtitle,
         if (!data.pgx_results.phenotypes) data.pgx_results.phenotypes = [];
       }
 
-      if (data.final_answer_markdown && !data.response_type) {
+      if ((data.final_answer_markdown || data.clinical_summary) && !data.response_type) {
         console.log('Adding default response_type');
         data.response_type = 'CLINICAL_PATIENT_SUMMARY';
       }
-      if (data.final_answer_markdown && !data.urgency_level) {
+      if ((data.final_answer_markdown || data.clinical_summary) && !data.urgency_level) {
         console.log('Adding default urgency_level');
         data.urgency_level = 'MEDIUM';
       }
-      if (data.final_answer_markdown && data.emergency_detected === undefined) {
+      if ((data.final_answer_markdown || data.clinical_summary) && data.emergency_detected === undefined) {
         console.log('Adding default emergency_detected');
         data.emergency_detected = false;
       }
 
       const missingFields = [];
-      if (!data.final_answer_markdown) missingFields.push('final_answer_markdown or clinical_summary');
+      if (!data.final_answer_markdown && !data.clinical_summary) missingFields.push('final_answer_markdown or clinical_summary');
       if (!data.response_type) missingFields.push('response_type');
       if (!data.urgency_level) missingFields.push('urgency_level');
       if (data.emergency_detected === undefined) missingFields.push('emergency_detected');
