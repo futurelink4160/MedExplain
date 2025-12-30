@@ -167,7 +167,7 @@ export default function Layout({ children }: LayoutProps) {
 
         <div className="bg-secondary py-2 px-4">
           <p className="text-white text-center text-sm font-medium">
-            Educational only. US sources (FDA, CPIC, PharmGKB). Not medical advice.
+            Educational only, Not medical advice
           </p>
         </div>
       </header>
