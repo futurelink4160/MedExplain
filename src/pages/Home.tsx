@@ -49,7 +49,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-                An AI-powered tool that explains why you experience side effects and how your genetics affect how medications work for you.
+                AI-Driven Insights Into How Your Genetics Affect Medication Response and Side Effects
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
