@@ -687,11 +687,12 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   // Helper function to check if a value is meaningful (not placeholder text)
   const isMeaningfulValue = (value: any): boolean => {
-    if (!value) return false;
-    if (typeof value !== 'string') return true;
+    if (value === null || value === undefined) return false;
+    if (typeof value !== 'string') return true; // Arrays, objects, numbers, booleans are meaningful
     const trimmed = value.trim().toLowerCase();
-    const placeholders = ['none', 'none mentioned', 'not specified', 'none reported', 'n/a', 'na', 'not applicable'];
-    return trimmed.length > 0 && !placeholders.includes(trimmed);
+    if (trimmed.length === 0) return false;
+    const placeholders = ['none', 'none mentioned', 'not specified', 'none reported', 'n/a', 'na', 'not applicable', 'not available'];
+    return !placeholders.includes(trimmed);
   };
 
   // Determine whether to show patient data from form or markdown
@@ -1198,8 +1199,22 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       )}
 
       {(() => {
-        const concernContent = extractSection(markdown, 'Understanding Your Concern');
+        let concernContent = extractSection(markdown, 'Understanding Your Concern');
         if (!concernContent) return null;
+
+        // If we're showing the patient information section separately, remove redundant patient details from this section
+        if (shouldShowPatientSection) {
+          // Strip out lines that start with patient demographic info to avoid duplication
+          concernContent = concernContent
+            .replace(/^.+?-year-old\s+\w+\s+(?:is\s+)?(?:experiencing|taking|asking|wondering|has\s+been\s+taking).+$/im, '')
+            .replace(/^They\s+(?:are|have been|started).+$/im, '')
+            .replace(/^The patient.+$/im, '')
+            .replace(/^Your.+?(?:is|are)\s+(?:experiencing|taking|asking).+$/im, '')
+            .trim();
+
+          // If after stripping there's no meaningful content left, don't show this section
+          if (concernContent.length < 50) return null;
+        }
 
         return (
           <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
@@ -1512,27 +1527,46 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           </button>
 
           {showPgx && (() => {
+            // Debug logging
+            console.log('PGX Results Raw Data:', {
+              drug_labels: data.pgx_results.drug_labels,
+              genes: data.pgx_results.genes,
+              phenotypes: data.pgx_results.phenotypes
+            });
+
             // Filter drug labels to only show those with meaningful content
-            const filteredDrugLabels = data.pgx_results.drug_labels?.filter(label =>
-              isMeaningfulValue(label.medication) ||
-              isMeaningfulValue(label.side_effects) ||
-              isMeaningfulValue(label.metabolism) ||
-              isMeaningfulValue(label.dosing_guideline)
-            ) || [];
+            const filteredDrugLabels = data.pgx_results.drug_labels?.filter(label => {
+              const hasMeaningful = isMeaningfulValue(label.medication) ||
+                isMeaningfulValue(label.side_effects) ||
+                isMeaningfulValue(label.metabolism) ||
+                isMeaningfulValue(label.dosing_guideline);
+              console.log('Drug label filter:', label, 'hasMeaningful:', hasMeaningful);
+              return hasMeaningful;
+            }) || [];
 
             // Filter genes to only show those with meaningful content
-            const filteredGenes = data.pgx_results.genes?.filter(gene =>
-              isMeaningfulValue(gene.gene) ||
-              isMeaningfulValue(gene.role) ||
-              isMeaningfulValue(gene.interpretation)
-            ) || [];
+            const filteredGenes = data.pgx_results.genes?.filter(gene => {
+              const hasMeaningful = isMeaningfulValue(gene.gene) ||
+                isMeaningfulValue(gene.role) ||
+                isMeaningfulValue(gene.interpretation);
+              console.log('Gene filter:', gene, 'hasMeaningful:', hasMeaningful);
+              return hasMeaningful;
+            }) || [];
 
             // Filter phenotypes to only show those with meaningful content
-            const filteredPhenotypes = data.pgx_results.phenotypes?.filter(phenotype =>
-              isMeaningfulValue(phenotype.gene) ||
-              isMeaningfulValue(phenotype.phenotype) ||
-              isMeaningfulValue(phenotype.clinical_implications)
-            ) || [];
+            const filteredPhenotypes = data.pgx_results.phenotypes?.filter(phenotype => {
+              const hasMeaningful = isMeaningfulValue(phenotype.gene) ||
+                isMeaningfulValue(phenotype.phenotype) ||
+                isMeaningfulValue(phenotype.clinical_implications);
+              console.log('Phenotype filter:', phenotype, 'hasMeaningful:', hasMeaningful);
+              return hasMeaningful;
+            }) || [];
+
+            console.log('Filtered PGX Data:', {
+              drug_labels: filteredDrugLabels,
+              genes: filteredGenes,
+              phenotypes: filteredPhenotypes
+            });
 
             const hasAnyPgxData = filteredDrugLabels.length > 0 || filteredGenes.length > 0 || filteredPhenotypes.length > 0;
 

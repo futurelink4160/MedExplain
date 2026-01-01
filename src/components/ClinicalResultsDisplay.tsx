@@ -126,11 +126,12 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
 
   // Helper function to check if a value is meaningful (not placeholder text)
   const isMeaningfulValue = (value: any): boolean => {
-    if (!value) return false;
-    if (typeof value !== 'string') return true;
+    if (value === null || value === undefined) return false;
+    if (typeof value !== 'string') return true; // Arrays, objects, numbers, booleans are meaningful
     const trimmed = value.trim().toLowerCase();
-    const placeholders = ['none', 'none mentioned', 'not specified', 'none reported', 'n/a', 'na', 'not applicable'];
-    return trimmed.length > 0 && !placeholders.includes(trimmed);
+    if (trimmed.length === 0) return false;
+    const placeholders = ['none', 'none mentioned', 'not specified', 'none reported', 'n/a', 'na', 'not applicable', 'not available'];
+    return !placeholders.includes(trimmed);
   };
 
   const getFemaleVoice = (): SpeechSynthesisVoice | null => {
