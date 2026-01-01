@@ -649,8 +649,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
     // Try natural language format: "taking [Medication]" or "while taking [Medication]"
     if (!medicationMatch) {
-      medicationMatch = markdown.match(/(?:taking|started|prescribed)\s+([A-Z][a-z]+(?:\s*\([A-Z][a-z]+\))?)/i) ||
-                       markdown.match(/while taking\s+([^\n,.]+?)(?:\s*\(|,|\.|for)/i);
+      medicationMatch = markdown.match(/(?:while\s+taking|taking|started|prescribed)\s+([a-z]+)/i);
     }
 
     // Try structured format for symptoms
@@ -658,7 +657,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
     // Try natural language format: "experiencing [symptoms]"
     if (!symptomsMatch) {
-      symptomsMatch = markdown.match(/experiencing\s+([^.]+?)(?:\s+while taking|\s+with|\.)/i);
+      symptomsMatch = markdown.match(/(?:experiencing|has|having)\s+([^,.]+?)(?:\s+for\s+|\s+while\s+|\s+and\s+|,)/i);
     }
 
     // Try structured format for duration
@@ -666,12 +665,17 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
     // Try natural language format
     if (!durationMatch) {
-      durationMatch = markdown.match(/for\s+(\d+\s+(?:days?|weeks?|months?))/i) ||
-                     markdown.match(/(\d+\s+(?:days?|weeks?|months?))\s+(?:ago|of)/i);
+      durationMatch = markdown.match(/for\s+((?:\w+\s+)?(?:days?|weeks?|months?))/i) ||
+                     markdown.match(/((?:\w+\s+)?(?:days?|weeks?|months?))\s+(?:ago|of)/i);
     }
 
     // Try structured format for other medications
     let otherMedsMatch = markdown.match(/\*\*(?:Other|Concomitant) Medications?:\*\*\s*([^\n*]+)/i);
+
+    // Try natural language format: "along with [medication]"
+    if (!otherMedsMatch) {
+      otherMedsMatch = markdown.match(/along with\s+([a-z]+)/i);
+    }
 
     return {
       hasStructuredOverview: false,
@@ -1202,15 +1206,28 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         let concernContent = extractSection(markdown, 'Understanding Your Concern');
         if (!concernContent) return null;
 
-        // If we're showing the patient information section separately, remove redundant patient details from this section
+        // If we're showing the patient information section separately, check if this section is just patient demographics
         if (shouldShowPatientSection) {
-          // Strip out lines that start with patient demographic info to avoid duplication
-          concernContent = concernContent
-            .replace(/^.+?-year-old\s+\w+\s+(?:is\s+)?(?:experiencing|taking|asking|wondering|has\s+been\s+taking).+$/im, '')
-            .replace(/^They\s+(?:are|have been|started).+$/im, '')
-            .replace(/^The patient.+$/im, '')
-            .replace(/^Your.+?(?:is|are)\s+(?:experiencing|taking|asking).+$/im, '')
-            .trim();
+          // Check if the content is primarily demographic info
+          const isDemographicOnly = /^You(?:'re|\s+are)\s+experiencing.+?while\s+taking.+?(?:for|along\s+with).+$/i.test(concernContent.trim()) ||
+                                    /^(?:A\s+)?\d+[- ]?year[- ]?old\s+\w+\s+(?:is\s+)?(?:experiencing|taking).+$/i.test(concernContent.trim());
+
+          // If it's just demographics that we're already showing, skip this section entirely
+          if (isDemographicOnly) {
+            return null;
+          }
+
+          // Otherwise, try to strip redundant patient details but keep the rest
+          const lines = concernContent.split('\n').filter(line => {
+            const trimmed = line.trim();
+            if (!trimmed) return true; // Keep blank lines for formatting
+            // Remove lines that are purely demographic
+            if (/^You(?:'re|\s+are)\s+experiencing.+?while\s+taking.+$/i.test(trimmed)) return false;
+            if (/^(?:A\s+)?\d+[- ]?year[- ]?old\s+\w+\s+(?:is\s+)?(?:experiencing|taking).+$/i.test(trimmed)) return false;
+            return true;
+          });
+
+          concernContent = lines.join('\n').trim();
 
           // If after stripping there's no meaningful content left, don't show this section
           if (concernContent.length < 50) return null;
@@ -1527,79 +1544,56 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
           </button>
 
           {showPgx && (() => {
-            // Debug logging
-            console.log('PGX Results Raw Data:', {
-              drug_labels: data.pgx_results.drug_labels,
-              genes: data.pgx_results.genes,
-              phenotypes: data.pgx_results.phenotypes
-            });
+            // Handle both string arrays and object arrays from N8N
+            const drugLabels = data.pgx_results.drug_labels || [];
+            const genes = data.pgx_results.genes || [];
+            const phenotypes = data.pgx_results.phenotypes || [];
+            const variants = (data.pgx_results as any).variants || [];
 
-            // Filter drug labels to only show those with meaningful content
-            const filteredDrugLabels = data.pgx_results.drug_labels?.filter(label => {
-              const hasMeaningful = isMeaningfulValue(label.medication) ||
-                isMeaningfulValue(label.side_effects) ||
-                isMeaningfulValue(label.metabolism) ||
-                isMeaningfulValue(label.dosing_guideline);
-              console.log('Drug label filter:', label, 'hasMeaningful:', hasMeaningful);
-              return hasMeaningful;
-            }) || [];
+            // Filter to only show meaningful content
+            const filteredDrugLabels = drugLabels.filter(label => isMeaningfulValue(label));
+            const filteredGenes = genes.filter(gene => isMeaningfulValue(gene));
+            const filteredPhenotypes = phenotypes.filter(phenotype => isMeaningfulValue(phenotype));
+            const filteredVariants = variants.filter((variant: any) => isMeaningfulValue(variant));
 
-            // Filter genes to only show those with meaningful content
-            const filteredGenes = data.pgx_results.genes?.filter(gene => {
-              const hasMeaningful = isMeaningfulValue(gene.gene) ||
-                isMeaningfulValue(gene.role) ||
-                isMeaningfulValue(gene.interpretation);
-              console.log('Gene filter:', gene, 'hasMeaningful:', hasMeaningful);
-              return hasMeaningful;
-            }) || [];
-
-            // Filter phenotypes to only show those with meaningful content
-            const filteredPhenotypes = data.pgx_results.phenotypes?.filter(phenotype => {
-              const hasMeaningful = isMeaningfulValue(phenotype.gene) ||
-                isMeaningfulValue(phenotype.phenotype) ||
-                isMeaningfulValue(phenotype.clinical_implications);
-              console.log('Phenotype filter:', phenotype, 'hasMeaningful:', hasMeaningful);
-              return hasMeaningful;
-            }) || [];
-
-            console.log('Filtered PGX Data:', {
-              drug_labels: filteredDrugLabels,
-              genes: filteredGenes,
-              phenotypes: filteredPhenotypes
-            });
-
-            const hasAnyPgxData = filteredDrugLabels.length > 0 || filteredGenes.length > 0 || filteredPhenotypes.length > 0;
+            const hasAnyPgxData = filteredDrugLabels.length > 0 ||
+                                  filteredGenes.length > 0 ||
+                                  filteredPhenotypes.length > 0 ||
+                                  filteredVariants.length > 0;
 
             return (
               <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-6">
                 {filteredDrugLabels.length > 0 && (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Drug Label Information</h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {filteredDrugLabels.map((label, idx) => (
-                        <div key={idx} className="space-y-3 p-4 bg-white rounded-lg border border-gray-200">
-                          {isMeaningfulValue(label.medication) && (
-                            <h4 className="font-bold text-gray-900 text-lg">{label.medication}</h4>
-                          )}
-
-                          {isMeaningfulValue(label.side_effects) && (
-                            <div>
-                              <h5 className="font-semibold text-gray-800 mb-1">Side Effects:</h5>
-                              <p className="text-gray-700">{label.side_effects}</p>
-                            </div>
-                          )}
-
-                          {isMeaningfulValue(label.metabolism) && (
-                            <div>
-                              <h5 className="font-semibold text-gray-800 mb-1">Metabolism:</h5>
-                              <p className="text-gray-700">{label.metabolism}</p>
-                            </div>
-                          )}
-
-                          {isMeaningfulValue(label.dosing_guideline) && (
-                            <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
-                              <h5 className="font-semibold text-blue-900 mb-1">Dosing Guideline:</h5>
-                              <p className="text-blue-800">{label.dosing_guideline}</p>
+                        <div key={idx} className="p-4 bg-white rounded-lg border border-gray-200">
+                          {typeof label === 'string' ? (
+                            <p className="text-gray-700">{label}</p>
+                          ) : (
+                            <div className="space-y-3">
+                              {isMeaningfulValue(label.medication) && (
+                                <h4 className="font-bold text-gray-900 text-lg">{label.medication}</h4>
+                              )}
+                              {isMeaningfulValue(label.side_effects) && (
+                                <div>
+                                  <h5 className="font-semibold text-gray-800 mb-1">Side Effects:</h5>
+                                  <p className="text-gray-700">{label.side_effects}</p>
+                                </div>
+                              )}
+                              {isMeaningfulValue(label.metabolism) && (
+                                <div>
+                                  <h5 className="font-semibold text-gray-800 mb-1">Metabolism:</h5>
+                                  <p className="text-gray-700">{label.metabolism}</p>
+                                </div>
+                              )}
+                              {isMeaningfulValue(label.dosing_guideline) && (
+                                <div className="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                                  <h5 className="font-semibold text-blue-900 mb-1">Dosing Guideline:</h5>
+                                  <p className="text-blue-800">{label.dosing_guideline}</p>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -1611,33 +1605,60 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 {filteredGenes.length > 0 && (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {filteredGenes.map((gene, idx) => (
                         <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                          {isMeaningfulValue(gene.gene) && (
-                            <h4 className="font-bold text-emerald-900 mb-2">{gene.gene}</h4>
-                          )}
-
-                          <div className="space-y-2 text-gray-700">
-                            {isMeaningfulValue(gene.role) && (
-                              <p><span className="font-semibold">Role:</span> {gene.role}</p>
-                            )}
-
-                            {gene.variants && gene.variants.length > 0 && (
-                              <div>
-                                <span className="font-semibold">Variants:</span>
-                                <ul className="list-disc list-inside ml-4 mt-1">
-                                  {gene.variants.map((variant, vIdx) => (
-                                    <li key={vIdx}>{variant}</li>
-                                  ))}
-                                </ul>
+                          {typeof gene === 'string' ? (
+                            <p className="text-gray-700">{gene}</p>
+                          ) : (
+                            <div className="space-y-2">
+                              {isMeaningfulValue(gene.gene) && (
+                                <h4 className="font-bold text-emerald-900 mb-2">{gene.gene}</h4>
+                              )}
+                              <div className="text-gray-700">
+                                {isMeaningfulValue(gene.role) && (
+                                  <p><span className="font-semibold">Role:</span> {gene.role}</p>
+                                )}
+                                {gene.variants && gene.variants.length > 0 && (
+                                  <div>
+                                    <span className="font-semibold">Variants:</span>
+                                    <ul className="list-disc list-inside ml-4 mt-1">
+                                      {gene.variants.map((variant: any, vIdx: number) => (
+                                        <li key={vIdx}>{variant}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                )}
+                                {isMeaningfulValue(gene.interpretation) && (
+                                  <p><span className="font-semibold">Interpretation:</span> {gene.interpretation}</p>
+                                )}
                               </div>
-                            )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-                            {isMeaningfulValue(gene.interpretation) && (
-                              <p><span className="font-semibold">Interpretation:</span> {gene.interpretation}</p>
-                            )}
-                          </div>
+                {filteredVariants.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">Genetic Variants</h3>
+                    <div className="space-y-3">
+                      {filteredVariants.map((variant: any, idx: number) => (
+                        <div key={idx} className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                          {typeof variant === 'string' ? (
+                            <p className="text-gray-700">{variant}</p>
+                          ) : (
+                            <div className="space-y-2 text-gray-700">
+                              {isMeaningfulValue(variant.variant) && (
+                                <h4 className="font-bold text-amber-900 mb-2">{variant.variant}</h4>
+                              )}
+                              {isMeaningfulValue(variant.description) && (
+                                <p>{variant.description}</p>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1647,20 +1668,26 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 {filteredPhenotypes.length > 0 && (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-3">Phenotype Categories (General Info Only)</h3>
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {filteredPhenotypes.map((phenotype, idx) => (
-                        <div key={idx} className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                          {isMeaningfulValue(phenotype.gene) && (
-                            <h4 className="font-bold text-purple-900 mb-2">{phenotype.gene}</h4>
+                        <div key={idx} className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                          {typeof phenotype === 'string' ? (
+                            <p className="text-gray-700">{phenotype}</p>
+                          ) : (
+                            <div className="space-y-2">
+                              {isMeaningfulValue(phenotype.gene) && (
+                                <h4 className="font-bold text-indigo-900 mb-2">{phenotype.gene}</h4>
+                              )}
+                              <div className="text-gray-700">
+                                {isMeaningfulValue(phenotype.phenotype) && (
+                                  <p><span className="font-semibold">Phenotype:</span> {phenotype.phenotype}</p>
+                                )}
+                                {isMeaningfulValue(phenotype.clinical_implications) && (
+                                  <p><span className="font-semibold">Clinical Implications:</span> {phenotype.clinical_implications}</p>
+                                )}
+                              </div>
+                            </div>
                           )}
-                          <div className="space-y-2 text-gray-700">
-                            {isMeaningfulValue(phenotype.phenotype) && (
-                              <p><span className="font-semibold">Phenotype:</span> {phenotype.phenotype}</p>
-                            )}
-                            {isMeaningfulValue(phenotype.clinical_implications) && (
-                              <p><span className="font-semibold">Clinical Implications:</span> {phenotype.clinical_implications}</p>
-                            )}
-                          </div>
                         </div>
                       ))}
                     </div>
