@@ -218,33 +218,42 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   const markdown = data.final_answer_markdown;
 
-  const extractSection = (markdown: string | undefined, title: string): string => {
+  const extractSection = (markdown: string | undefined, title: string, returnWithHeader: boolean = false): string => {
     if (!markdown) return '';
 
     const cleanedMarkdown = markdown.replace(/\\n/g, '\n');
 
     // Try ### headers first
-    let regex = new RegExp(`###\\s*${title}([\\s\\S]*?)(?=###|##|#|$)`, 'i');
+    let regex = new RegExp(`(###\\s*[^\\n]*${title}[^\\n]*)[\\n]([\\s\\S]*?)(?=###|##|#|$)`, 'i');
     let match = cleanedMarkdown.match(regex);
     if (match) {
-      console.log(`Extracted section "${title}" (###):`, match[1].trim().substring(0, 100) + '...');
-      return match[1].trim();
+      const headerText = match[1].trim();
+      const content = match[2].trim();
+      console.log(`Extracted section "${title}" (###):`, content.substring(0, 100) + '...');
+      console.log(`Full header: "${headerText}"`);
+      return returnWithHeader ? headerText : content;
     }
 
     // Try ## headers
-    regex = new RegExp(`##\\s*${title}([\\s\\S]*?)(?=##|#|$)`, 'i');
+    regex = new RegExp(`(##\\s*[^\\n]*${title}[^\\n]*)[\\n]([\\s\\S]*?)(?=##|#|$)`, 'i');
     match = cleanedMarkdown.match(regex);
     if (match) {
-      console.log(`Extracted section "${title}" (##):`, match[1].trim().substring(0, 100) + '...');
-      return match[1].trim();
+      const headerText = match[1].trim();
+      const content = match[2].trim();
+      console.log(`Extracted section "${title}" (##):`, content.substring(0, 100) + '...');
+      console.log(`Full header: "${headerText}"`);
+      return returnWithHeader ? headerText : content;
     }
 
     // Try # headers
-    regex = new RegExp(`#\\s*${title}([\\s\\S]*?)(?=#|$)`, 'i');
+    regex = new RegExp(`(#\\s*[^\\n]*${title}[^\\n]*)[\\n]([\\s\\S]*?)(?=#|$)`, 'i');
     match = cleanedMarkdown.match(regex);
     if (match) {
-      console.log(`Extracted section "${title}" (#):`, match[1].trim().substring(0, 100) + '...');
-      return match[1].trim();
+      const headerText = match[1].trim();
+      const content = match[2].trim();
+      console.log(`Extracted section "${title}" (#):`, content.substring(0, 100) + '...');
+      console.log(`Full header: "${headerText}"`);
+      return returnWithHeader ? headerText : content;
     }
 
     console.log(`Section "${title}" not found in markdown`);
@@ -1277,7 +1286,28 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         const whyHappen = extractSection(markdown, 'Why') ||
                          extractSection(markdown, 'Why Bruising') ||
                          extractSection(markdown, 'Why This Happens');
-        if (whyHappen) {
+
+        // Check if this is actually from a combined section (e.g., "How Medicine Works & Why Symptoms")
+        // by getting the header text
+        const whyHeader = extractSection(markdown, 'Why', true) ||
+                         extractSection(markdown, 'Why Bruising', true) ||
+                         extractSection(markdown, 'Why This Happens', true);
+
+        // Skip if the header contains words indicating it's a combined section that's shown elsewhere
+        if (whyHappen && whyHeader) {
+          const headerLower = whyHeader.toLowerCase();
+          const isCombinedSection = headerLower.includes('how') && (
+            headerLower.includes('work') ||
+            headerLower.includes('symptom') ||
+            headerLower.includes('occur') ||
+            headerLower.includes('may')
+          );
+
+          // Skip this section if it's a combined "How it works & Why" section
+          if (isCombinedSection) {
+            return null;
+          }
+
           return (
             <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-accent">
               <div className="flex items-start space-x-4">
@@ -1306,7 +1336,28 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                            extractSection(markdown, 'Pharmacogenomic Context') ||
                            extractSection(markdown, 'How Your Genes May Play a Role');
 
-        if (geneticInfo) {
+        // Check if this is the educational version that's shown in the PGX section
+        const geneticHeader = extractSection(markdown, 'Genetic Considerations', true) ||
+                             extractSection(markdown, 'Relevant Genetic Information', true) ||
+                             extractSection(markdown, 'Genetic Information', true) ||
+                             extractSection(markdown, 'Pharmacogenomic Information', true) ||
+                             extractSection(markdown, 'Genetic Factors', true) ||
+                             extractSection(markdown, 'Pharmacogenomic Context', true) ||
+                             extractSection(markdown, 'How Your Genes May Play a Role', true);
+
+        // Skip if the header contains "(Educational)" which indicates it's in the PGX collapsible section
+        if (geneticInfo && geneticHeader) {
+          const headerLower = geneticHeader.toLowerCase();
+          const isEducationalSection = headerLower.includes('(educational)') ||
+                                       headerLower.includes('educational)') ||
+                                       headerLower.includes('(general') ||
+                                       headerLower.includes('general)');
+
+          // Skip this section if it's already covered in the PGX detailed section below
+          if (isEducationalSection) {
+            return null;
+          }
+
           return (
             <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-accent">
               <div className="flex items-start space-x-4">
