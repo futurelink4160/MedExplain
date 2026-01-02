@@ -12,21 +12,26 @@ Your n8n webhook at `https://ftlteam4160.app.n8n.cloud/webhook-test/medexplain-q
   "rag_results": "Retrieved relevant information about medication",
   "pgx_results": {
     "drug_labels": [
-      "FDA Label: [drug name] - [guideline]",
-      "CPIC Guideline: [guideline text]"
+      "Clopidogrel is used to prevent blood clots by blocking platelets from forming clumps.",
+      "Activation of clopidogrel in the liver depends on the CYP2C19 enzyme."
     ],
     "genes": [
-      "CYP2C19 - Primary metabolizer of [drug]",
-      "CYP2D6 - Secondary metabolic pathway"
+      "CYP2C19: crucial for activating clopidogrel; variations affect drug effect and side effect likelihood.",
+      "ABCB1: influences how clopidogrel moves through the body."
     ],
     "variants": [
-      "CYP2C19*2 - Loss of function allele",
-      "CYP2C19*17 - Increased function allele"
+      "CYP2C19*1: typical function variant.",
+      "CYP2C19*2, *3: reduce enzyme activity, possibly lowering drug effect."
     ],
     "phenotypes": [
-      "Poor Metabolizer (PM) - Reduced enzyme activity",
-      "Normal Metabolizer (NM) - Standard enzyme activity"
-    ]
+      "Loss-of-function variants can lead to reduced response to clopidogrel.",
+      "Increased-function variants like CYP2C19*17 may raise bruising or bleeding risk."
+    ],
+    "testing_guidelines": {
+      "fda_level": "Actionable PGx",
+      "cpic_dosing_info": true,
+      "has_dosing_guideline": true
+    }
   },
   "final_answer_markdown": "### Understanding Your Concern\n\nYour markdown content here..."
 }
@@ -47,6 +52,10 @@ Your n8n webhook at `https://ftlteam4160.app.n8n.cloud/webhook-test/medexplain-q
 - `genes`: Array of strings
 - `variants`: Array of strings
 - `phenotypes`: Array of strings
+- `testing_guidelines`: Object (optional) with:
+  - `fda_level`: String (e.g., "Actionable PGx")
+  - `cpic_dosing_info`: Boolean
+  - `has_dosing_guideline`: Boolean
 
 ## Expected Markdown Sections in final_answer_markdown
 
@@ -54,14 +63,14 @@ The `final_answer_markdown` field should contain markdown text with these sectio
 
 1. `### Understanding Your Concern`
 2. `### About This Medication`
-3. `### Why These Symptoms May Happen`
-4. `### How Common Is This`
-5. `### What You Can Do Now`
-6. `### When to Contact Your Doctor`
-7. `### When to Seek Emergency Care`
-8. `### Important Safety Reminders`
-9. `### What to Expect Going Forward`
-10. `### Educational Purpose Only`
+3. `### Why These Symptoms May Occur`
+4. `### Genetic Information (Educational)`
+5. `### How Common Are These Side Effects?`
+6. `### What You Can Do Now`
+7. `### When to Contact Your Doctor`
+8. `### When to Seek Emergency Care`
+9. `### Important Safety Reminders`
+10. `### What to Expect Moving Forward`
 
 ## Debugging Steps
 

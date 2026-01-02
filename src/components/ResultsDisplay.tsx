@@ -311,33 +311,39 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       titles.add('about medication');
     }
 
-    const whyHappen = extractSection(markdown, 'Why') ||
-                     extractSection(markdown, 'Why Bruising') ||
-                     extractSection(markdown, 'Why This Happens');
+    const whyHappen = extractSection(markdown, 'Why These Symptoms May Occur') ||
+                     extractSection(markdown, 'Why This Happens') ||
+                     extractSection(markdown, 'Why') ||
+                     extractSection(markdown, 'Why Bruising');
     if (whyHappen) {
+      titles.add('why these symptoms may occur');
+      titles.add('why this happens');
       titles.add('why');
       titles.add('why bruising');
-      titles.add('why this happens');
     }
 
-    const geneticInfo = extractSection(markdown, 'Genetic Considerations') ||
-                       extractSection(markdown, 'Relevant Genetic Information') ||
+    const geneticInfo = extractSection(markdown, 'Genetic Information (Educational)') ||
                        extractSection(markdown, 'Genetic Information') ||
+                       extractSection(markdown, 'Genetic Considerations') ||
+                       extractSection(markdown, 'Relevant Genetic Information') ||
                        extractSection(markdown, 'Pharmacogenomic Information') ||
                        extractSection(markdown, 'Genetic Factors') ||
                        extractSection(markdown, 'Pharmacogenomic Context') ||
                        extractSection(markdown, 'How Your Genes May Play a Role');
     if (geneticInfo) {
+      titles.add('genetic information (educational)');
+      titles.add('genetic information');
       titles.add('genetic considerations');
       titles.add('relevant genetic information');
-      titles.add('genetic information');
       titles.add('pharmacogenomic information');
       titles.add('genetic factors');
       titles.add('pharmacogenomic context');
       titles.add('how your genes may play a role');
     }
 
-    if (extractSection(markdown, 'How Common Is This?') || extractSection(markdown, 'How Common Is This')) {
+    if (extractSection(markdown, 'How Common Are These Side Effects') || extractSection(markdown, 'How Common Is This?') || extractSection(markdown, 'How Common Is This')) {
+      titles.add('how common are these side effects');
+      titles.add('how common are these side effects?');
       titles.add('how common is this');
       titles.add('how common is this?');
     }
@@ -1283,15 +1289,17 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       })()}
 
       {(() => {
-        const whyHappen = extractSection(markdown, 'Why') ||
-                         extractSection(markdown, 'Why Bruising') ||
-                         extractSection(markdown, 'Why This Happens');
+        const whyHappen = extractSection(markdown, 'Why These Symptoms May Occur') ||
+                         extractSection(markdown, 'Why This Happens') ||
+                         extractSection(markdown, 'Why') ||
+                         extractSection(markdown, 'Why Bruising');
 
         // Check if this is actually from a combined section (e.g., "How Medicine Works & Why Symptoms")
         // by getting the header text
-        const whyHeader = extractSection(markdown, 'Why', true) ||
-                         extractSection(markdown, 'Why Bruising', true) ||
-                         extractSection(markdown, 'Why This Happens', true);
+        const whyHeader = extractSection(markdown, 'Why These Symptoms May Occur', true) ||
+                         extractSection(markdown, 'Why This Happens', true) ||
+                         extractSection(markdown, 'Why', true) ||
+                         extractSection(markdown, 'Why Bruising', true);
 
         // Skip if the header contains words indicating it's a combined section that's shown elsewhere
         if (whyHappen && whyHeader) {
@@ -1308,6 +1316,8 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             return null;
           }
 
+          const displayTitle = whyHeader.replace(/^#+\s*/, '');
+
           return (
             <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-accent">
               <div className="flex items-start space-x-4">
@@ -1315,7 +1325,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                   <Info className="w-6 h-6 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-accent mb-4">Why This Happens</h2>
+                  <h2 className="text-2xl font-bold text-accent mb-4">{displayTitle}</h2>
                   <div className="prose max-w-none text-text-primary">
                     <ReactMarkdown>{whyHappen}</ReactMarkdown>
                   </div>
@@ -1328,9 +1338,10 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       })()}
 
       {(() => {
-        const geneticInfo = extractSection(markdown, 'Genetic Considerations') ||
-                           extractSection(markdown, 'Relevant Genetic Information') ||
+        const geneticInfo = extractSection(markdown, 'Genetic Information (Educational)') ||
                            extractSection(markdown, 'Genetic Information') ||
+                           extractSection(markdown, 'Genetic Considerations') ||
+                           extractSection(markdown, 'Relevant Genetic Information') ||
                            extractSection(markdown, 'Pharmacogenomic Information') ||
                            extractSection(markdown, 'Genetic Factors') ||
                            extractSection(markdown, 'Pharmacogenomic Context') ||
@@ -1378,9 +1389,16 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
       })()}
 
       {(() => {
-        const howCommon = extractSection(markdown, 'How Common Is This?') ||
+        const howCommon = extractSection(markdown, 'How Common Are These Side Effects') ||
+                         extractSection(markdown, 'How Common Is This?') ||
                          extractSection(markdown, 'How Common Is This');
         if (!howCommon) return null;
+
+        const sectionTitle = extractSection(markdown, 'How Common Are These Side Effects', true) ||
+                            extractSection(markdown, 'How Common Is This?', true) ||
+                            extractSection(markdown, 'How Common Is This', true) ||
+                            'How Common Is This?';
+        const displayTitle = sectionTitle.replace(/^#+\s*/, '');
 
         return (
           <div className="bg-background-card rounded-xl shadow-lg p-6 border-l-4 border-secondary">
@@ -1389,7 +1407,7 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-secondary mb-4">How Common Is This?</h2>
+                <h2 className="text-2xl font-bold text-secondary mb-4">{displayTitle}</h2>
                 <div className="prose max-w-none text-text-primary">
                   <ReactMarkdown>{howCommon}</ReactMarkdown>
                 </div>
