@@ -1222,39 +1222,61 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
                 {filteredGenes.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3">Genes Associated With This Medication</h3>
-                    <div className="space-y-3">
-                      {filteredGenes.map((gene, idx) => (
-                        <div key={idx} className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                          {typeof gene === 'string' ? (
-                            <p className="text-gray-700">{gene}</p>
-                          ) : (
-                            <div className="space-y-2">
-                              {isMeaningfulValue(gene.gene) && (
-                                <h4 className="font-bold text-emerald-900 mb-2">{gene.gene}</h4>
-                              )}
-                              <div className="text-gray-700">
-                                {isMeaningfulValue(gene.role) && (
-                                  <p><span className="font-semibold">Role:</span> {gene.role}</p>
-                                )}
-                                {gene.variants && gene.variants.length > 0 && (
-                                  <div>
-                                    <span className="font-semibold">Variants:</span>
-                                    <ul className="list-disc list-inside ml-4 mt-1">
-                                      {gene.variants.map((variant: any, vIdx: number) => (
-                                        <li key={vIdx}>{variant}</li>
-                                      ))}
-                                    </ul>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3">How Genetics May Influence Your Response</h3>
+                    <p className="text-gray-700 mb-4">
+                      Your response to this medication can be influenced by your genetics. The medication may be a "prodrug," meaning it must be activated by enzymes in your body to work effectively. Here's how different genes may play a role:
+                    </p>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm">
+                        <thead>
+                          <tr className="bg-emerald-100">
+                            <th className="border border-emerald-200 px-4 py-3 text-left font-bold text-emerald-900">Gene</th>
+                            <th className="border border-emerald-200 px-4 py-3 text-left font-bold text-emerald-900">Role in Your Treatment</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredGenes.map((gene, idx) => (
+                            typeof gene === 'string' ? (
+                              <tr key={idx} className="hover:bg-emerald-50">
+                                <td colSpan={2} className="border border-emerald-200 px-4 py-3 text-gray-700">{gene}</td>
+                              </tr>
+                            ) : (
+                              <tr key={idx} className="hover:bg-emerald-50">
+                                <td className="border border-emerald-200 px-4 py-3 align-top">
+                                  {isMeaningfulValue(gene.gene) && (
+                                    <span className="font-bold text-emerald-900">{gene.gene}</span>
+                                  )}
+                                </td>
+                                <td className="border border-emerald-200 px-4 py-3">
+                                  <div className="space-y-2 text-gray-700">
+                                    {isMeaningfulValue(gene.role) && (
+                                      <p>{gene.role}</p>
+                                    )}
+                                    {gene.variants && gene.variants.length > 0 && (
+                                      <div className="mt-2">
+                                        <p className="font-semibold text-sm text-emerald-800">If you have certain variants:</p>
+                                        <ul className="list-disc list-inside ml-2 mt-1 text-sm">
+                                          {gene.variants.map((variant: any, vIdx: number) => (
+                                            <li key={vIdx}>{variant}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    {isMeaningfulValue(gene.interpretation) && (
+                                      <p className="mt-2 text-sm italic">{gene.interpretation}</p>
+                                    )}
                                   </div>
-                                )}
-                                {isMeaningfulValue(gene.interpretation) && (
-                                  <p><span className="font-semibold">Interpretation:</span> {gene.interpretation}</p>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                                </td>
+                              </tr>
+                            )
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                      <p className="text-sm text-blue-900">
+                        <strong>Important:</strong> This is general educational information. If you have specific genetic variants, they may affect how this medication works for you. Discuss genetic testing with your healthcare provider if you have concerns about medication effectiveness.
+                      </p>
                     </div>
                   </div>
                 )}
