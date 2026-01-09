@@ -86,6 +86,9 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   const [isSpeaking, setIsSpeaking] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const [speechSpeed, setSpeechSpeed] = useState(1.0);
+  const [summary, setSummary] = useState<string>('');
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string>('');
 
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
@@ -149,7 +152,16 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   const handleStartSpeech = () => {
     if (!data?.final_answer_markdown) return;
 
-    const textToSpeak = stripMarkdown(data.final_answer_markdown);
+    let textToSpeak: string;
+
+    if (summary) {
+      textToSpeak = summary;
+    } else if (summaryError) {
+      textToSpeak = stripMarkdown(data.final_answer_markdown.substring(0, 2000));
+    } else {
+      textToSpeak = stripMarkdown(data.final_answer_markdown);
+    }
+
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
     const voice = getFemaleVoice();
@@ -192,6 +204,85 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
     }
   };
 
+  const generateSummary = async () => {
+    if (!data?.final_answer_markdown || summaryLoading || summary) return;
+
+    setSummaryLoading(true);
+    setSummaryError('');
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Supabase configuration missing');
+      }
+
+      const isClinician = role === 'Doctor' || role === 'Clinician';
+      const medicationName = patientData?.medication;
+
+      const pgxResults = data.pgx_results?.genes?.map(gene => ({
+        gene: gene.gene,
+        star_alleles: gene.variants,
+        phenotype: undefined,
+        activity_score: undefined
+      })) || [];
+
+      if (data.pgx_results?.phenotypes) {
+        data.pgx_results.phenotypes.forEach(phenotype => {
+          const existingGene = pgxResults.find(g => g.gene === phenotype.gene);
+          if (existingGene) {
+            existingGene.phenotype = phenotype.phenotype;
+          } else {
+            pgxResults.push({
+              gene: phenotype.gene,
+              phenotype: phenotype.phenotype,
+              star_alleles: undefined,
+              activity_score: undefined
+            });
+          }
+        });
+      }
+
+      const requestBody = {
+        markdownText: data.final_answer_markdown,
+        pgxResults: pgxResults.length > 0 ? pgxResults : undefined,
+        patientData: {
+          age: patientData?.age,
+          sex: patientData?.gender,
+          medications: patientData?.otherMeds,
+          allergies: undefined,
+          symptoms: patientData?.symptoms
+        },
+        role: isClinician ? 'clinician' : 'patient',
+        medicationName
+      };
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/summarize-response`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to generate summary: ${errorText}`);
+      }
+
+      const result = await response.json();
+      setSummary(result.summary);
+    } catch (error) {
+      console.error('Error generating summary:', error);
+      setSummaryError('Failed to generate audio summary. Will use full text instead.');
+      setSummary('');
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
   useEffect(() => {
     window.speechSynthesis.getVoices();
     return () => {
@@ -201,6 +292,9 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
 
   useEffect(() => {
     handleStopSpeech();
+    setSummary('');
+    setSummaryError('');
+    generateSummary();
   }, [data]);
 
   const extractSection = (markdown: string | undefined, title: string): string => {
@@ -294,7 +388,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
                           extractSection(markdown, 'Potential Interactions') ||
                           extractSection(markdown, 'Interaction Considerations');
 
-  const summary = extractSection(markdown, 'Summary');
+  const summarySection = extractSection(markdown, 'Summary');
   const references = extractSection(markdown, 'References');
 
   // Extract patient overview from the beginning
@@ -324,7 +418,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
   // Check if we have any structured sections
   const hasStructuredSections = !!(pgxContext || clinicalInterpretation || recommendations ||
                                     dosingConsiderations || riskAssessment || monitoringRequirements ||
-                                    drugInteractions || summary);
+                                    drugInteractions || summarySection);
 
   // Parse all sections dynamically
   const allSections = parseAllSections(markdown);
@@ -378,7 +472,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
     displayedSectionTitles.add('emergency signs');
     displayedSectionTitles.add('when to seek immediate care');
   }
-  if (summary) {
+  if (summarySection) {
     displayedSectionTitles.add('summary');
   }
   if (references) {
@@ -419,9 +513,21 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
 
       {/* Speech Controls */}
       <div className="flex flex-col items-center gap-4 bg-white rounded-lg shadow-md p-4">
+        {summaryLoading && (
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span>Generating audio summary...</span>
+          </div>
+        )}
+        {summaryError && (
+          <div className="text-sm text-amber-600 text-center max-w-md">
+            {summaryError}
+          </div>
+        )}
         <button
           onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
-          className="flex items-center gap-2 px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-all shadow-md"
+          disabled={summaryLoading}
+          className="flex items-center gap-2 px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSpeaking ? (
             <>
@@ -726,7 +832,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
       )}
 
       {/* Summary */}
-      {hasStructuredSections && summary && (
+      {hasStructuredSections && summarySection && (
         <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-xl shadow-lg p-6 border-l-4 border-slate-600">
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 bg-slate-600 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -735,7 +841,7 @@ export default function ClinicalResultsDisplay({ data, onNewQuery, role, patient
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-slate-900 mb-4">Summary</h2>
               <div className="prose prose-slate max-w-none text-gray-700">
-                <ReactMarkdown>{summary}</ReactMarkdown>
+                <ReactMarkdown>{summarySection}</ReactMarkdown>
               </div>
             </div>
           </div>

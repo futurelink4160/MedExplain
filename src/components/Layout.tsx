@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
-import { LogOut, User, BookmarkCheck, Shield, Home, LayoutDashboard, MessageSquare, FileText, Stethoscope, Clock } from 'lucide-react';
+import { LogOut, User, BookmarkCheck, Shield, Home, LayoutDashboard, MessageSquare, FileText, Stethoscope, Clock, Menu, X } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
@@ -12,6 +12,7 @@ export default function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const isActive = (path: string) => {
     if (path === '/home') {
@@ -30,18 +31,29 @@ export default function Layout({ children }: LayoutProps) {
       <header className="sticky top-0 z-50 bg-primary border-b border-primary-dark shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/home" className="flex items-center space-x-3">
-              <img
-                src="/medexplain_logo_updated.png"
-                alt="MedExplain Logo"
-                className="h-10 w-10 object-contain"
-              />
-              <h1 className="text-xl font-bold text-white">
-                MedExplain
-              </h1>
-            </Link>
+            <div className="flex items-center space-x-3">
+              {user && (
+                <button
+                  onClick={() => setShowMobileMenu(!showMobileMenu)}
+                  className="md:hidden text-white p-2 rounded-lg hover:bg-primary-light transition"
+                  aria-label="Toggle mobile menu"
+                >
+                  {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+              )}
+              <Link to="/home" className="flex items-center space-x-3">
+                <img
+                  src="/medexplain_logo_updated.png"
+                  alt="MedExplain Logo"
+                  className="h-10 w-10 object-contain"
+                />
+                <h1 className="text-xl font-bold text-white">
+                  MedExplain
+                </h1>
+              </Link>
+            </div>
 
-{user && (
+            {user && (
               <nav className="hidden md:flex items-center space-x-2">
                 <Link
                   to="/home"
@@ -163,6 +175,116 @@ export default function Layout({ children }: LayoutProps) {
               </div>
             )}
           </div>
+
+          {user && showMobileMenu && (
+            <>
+              <div
+                className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                onClick={() => setShowMobileMenu(false)}
+              />
+              <div className="absolute top-16 left-0 right-0 bg-primary border-b border-primary-dark shadow-xl z-40 md:hidden animate-in slide-in-from-top">
+                <nav className="flex flex-col p-4 space-y-2">
+                  <Link
+                    to="/home"
+                    className={`font-semibold transition-all flex items-center space-x-2 px-4 py-3 rounded-lg ${
+                      isActive('/home')
+                        ? 'bg-secondary text-white shadow-lg'
+                        : 'text-white hover:bg-white/20'
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Home className="w-5 h-5" />
+                    <span>Home</span>
+                  </Link>
+                  <Link
+                    to="/chat"
+                    className={`font-semibold transition-all flex items-center space-x-2 px-4 py-3 rounded-lg ${
+                      isActive('/chat')
+                        ? 'bg-secondary text-white shadow-lg'
+                        : 'text-white hover:bg-white/20'
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    <span>New Inquiry</span>
+                  </Link>
+                  <Link
+                    to="/history"
+                    className={`font-semibold transition-all flex items-center space-x-2 px-4 py-3 rounded-lg ${
+                      isActive('/history')
+                        ? 'bg-secondary text-white shadow-lg'
+                        : 'text-white hover:bg-white/20'
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Clock className="w-5 h-5" />
+                    <span>History</span>
+                  </Link>
+                  <Link
+                    to="/evidence"
+                    className={`font-semibold transition-all flex items-center space-x-2 px-4 py-3 rounded-lg ${
+                      isActive('/evidence')
+                        ? 'bg-secondary text-white shadow-lg'
+                        : 'text-white hover:bg-white/20'
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <FileText className="w-5 h-5" />
+                    <span>Evidence</span>
+                  </Link>
+                  <Link
+                    to="/cases"
+                    className={`font-semibold transition-all flex items-center space-x-2 px-4 py-3 rounded-lg ${
+                      isActive('/cases')
+                        ? 'bg-secondary text-white shadow-lg'
+                        : 'text-white hover:bg-white/20'
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <Stethoscope className="w-5 h-5" />
+                    <span>Ask Pharmacist</span>
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    className={`font-semibold transition-all flex items-center space-x-2 px-4 py-3 rounded-lg ${
+                      isActive('/dashboard')
+                        ? 'bg-secondary text-white shadow-lg'
+                        : 'text-white hover:bg-white/20'
+                    }`}
+                    onClick={() => setShowMobileMenu(false)}
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                    <span>Dashboard</span>
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className={`font-semibold transition-all flex items-center space-x-2 px-4 py-3 rounded-lg ${
+                        isActive('/admin')
+                          ? 'bg-status-warning text-white shadow-lg'
+                          : 'text-white hover:bg-white/20'
+                      }`}
+                      onClick={() => setShowMobileMenu(false)}
+                    >
+                      <Shield className="w-5 h-5" />
+                      <span>Admin</span>
+                    </Link>
+                  )}
+                  <div className="border-t border-white/20 my-2"></div>
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      handleSignOut();
+                    }}
+                    className="flex items-center space-x-2 px-4 py-3 text-white hover:bg-red-600/20 rounded-lg transition font-semibold"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>Logout</span>
+                  </button>
+                </nav>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="bg-secondary py-2 px-4">

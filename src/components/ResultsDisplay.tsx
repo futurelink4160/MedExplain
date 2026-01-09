@@ -98,6 +98,9 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   const [isSpeaking, setIsSpeaking] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const [speechSpeed, setSpeechSpeed] = useState(1.0);
+  const [summary, setSummary] = useState<string>('');
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [summaryError, setSummaryError] = useState<string>('');
 
   const handleDownloadPDF = async () => {
     if (!contentRef.current) return;
@@ -151,7 +154,16 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
   const handleStartSpeech = () => {
     if (!data?.final_answer_markdown) return;
 
-    const textToSpeak = stripMarkdown(data.final_answer_markdown);
+    let textToSpeak: string;
+
+    if (summary) {
+      textToSpeak = summary;
+    } else if (summaryError) {
+      textToSpeak = stripMarkdown(data.final_answer_markdown.substring(0, 2000));
+    } else {
+      textToSpeak = stripMarkdown(data.final_answer_markdown);
+    }
+
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
     const voice = getFemaleVoice();
@@ -194,6 +206,85 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
     }
   };
 
+  const generateSummary = async () => {
+    if (!data?.final_answer_markdown || summaryLoading || summary) return;
+
+    setSummaryLoading(true);
+    setSummaryError('');
+
+    try {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseAnonKey) {
+        throw new Error('Supabase configuration missing');
+      }
+
+      const role = patientData?.role === 'clinician' ? 'clinician' : 'patient';
+      const medicationName = patientData?.medication || extractedPatientData.medication;
+
+      const pgxResults = data.pgx_results?.genes?.map(gene => ({
+        gene: gene.gene,
+        star_alleles: gene.variants,
+        phenotype: undefined,
+        activity_score: undefined
+      })) || [];
+
+      if (data.pgx_results?.phenotypes) {
+        data.pgx_results.phenotypes.forEach(phenotype => {
+          const existingGene = pgxResults.find(g => g.gene === phenotype.gene);
+          if (existingGene) {
+            existingGene.phenotype = phenotype.phenotype;
+          } else {
+            pgxResults.push({
+              gene: phenotype.gene,
+              phenotype: phenotype.phenotype,
+              star_alleles: undefined,
+              activity_score: undefined
+            });
+          }
+        });
+      }
+
+      const requestBody = {
+        markdownText: data.final_answer_markdown,
+        pgxResults: pgxResults.length > 0 ? pgxResults : undefined,
+        patientData: {
+          age: patientData?.age || extractedPatientData.age,
+          sex: patientData?.gender,
+          medications: patientData?.otherMeds || extractedPatientData.otherMeds,
+          allergies: undefined,
+          symptoms: patientData?.symptoms || extractedPatientData.symptoms
+        },
+        role,
+        medicationName
+      };
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/summarize-response`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to generate summary: ${errorText}`);
+      }
+
+      const result = await response.json();
+      setSummary(result.summary);
+    } catch (error) {
+      console.error('Error generating summary:', error);
+      setSummaryError('Failed to generate audio summary. Will use full text instead.');
+      setSummary('');
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
   useEffect(() => {
     window.speechSynthesis.getVoices();
     return () => {
@@ -203,6 +294,9 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
 
   useEffect(() => {
     handleStopSpeech();
+    setSummary('');
+    setSummaryError('');
+    generateSummary();
   }, [data]);
 
   if (!data || !data.final_answer_markdown) {
@@ -311,9 +405,21 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
 
         <div className="flex flex-col items-center gap-4 bg-white rounded-lg shadow-md p-4">
+          {summaryLoading && (
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              <span>Generating audio summary...</span>
+            </div>
+          )}
+          {summaryError && (
+            <div className="text-sm text-amber-600 text-center max-w-md">
+              {summaryError}
+            </div>
+          )}
           <button
             onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
-            className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
+            disabled={summaryLoading}
+            className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSpeaking ? (
               <>
@@ -690,9 +796,21 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
 
         <div className="flex flex-col items-center gap-4 bg-white rounded-lg shadow-md p-4">
+          {summaryLoading && (
+            <div className="flex items-center gap-2 text-sm text-slate-600">
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              <span>Generating audio summary...</span>
+            </div>
+          )}
+          {summaryError && (
+            <div className="text-sm text-amber-600 text-center max-w-md">
+              {summaryError}
+            </div>
+          )}
           <button
             onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
-            className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
+            disabled={summaryLoading}
+            className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSpeaking ? (
               <>
@@ -1005,10 +1123,22 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
         </div>
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-3">
+        {summaryLoading && (
+          <div className="flex items-center gap-2 text-sm text-slate-600">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span>Generating audio summary...</span>
+          </div>
+        )}
+        {summaryError && (
+          <div className="text-sm text-amber-600 text-center max-w-md">
+            {summaryError}
+          </div>
+        )}
         <button
           onClick={isSpeaking ? handleStopSpeech : handleStartSpeech}
-          className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md"
+          disabled={summaryLoading}
+          className="flex items-center gap-2 px-6 py-3 bg-secondary text-white rounded-lg hover:bg-opacity-90 transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSpeaking ? (
             <>
@@ -1022,6 +1152,24 @@ export default function ResultsDisplay({ data, onNewQuery, patientData }: Result
             </>
           )}
         </button>
+        <div className="flex items-center gap-3 w-full max-w-md">
+          <span className="text-sm font-medium text-slate-600 whitespace-nowrap">Speed:</span>
+          <div className="flex gap-2">
+            {[0.75, 1.0, 1.25, 1.5].map((speed) => (
+              <button
+                key={speed}
+                onClick={() => handleSpeedChange(speed)}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
+                  speechSpeed === speed
+                    ? 'bg-secondary text-white'
+                    : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                }`}
+              >
+                {speed}x
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Patient Information - Only show if we have meaningful data and avoid redundancy */}
