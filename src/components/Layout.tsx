@@ -30,24 +30,25 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-background-main flex flex-col">
       <header className="sticky top-0 z-50 bg-primary border-b border-primary-dark shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
+          <div className="flex justify-between items-center h-16 gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               {user && (
                 <button
                   onClick={() => setShowMobileMenu(!showMobileMenu)}
-                  className="md:hidden text-white p-2 rounded-lg hover:bg-primary-light transition"
+                  className="md:hidden text-white p-2 rounded-lg hover:bg-primary-light transition-all active:scale-95 flex-shrink-0"
                   aria-label="Toggle mobile menu"
+                  type="button"
                 >
                   {showMobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                 </button>
               )}
-              <Link to="/home" className="flex items-center space-x-3">
+              <Link to="/home" className="flex items-center gap-2 min-w-0">
                 <img
                   src="/medexplain_logo_updated.png"
                   alt="MedExplain Logo"
-                  className="h-10 w-10 object-contain"
+                  className="h-10 w-10 object-contain flex-shrink-0"
                 />
-                <h1 className="text-xl font-bold text-white">
+                <h1 className="text-lg sm:text-xl font-bold text-white truncate">
                   MedExplain
                 </h1>
               </Link>
@@ -138,13 +139,15 @@ export default function Layout({ children }: LayoutProps) {
             )}
 
             {user && (
-              <div className="relative">
+              <div className="relative flex-shrink-0">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-primary-light transition text-white"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-primary-light transition-all text-white active:scale-95"
+                  type="button"
+                  aria-label="User menu"
                 >
                   <User className="w-5 h-5" />
-                  <span className="text-sm hidden sm:block">{user.email}</span>
+                  <span className="text-sm hidden sm:block truncate max-w-[150px]">{user.email}</span>
                 </button>
 
                 {showDropdown && (
@@ -154,14 +157,6 @@ export default function Layout({ children }: LayoutProps) {
                       onClick={() => setShowDropdown(false)}
                     />
                     <div className="absolute right-0 mt-2 w-48 bg-background-card rounded-lg shadow-lg border border-gray-200 py-1 z-20">
-                      <Link
-                        to="/cases"
-                        className="flex items-center space-x-2 px-4 py-2 text-sm text-text-primary hover:bg-gray-100"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <Stethoscope className="w-4 h-4" />
-                        <span>Ask Pharmacist</span>
-                      </Link>
                       <button
                         onClick={handleSignOut}
                         className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-status-alert hover:bg-red-50"
