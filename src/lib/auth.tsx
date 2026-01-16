@@ -7,7 +7,7 @@ interface AuthContextType {
   isAdmin: boolean;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -58,8 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       (async () => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setUser(session?.user ?? null);
+          setLoading(false);
+          return;
+        }
+
         setUser(session?.user ?? null);
         if (session?.user) {
           await checkAdmin(session.user.id);
@@ -93,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function signUp(email: string, password: string) {
+  async function signUp(email: string, password: string, firstName: string, lastName: string) {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -106,6 +112,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (data.user) {
         console.log('User created successfully:', data.user.id);
+
+        try {
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              user_id: data.user.id,
+              first_name: firstName,
+              last_name: lastName,
+              display_name: `${firstName} ${lastName}`.trim()
+            });
+
+          if (profileError) {
+            console.error('Error creating user profile:', profileError);
+          }
+        } catch (profileError) {
+          console.error('Error creating user profile:', profileError);
+        }
       }
     } catch (error: any) {
       throw new Error(getReadableErrorMessage(error));
