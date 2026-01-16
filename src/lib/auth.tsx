@@ -106,10 +106,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         password,
         options: {
           emailRedirectTo: window.location.origin,
-          data: {
-            first_name: firstName,
-            last_name: lastName
-          }
         }
       });
       if (error) throw error;
@@ -117,20 +113,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.user) {
         console.log('User created successfully:', data.user.id);
 
-        // Update the user profile with names (in case trigger didn't capture metadata)
+        // Save metadata using updateUser (works with auto-confirm enabled)
+        const { error: metadataError } = await supabase.auth.updateUser({
+          data: {
+            first_name: firstName,
+            last_name: lastName
+          }
+        });
+
+        if (metadataError) {
+          console.error('Error saving user metadata:', metadataError);
+        }
+
+        // Upsert the user profile with names (handles both creation and update)
         const displayName = `${firstName} ${lastName}`.trim();
         const { error: profileError } = await supabase
           .from('user_profiles')
-          .update({
+          .upsert({
+            user_id: data.user.id,
             first_name: firstName,
             last_name: lastName,
             display_name: displayName
-          })
-          .eq('user_id', data.user.id);
+          }, {
+            onConflict: 'user_id'
+          });
 
         if (profileError) {
-          console.error('Error updating profile:', profileError);
-          // Don't throw - profile was created by trigger, just missing names
+          console.error('Error upserting profile:', profileError);
+          // Don't throw - profile operation is not critical for signup success
         }
       }
     } catch (error: any) {
