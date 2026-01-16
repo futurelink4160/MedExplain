@@ -9,6 +9,36 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
+}
+
+function getReadableErrorMessage(error: any): string {
+  const message = error.message?.toLowerCase() || '';
+
+  if (message.includes('invalid login credentials') || message.includes('invalid password')) {
+    return 'Invalid email or password. Please try again.';
+  }
+  if (message.includes('email not confirmed')) {
+    return 'Please verify your email address before logging in.';
+  }
+  if (message.includes('user not found')) {
+    return 'No account found with this email address.';
+  }
+  if (message.includes('user already registered')) {
+    return 'An account with this email already exists. Please log in instead.';
+  }
+  if (message.includes('password should be at least')) {
+    return 'Password must be at least 6 characters long.';
+  }
+  if (message.includes('rate limit')) {
+    return 'Too many attempts. Please wait a moment and try again.';
+  }
+  if (message.includes('invalid email')) {
+    return 'Please enter a valid email address.';
+  }
+
+  return error.message || 'An unexpected error occurred. Please try again.';
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -55,28 +85,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signIn(email: string, password: string) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    } catch (error: any) {
+      throw new Error(getReadableErrorMessage(error));
+    }
   }
 
   async function signUp(email: string, password: string) {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin
+        }
+      });
+      if (error) throw error;
+
+      if (data.user) {
+        console.log('User created successfully:', data.user.id);
       }
-    });
-    if (error) throw error;
+    } catch (error: any) {
+      throw new Error(getReadableErrorMessage(error));
+    }
   }
 
   async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error: any) {
+      throw new Error(getReadableErrorMessage(error));
+    }
+  }
+
+  async function resetPassword(email: string) {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      throw new Error(getReadableErrorMessage(error));
+    }
+  }
+
+  async function updatePassword(password: string) {
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+    } catch (error: any) {
+      throw new Error(getReadableErrorMessage(error));
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, isAdmin, loading, signIn, signUp, signOut, resetPassword, updatePassword }}>
       {children}
     </AuthContext.Provider>
   );
