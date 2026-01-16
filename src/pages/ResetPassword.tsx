@@ -16,10 +16,24 @@ export default function ResetPassword() {
 
   useEffect(() => {
     async function checkSession() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setValidSession(true);
-      } else {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('Session error:', error);
+          setValidSession(false);
+          return;
+        }
+
+        if (session) {
+          console.log('Valid recovery session found');
+          setValidSession(true);
+        } else {
+          console.log('No session found - redirect URL may not be whitelisted in Supabase');
+          setValidSession(false);
+        }
+      } catch (err) {
+        console.error('Error checking session:', err);
         setValidSession(false);
       }
     }
@@ -94,9 +108,21 @@ export default function ResetPassword() {
                 <AlertCircle className="w-8 h-8 text-red-600" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Invalid or Expired Link</h2>
-              <p className="text-gray-600 mb-6">
-                This password reset link is invalid or has expired. Please request a new one.
+              <p className="text-gray-600 mb-4">
+                This password reset link is invalid, has expired, or the redirect URL is not configured properly.
               </p>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-left">
+                <p className="text-sm text-amber-800 font-medium mb-2">Configuration Required:</p>
+                <p className="text-xs text-amber-700">
+                  If you're the site administrator, you may need to add this URL to your Supabase redirect URLs:
+                </p>
+                <code className="text-xs bg-amber-100 text-amber-900 px-2 py-1 rounded mt-2 block">
+                  {window.location.origin}/reset-password
+                </code>
+                <p className="text-xs text-amber-700 mt-2">
+                  See PASSWORD_RESET_SETUP.md for detailed instructions.
+                </p>
+              </div>
               <Link
                 to="/forgot-password"
                 className="inline-block w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg hover:from-blue-700 hover:to-teal-700 transition-all font-medium"
