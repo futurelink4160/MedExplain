@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export default function ResetPassword() {
@@ -12,6 +12,20 @@ export default function ResetPassword() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [validSession, setValidSession] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    async function checkSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setValidSession(true);
+      } else {
+        setValidSession(false);
+      }
+    }
+
+    checkSession();
+  }, []);
 
   function validatePassword(): string | null {
     if (password.length < 6) {
@@ -42,6 +56,8 @@ export default function ResetPassword() {
 
       if (error) throw error;
 
+      await supabase.auth.signOut();
+
       setSuccess(true);
       setTimeout(() => {
         navigate('/login');
@@ -51,6 +67,47 @@ export default function ResetPassword() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (validSession === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Verifying reset link...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (validSession === false) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-teal-50 flex items-center justify-center px-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-red-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Invalid or Expired Link</h2>
+              <p className="text-gray-600 mb-6">
+                This password reset link is invalid or has expired. Please request a new one.
+              </p>
+              <Link
+                to="/forgot-password"
+                className="inline-block w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-teal-600 text-white rounded-lg hover:from-blue-700 hover:to-teal-700 transition-all font-medium"
+              >
+                Request New Reset Link
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (success) {
