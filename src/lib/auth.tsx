@@ -116,6 +116,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (data.user) {
         console.log('User created successfully:', data.user.id);
+
+        // Update the user profile with names (in case trigger didn't capture metadata)
+        const displayName = `${firstName} ${lastName}`.trim();
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .update({
+            first_name: firstName,
+            last_name: lastName,
+            display_name: displayName
+          })
+          .eq('user_id', data.user.id);
+
+        if (profileError) {
+          console.error('Error updating profile:', profileError);
+          // Don't throw - profile was created by trigger, just missing names
+        }
       }
     } catch (error: any) {
       throw new Error(getReadableErrorMessage(error));
