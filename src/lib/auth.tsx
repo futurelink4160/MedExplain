@@ -105,30 +105,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin
+          emailRedirectTo: window.location.origin,
+          data: {
+            first_name: firstName,
+            last_name: lastName
+          }
         }
       });
       if (error) throw error;
 
       if (data.user) {
         console.log('User created successfully:', data.user.id);
-
-        try {
-          const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert({
-              user_id: data.user.id,
-              first_name: firstName,
-              last_name: lastName,
-              display_name: `${firstName} ${lastName}`.trim()
-            });
-
-          if (profileError) {
-            console.error('Error creating user profile:', profileError);
-          }
-        } catch (profileError) {
-          console.error('Error creating user profile:', profileError);
-        }
       }
     } catch (error: any) {
       throw new Error(getReadableErrorMessage(error));
