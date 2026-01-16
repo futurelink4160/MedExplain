@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth';
+import { isSupabaseConfigured } from './lib/supabase';
 import ProtectedRoute from './components/ProtectedRoute';
+import ConfigurationError from './components/ConfigurationError';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -22,6 +24,10 @@ function HomeRedirect() {
 }
 
 function App() {
+  if (!isSupabaseConfigured) {
+    return <ConfigurationError />;
+  }
+
   return (
     <BrowserRouter>
       <AuthProvider>
